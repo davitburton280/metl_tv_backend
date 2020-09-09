@@ -12,7 +12,7 @@ const rules = [
         let pass = req.password;
 
         // Checking email existence & passwords match
-        let found = await Users.findOne({where: {email: email}});
+        let found = await Users.findOne({where: {email}});
         if (!found) throw new Error('A user with such email doesn\'t exist');
         if (found.password) {
 

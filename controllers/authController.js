@@ -2,6 +2,7 @@ const sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const Users = db.users;
+const bcrypt = require('bcryptjs');
 
 const showIfErrors = require('../helpers/showIfErrors');
 
@@ -55,6 +56,25 @@ exports.logout = (req, res) => {
     res.status(200).json({msg: 'OK'})
 };
 
-exports.register = (req, res) => {
+exports.register = async(req, res) => {
+// Checking validation result from express-validator
+    if (!showIfErrors(req, res)) {
+        // Getting request data and setting user fields to return
+        let data = req.body;
+        let email = data.email.trim();
 
+        // Saving the original password of user and hashing it to save in db
+        let originalPass = data.password;
+        data.password = bcrypt.hashSync(originalPass, 10);
+
+        await Users.create(data);
+
+        // Saving the original password again to request for authenticating the user at once
+        data.password = originalPass;
+        req.body = data;
+
+        // res.json("OK");
+
+        this.login(req, res);
+    }
 };

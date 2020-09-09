@@ -1,10 +1,11 @@
 // Express Validator
 const {body} = require('express-validator');
-const Users = require('../models/users');
+const db = require('../models');
+const Users = db.users;
 
 const rules = [
-    body('first_name').not().isEmpty().withMessage('First name is required'),
-    body('last_name').not().isEmpty().withMessage('Last name is required'),
+    body('full_name').not().isEmpty().withMessage('Full name is required'),
+    // body('last_name').not().isEmpty().withMessage('Last name is required'),
     body('email').not().isEmpty().withMessage('E-mail is required').isEmail().withMessage('E-mail is invalid'),
     body('password', 'Password is required').not().isEmpty(),
     // body('gender', 'Gender is required').not().isEmpty(),
