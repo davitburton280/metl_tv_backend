@@ -14,12 +14,15 @@ module.exports = {
       status_id: {
         type: Sequelize.INTEGER
       },
-      first_name: {
+      full_name: {
         type: Sequelize.STRING
       },
-      last_name: {
-        type: Sequelize.STRING
-      },
+      // first_name: {
+      //   type: Sequelize.STRING
+      // },
+      // last_name: {
+      //   type: Sequelize.STRING
+      // },
       birthday: {
         type: Sequelize.DATEONLY
       },
