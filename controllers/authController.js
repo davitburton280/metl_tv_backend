@@ -15,7 +15,7 @@ exports.login = async (req, res) => {
         let data = req.body;
         let email = data.email.trim();
 
-        let attributes = [`first_name`, `last_name`, 'email', 'profile_img', 'password', 'id', 'status_id'];
+        let attributes = [`full_name`, 'email', 'profile_img', 'password', 'id', 'status_id'];
 
         // Active status selecting
         let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
@@ -38,11 +38,10 @@ exports.login = async (req, res) => {
             else {
                 // Cloning users object without password and saving user full name
                 let {password, ...details} = user.toJSON();
-                let full_name = user[`first_name`] + ' ' + user[`last_name`];
 
 
                 res.status(200).json({
-                    token: jwt.sign(details, 'secretkey', {expiresIn: '8h'}), user_id: user.id, full_name: full_name
+                    token: jwt.sign(details, 'secretkey', {expiresIn: '8h'}), user_id: user.id, full_name: user[`full_name`]
                 })
             }
 
