@@ -78,9 +78,9 @@ exports.register = async (req, res) => {
 
     // setup email data with unicode symbols
     let mailOptions = {
-        from: '"Secret South " <foo@example.com>', // sender address
+        from: '"Trading " <foo@example.com>', // sender address
         to: 'sofiabruno3003@gmail.com', // list of receivers
-        subject: 'Password Reset', // Subject line
+        subject: 'Confirmation email', // Subject line
         text: 'You recently requested a password reset', // plain text body
         html: `${randomCode}` // html body
     };
