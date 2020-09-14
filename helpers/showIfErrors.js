@@ -23,9 +23,10 @@ module.exports = (req, res, err = '') => {
         // Handling database connection error
         if (!errors.isEmpty()) {
             let singleError = errors.array()[0];
+            console.log(singleError)
             if (singleError.hasOwnProperty('msg') && singleError.msg.includes('ECONNREFUSED 127.0.0.1:3306')) {
-                singleError = 'Please check db connection';
-                return res.status(422).json(singleError);
+                singleError = 'Please check database connection';
+                return res.status(422).json({db_error:singleError});
             } else return res.status(422).json(singleError);
             // return true;
         }
