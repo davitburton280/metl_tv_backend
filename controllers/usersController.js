@@ -13,7 +13,7 @@ exports.getOpentokParams = async (req, res) => {
         generateToken(roomName, res);
     } else {
 
-        OT.createSession((error, session) => {
+        OT.createSession({mediaMode: "routed"}, (error, session) => {
             if (error) {
                 console.log("Error creating session:", error)
             } else {
