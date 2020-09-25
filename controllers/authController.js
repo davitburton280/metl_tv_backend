@@ -39,8 +39,9 @@ exports.login = async (req, res) => {
             else {
                 // Cloning users object without password and saving user full name
                 let {password, ...details} = user.toJSON();
-
-
+                console.log("'" + user.full_name + "' has logged in");
+                req.session.full_name = user.full_name;
+                console.log(req.session)
                 res.status(200).json({
                     token: jwt.sign(details, 'secretkey', {expiresIn: '8h'}),
                     user_id: user.id,
@@ -55,6 +56,9 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     req.logout();
+    console.log(req.session)
+    console.log("'" + req.session.loggedUser + "' has logged out");
+    req.session.destroy();
     res.status(200).json({msg: 'OK'})
 };
 

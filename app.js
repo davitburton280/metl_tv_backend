@@ -1,10 +1,35 @@
 const express = require('express');
-const app = express();
+global.app = express();
 
 const port = process.env.PORT || 3001;
 const server = require('http').createServer(app);
 const cors = require('cors');
 const path = require('path');
+
+const ONE_DAY = 1000 * 60 * 60 * 24;
+const IN_PRODUCTION = process.env.NODE_ENV === 'production';
+
+// Listen
+const session = require('express-session');
+const https = require('https');
+
+
+// Server configuration
+app.use(session({
+    name: 'sid',
+    saveUninitialized: true,
+    resave: false,
+    secret: 'MY_SECRET',
+    cookie: {
+        maxAge: ONE_DAY
+    },
+    secure: IN_PRODUCTION
+}));
+// var options = {
+//     key: fs.readFileSync('openvidukey.pem'),
+//     cert: fs.readFileSync('openviducert.pem')
+// };
+// https.createServer(options, app).listen(5000);
 
 
 // Cors
@@ -37,12 +62,9 @@ app.use('/auth', require('./routes/auth'));
 app.use('/users', require('./routes/users'));
 
 let dist = path.join(__dirname, 'dist/');
-console.log(dist)
+console.log(dist);
 
 app.use(express.static(dist));
-
-
-
 
 
 // Separating Angular routes

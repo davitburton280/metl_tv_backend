@@ -1,39 +1,111 @@
-// Opentok
-const opentok = require('opentok');
-const OT = new opentok(process.env.OPENTOK_API_KEY, process.env.OPENTOK_API_SECRET);
+/* OPENVIDU CONFIGURATION */
 
-let sessions = {};
+const OpenVidu = require('openvidu-node-client').OpenVidu;
+const OpenViduRole = require('openvidu-node-client').OpenViduRole;
+
+// // Check launch arguments: must receive openvidu-server URL and the secret
+// if (process.argv.length !== 4) {
+//     console.log("Usage: node " + __filename + " OPENVIDU_URL OPENVIDU_SECRET");
+//     process.exit(-1);
+// }
+// For demo purposes we ignore self-signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
-exports.getOpentokParams = async (req, res) => {
-    const roomName = req.params.room;
-    console.log(roomName)
+// Environment variable: URL where our OpenVidu server is listening
+var OPENVIDU_URL = 'https://localhost:4443';
+// Environment variable: secret shared with our OpenVidu server
+var OPENVIDU_SECRET = 'MY_SECRET';
 
-    if (sessions[roomName]) {
-        generateToken(roomName, res);
-    } else {
+console.log(OPENVIDU_URL, OPENVIDU_SECRET);
 
-        OT.createSession({mediaMode: "routed"}, (error, session) => {
-            if (error) {
-                console.log("Error creating session:", error)
-            } else {
-                sessions[roomName] = session.sessionId;
-                generateToken(roomName, res);
-            }
-        })
-    }
-};
+// Entrypoint to OpenVidu Node Client SDK
+var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 
-generateToken = (roomName, res) => {
-    const tokenOptions = {
-        role: "publisher",
-        data: `roomname=${roomName}`
+// Collection to pair session names with OpenVidu Session objects
+var mapSessions = {};
+// Collection to pair session names with tokens
+var mapSessionNamesTokens = {};
+
+/* CONFIGURATION */
+
+const db = require('../models');
+const Users = db.users;
+
+const url = require('url');
+
+
+exports.getSession = async (req, res) => {
+    const {email, sessionName} = req.query;
+    console.log(req.body)
+    // The video-call to connect
+    let user = await Users.findOne({
+        where: {email: email}
+    }, res);
+
+    var tokenOptions = {
+        data: JSON.stringify({serverData: user.full_name}),
+        role: 'PUBLISHER'
     };
-    let token = OT.generateToken(sessions[roomName], tokenOptions);
-    res.status(200);
-    res.send({
-        sessionId: sessions[roomName],
-        token,
-        apiKey: process.env.OPENTOK_API_KEY
-    })
+
+    console.log(tokenOptions)
+    if (mapSessions[sessionName]) {
+        // Session already exists
+        console.log('Existing session ' + sessionName);
+
+        // Get the existing Session from the collection
+        var mySession = mapSessions[sessionName];
+
+        // Generate a new token asynchronously with the recently created tokenOptions
+        mySession.generateToken(tokenOptions)
+            .then(token => {
+
+                // Store the new token in the collection of tokens
+                mapSessionNamesTokens[sessionName].push(token);
+
+                const urlParts = url.parse(token, true);
+
+                res.status(200).send({...urlParts.query, ...{href: urlParts.href}});
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    } else {
+        // New session
+        console.log('New session ' + sessionName);
+        console.log('OK!!!!')
+        // Create a new OpenVidu Session asynchronously
+        OV.createSession()
+            .then(session => {
+
+                // Store the new Session in the collection of Sessions
+                mapSessions[sessionName] = session;
+                // Store a new empty array in the collection of tokens
+                mapSessionNamesTokens[sessionName] = [];
+
+
+                // Generate a new token asynchronously with the recently created tokenOptions
+                session.generateToken(tokenOptions)
+                    .then(token => {
+                        // Store the new token in the collection of tokens
+                        mapSessionNamesTokens[sessionName].push(token);
+
+
+                        const urlParts = url.parse(token, true);
+
+                        res.status(200).send({...urlParts.query, ...{href: urlParts.href}});
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+
 };
+
+function isLogged(session) {
+    return (session.loggedUser != null);
+}
