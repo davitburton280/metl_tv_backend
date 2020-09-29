@@ -73,6 +73,8 @@ exports.getSession = async (req, res) => {
                 res.status(500).json({msg: error.toString()})
             });
     } else {
+
+        
         // New session
         console.log('New session ' + sessionName);
 
