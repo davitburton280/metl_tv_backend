@@ -2,6 +2,20 @@
 @import "variables";
 @import '~ngx-toastr/toastr';
 
+// Video JS
+@import '~video.js/dist/video-js.css';
+@import '~videojs-record/dist/css/videojs.record.min.css';
+// City
+@import '~@videojs/themes/dist/city/index.css';
+// Fantasy
+@import '~@videojs/themes/dist/fantasy/index.css';
+// Forest
+@import '~@videojs/themes/dist/forest/index.css';
+// Sea
+@import '~@videojs/themes/dist/sea/index.css';
+
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
 html, body, p, h1, h2, h3, h4, ul {
   margin: 0;
   padding: 0;
@@ -30,6 +44,27 @@ button:active, button:focus {
 li {
   padding: 0;
   list-style-type: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Bootstrap Datepicker Styles */
+.bs-datepicker-head,
+.bs-datepicker-head, .bs-datepicker button:active,
+.bs-datepicker-body table td span.selected,
+.bs-datepicker-body table td.selected span,
+.bs-datepicker-body table td span[class*="select-"]:after,
+.bs-datepicker-body table td[class*="select-"] span:after,
+.bs-datepicker-body table td.active-week span:hover
+{
+  background-color: #18B587 !important;
+}
+
+.bs-datepicker-body table td.week span
+{
+  color: #18B587 !important;
 }
 
 .home-header {
@@ -111,7 +146,7 @@ li {
 }
 
 .home-black-block {
-  width: 585px;
+  width: 625px;
   height: 36px;
   background: #393939;
   padding: 11px 12px;
@@ -671,6 +706,57 @@ li {
   margin-left: 15px;
 }
 
+.sub-block {
+  display: flex;
+  justify-content: space-between;
+}
+
+.user-profile-block .watchlist-input {
+  background: #00000000;
+}
+
+.user-profile-block {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pWatchlist .nav-tabs .nav-item {
+  width: 156px;
+}
+
+.pWatchlist .nav-link {
+  width: 156px;
+}
+
+.profile-list .watchlist-search {
+  width: 290px;
+  background: #00000029 0% 0% no-repeat padding-box;
+}
+
+.sub-bell {
+  color: #F53C6F;
+  margin-right: 16px;
+}
+
+.subscribe-btn {
+  width: 119px;
+  height: 36px;
+  background: #18B587;
+  font-family: "Muli-Light";
+  font-size: 16px;
+  color: white !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.profile-block img {
+  width: 100%;
+  margin-bottom: 28px;
+}
+
 .smile-block {
   display: flex;
   justify-content: space-between;
@@ -746,10 +832,109 @@ li {
   float: left;
 }
 
-.error{
+.error {
   color: $red;
 }
 
+.down-white {
+  color: white;
+  font-size: 12px;
+  font-family: "Muli-Bold";
+}
+
+.chat-by-bits {
+  width: 68px;
+  height: 19px;
+  background: #F53C6F 0% 0% no-repeat padding-box;
+  font-size: 12px;
+  font-family: "Muli-SemiBold";
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white !important;
+}
+.chat-by-bits {
+  color: white !important;
+}
+.modal-dialog {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-top: 0;
+}
+
+.OT_subscriber {
+  //width: 100% !important;
+  //height: 570px !important;
+  min-height: 100% !important;
+  min-width: 100% !important;
+}
+
+
+#session-container {
+  position: relative;
+  height: 100vh;
+
+  .screen-share {
+    position: absolute;
+    bottom: 35px;
+    right: 30px;
+    z-index: 20;
+    padding: 5px;
+    color: white;
+  }
+
+  #startScreenShare {
+    background: #18B587;
+  }
+
+  #stopScreenShare {
+
+  }
+}
+
+#screen {
+  //height: 370px;
+}
+
+.publisher {
+  position: absolute;
+  bottom: 0;
+}
+
+.subscriber,
+.screen.pub-active,
+.screen.sub-active {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+#session-container.sub-active .subscriber,
+#session-container.pub-active .subscriber {
+  position: absolute;
+  width: 25vmin;
+  height: 25vmin;
+  min-width: 8em;
+  min-height: 8em;
+  align-self: flex-end;
+  right: 0;
+  bottom: 0;
+}
+
+.publisher {
+  position: absolute;
+  width: 25vmin;
+  height: 25vmin;
+  min-width: 8em;
+  min-height: 8em;
+  align-self: flex-end;
+}
+
+.screen-share {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
 
 @media (max-width: 1700px) {
   .home-header {
@@ -766,7 +951,21 @@ li {
   }
 }
 
+@media (max-width: 1600px) {
+  .user-profile-block {
+    flex-direction: column-reverse;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 1400px) {
+  .user-profile-block .watchlist-search {
+    margin: 0 auto 20px;
+  }
+  .user-profile-block .nav-tabs {
+    display: flex;
+    justify-content: space-around;
+  }
   .home-header {
     padding: 20px 50px;
     flex-direction: column;
@@ -793,7 +992,7 @@ li {
 
 @media (max-width: 1200px) {
   .home-black-block {
-    width: 470px;
+    width: 485px;
   }
   .black-text {
     font-size: 8px;
@@ -881,9 +1080,6 @@ li {
     justify-content: space-around;
     height: auto;
   }
-  .home-black-item {
-    margin-bottom: 10px;
-  }
   .header-left {
     width: 100%;
     justify-content: space-between;
@@ -894,6 +1090,10 @@ li {
 }
 
 @media (max-width: 767px) {
+  .home-black-item {
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
   .home-search {
     width: 100%;
   }
