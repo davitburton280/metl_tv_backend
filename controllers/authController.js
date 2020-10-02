@@ -8,7 +8,6 @@ const nodemailer = require('nodemailer')
 
 const showIfErrors = require('../helpers/showIfErrors');
 
-
 exports.login = async (req, res) => {
 
     // Checking validation result from express-validator
@@ -16,11 +15,10 @@ exports.login = async (req, res) => {
         // Getting request data and setting user fields to return
         let {email} = req.body;
 
-        let attributes = [`full_name`, 'email', 'profile_img', 'password', 'id', 'status_id'];
+        let attributes = [`full_name`, 'email','username', 'profile_img', 'password', 'id', 'status_id'];
 
         // Active status selecting
         let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
-
 
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
