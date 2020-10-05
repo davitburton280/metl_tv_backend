@@ -35,7 +35,6 @@ const Users = db.users;
 
 const url = require('url');
 
-
 exports.getSession = async (req, res) => {
     const {email, sessionName} = req.query;
     console.log('OK')
@@ -67,7 +66,6 @@ exports.getSession = async (req, res) => {
 
                 const urlParts = url.parse(token, true);
                 res.status(200).json(token);
-
                 // res.status(200).send({...urlParts.query, ...{href: urlParts.href}});
             })
             .catch(error => {
