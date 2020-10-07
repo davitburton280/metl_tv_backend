@@ -28,6 +28,8 @@ input, button {
   padding: 0;
 }
 
+
+
 button:hover {
   outline: none;
   cursor: pointer;
@@ -35,6 +37,7 @@ button:hover {
 
 a, a:hover {
   text-decoration: none;
+  cursor: pointer;
 }
 
 button:active, button:focus {
@@ -65,6 +68,31 @@ li {
 .bs-datepicker-body table td.week span
 {
   color: #18B587 !important;
+}
+
+.left-menu{
+  margin-bottom: 40px;
+}
+
+.body-content-left{
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #fff;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #ECECEC;
+        border-radius: 4px
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgb(174, 174, 174);
+    }
+
+    .left-list{
+        max-height: 570px;
+        overflow-x: auto;
+    }
 }
 
 .home-header {
@@ -123,8 +151,12 @@ li {
   width: 300px;
   height: 36px;
   background: #EFEFEF;
-  padding-left: 15px;
   margin-right: 24px;
+
+  input{
+    width: 100%;
+    padding-left: 15px;
+  }
 }
 
 .home-search-input {
@@ -306,6 +338,8 @@ li {
 .main-item-block {
   display: flex;
   margin-top: 12px;
+
+
 }
 
 .main-item-block img {
@@ -380,6 +414,7 @@ li {
   align-items: center;
   transition: 0.3s ease-in-out;
   margin-bottom: 5px;
+  border-bottom: 1px solid transparent;
 }
 
 .left-menu-main:hover {
@@ -418,7 +453,7 @@ li {
 }
 
 .left-list {
-  margin-top: 40px;
+  // margin-top: 40px;
 }
 
 .subscriptions-text {
@@ -619,11 +654,13 @@ li {
 }
 
 .chat-content {
-  margin-bottom: 40px;
+  //margin-bottom: 40px;
   box-shadow: 0 0 6px #0000001A;
 }
 
 .chat-information {
+  height: 365px;
+  width: 316px;
   padding: 14px 12px 30px 12px;
 }
 
@@ -947,7 +984,7 @@ li {
     width: 250px;
   }
   .header-left-logo {
-    margin-bottom: 20px;
+    //margin-bottom: 20px;
   }
 }
 
