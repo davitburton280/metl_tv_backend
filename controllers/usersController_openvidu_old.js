@@ -92,6 +92,9 @@ exports.getSession = async (req, res) => {
                 mapSessionNamesTokens[sessionName] = [];
 
                 console.log(tokenOptions)
+
+
+
                 // Generate a new token asynchronously with the recently created tokenOptions
                 session.generateToken(tokenOptions)
                     .then(token => {
@@ -114,9 +117,11 @@ exports.getSession = async (req, res) => {
             })
             .catch(error => {
                 console.log('session creation error')
-                res.status(500).json({msg: error.toString()})
+                console.log(error)
+                res.status(500).json({msg: error})
             });
     }
+
 
 };
 

@@ -3,12 +3,13 @@ const {body} = require('express-validator');
 const db = require('../models');
 const Users = db.users;
 
+
 const rules = [
     body('full_name').not().isEmpty().withMessage('Full name is required'),
     // body('last_name').not().isEmpty().withMessage('Last name is required'),
     body('email').not().isEmpty().withMessage('E-mail is required').isEmail().withMessage('E-mail is invalid'),
     body('password', 'Password is required').not().isEmpty(),
-    // body('gender', 'Gender is required').not().isEmpty(),
+    body('birthday', 'Birth day is required').not().isEmpty(),
     // body('user_type', 'User type is required').not().isEmpty(),
     // body('field_type')
     //     .custom(async (type, {req}) => {
