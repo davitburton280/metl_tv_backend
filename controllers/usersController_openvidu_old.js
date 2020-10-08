@@ -19,7 +19,6 @@ var OPENVIDU_SECRET = 'MY_SECRET';
 
 console.log(OPENVIDU_URL, OPENVIDU_SECRET);
 
-
 // Entrypoint to OpenVidu Node Client SDK
 var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 
@@ -46,8 +45,9 @@ exports.getSession = async (req, res) => {
     // The video-call to connect
     const tokenOptions = {
         data: JSON.stringify({serverData: {username: user.username}}),
-        role: 'PUBLISHER'
+
     };
+
 
     // console.log(tokenOptions)
     if (mapSessions[sessionName]) {
@@ -56,6 +56,8 @@ exports.getSession = async (req, res) => {
 
         // Get the existing Session from the collection
         var mySession = mapSessions[sessionName];
+
+        tokenOptions.role = 'SUBSCRIBER';
 
         // Generate a new token asynchronously with the recently created tokenOptions
         mySession.generateToken(tokenOptions)
@@ -75,7 +77,6 @@ exports.getSession = async (req, res) => {
             });
     } else {
 
-
         // New session
         console.log('New session ' + sessionName);
 
@@ -91,8 +92,9 @@ exports.getSession = async (req, res) => {
                 // Store a new empty array in the collection of tokens
                 mapSessionNamesTokens[sessionName] = [];
 
-                console.log(tokenOptions)
+                tokenOptions.role = 'PUBLISHER';
 
+                console.log(tokenOptions)
 
 
                 // Generate a new token asynchronously with the recently created tokenOptions
@@ -125,6 +127,3 @@ exports.getSession = async (req, res) => {
 
 };
 
-function isLogged(session) {
-    return (session.loggedUser != null);
-}
