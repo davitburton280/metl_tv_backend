@@ -14,10 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "freelanc_tradingusr",
-    "password": "9WpPernlgOFw",
-    "database": "freelanc_trading",
-    "host": "128.199.247.46",
+    "username": "root",
+    "password": "s94YpeJ?!ytgVwtv",
+    "database": "metltv",
+    "host": "142.93.250.43",
     "dialect": "mysql"
   }
 }
