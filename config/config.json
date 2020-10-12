@@ -14,10 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": "s94YpeJ?!ytgVwtv",
+    "username": "test_user",
+    "password": "gQyBJ?4Q4^=$XbvK",
     "database": "metltv",
-    "host": "127.0.0.1",
+    "host": "195.206.183.132",
     "dialect": "mysql"
   }
 }
