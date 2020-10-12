@@ -17,7 +17,6 @@ const https = require('https');
 require('./helpers/multer');
 
 
-
 // Server configuration
 app.use(session({
     name: 'sid',
@@ -77,6 +76,9 @@ require('./config/facebook-passport-strategy')(passport);
 app.use(passport.initialize({}));
 
 // Routes
+app.use('/', (req, res) => {
+   res.json('OK!!!!!')
+});
 app.use('/auth', require('./routes/auth'));
 app.use('/users', require('./routes/users'));
 app.use('/video', require('./routes/video'));
