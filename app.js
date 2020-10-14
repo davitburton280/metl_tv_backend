@@ -92,8 +92,8 @@ app.get('*', (req, res, next) => {
     console.log(/dashboard|sessions|openvidu|recordings|api/.test(req.url))
     if (/dashboard|sessions|openvidu|recordings|api/.test(req.url)) {
         // console.log('aaaa')
-        // next();
-        res.json('Openvidu route')
+        next();
+        // res.json('Openvidu route')
     } else if (!req.url.includes('phpmyadmin')) {
         res.sendFile(dist + 'index.html');
     } else {
