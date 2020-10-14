@@ -88,8 +88,9 @@ app.use(express.static(dist));
 
 // Separating Angular routes
 app.get('*', (req, res, next) => {
-    console.log(req.url)
-    if (['dashboard', 'sessions', 'openvidu', 'recordings', 'api'].indexOf(req.url) !== -1) {
+
+    console.log(/dashboard|sessions|openvidu|recordings|api/.test(req.url))
+    if (/dashboard|sessions|openvidu|recordings|api/.test(req.url)) {
         console.log('aaaa')
         next();
     } else if (!req.url.includes('phpmyadmin')) {
