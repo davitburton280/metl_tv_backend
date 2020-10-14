@@ -88,9 +88,16 @@ app.use(express.static(dist));
 
 // Separating Angular routes
 app.get('*', (req, res, next) => {
-    if (!req.url.includes('phpmyadmin')) {
+    console.log(req.url)
+    if(req.url.includes('dashboard')){
+        console.log('aaaa')
+        next()
+    }
+    else if (!req.url.includes('phpmyadmin')) {
         res.sendFile(dist + 'index.html');
-    } else {
+    }
+
+    else {
         res.status(404).send('Not found');
     }
 });
