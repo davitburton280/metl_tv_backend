@@ -13,7 +13,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
 // Environment variable: URL where our OpenVidu server is listening
-var OPENVIDU_URL = 'https://localhost:4443';
+var OPENVIDU_URL = 'https://metl.tv:4443';
 // Environment variable: secret shared with our OpenVidu server
 var OPENVIDU_SECRET = 'MY_SECRET';
 
