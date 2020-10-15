@@ -17,6 +17,7 @@ const https = require('https');
 // Multer
 require('./helpers/multer');
 
+app.set('trust proxy', 1);
 
 // Server configuration
 app.use(session({
