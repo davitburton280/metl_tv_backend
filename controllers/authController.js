@@ -4,7 +4,8 @@ const db = require('../models');
 const Users = db.users;
 const bcrypt = require('bcryptjs');
 
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+
 
 const showIfErrors = require('../helpers/showIfErrors');
 
