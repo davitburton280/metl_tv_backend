@@ -46,7 +46,6 @@ exports.getSession = async (req, res) => {
     // The video-call to connect
     const tokenOptions = {
         data: JSON.stringify({serverData: {username: user.username}}),
-
     };
 
     console.log(mapSessions)
