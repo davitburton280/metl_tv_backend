@@ -40,7 +40,6 @@ exports.saveVideoMessage = async (req, res) => {
     console.log(token)
     const videoStream = await VideoStreams.findOne({token: token});
     if (videoStream) {
-
         videoStream.messages.push({from: from, message: message});
         videoStream.save();
     }

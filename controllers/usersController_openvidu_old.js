@@ -13,7 +13,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
 // Environment variable: URL where our OpenVidu server is listening
-var OPENVIDU_URL = process.env.NODE_ENV === 'production' ? 'https://metl.tv/':'https://localhost:4443';
+var OPENVIDU_URL = process.env.NODE_ENV === 'production' ? 'https://metl.tv/' : 'https://localhost:4443';
 // Environment variable: secret shared with our OpenVidu server
 var OPENVIDU_SECRET = 'MY_SECRET';
 
@@ -35,9 +35,10 @@ const Users = db.users;
 const url = require('url');
 
 exports.getSession = async (req, res) => {
-    const {email, sessionName} = req.query;
+    const {email, sessionName, role} = req.query;
     console.log('OK')
     console.log(req.query)
+    console.log('ROLE:' + role + '!!!!!')
     let user = await Users.findOne({
         where: {email: email}
     }, res);
@@ -47,6 +48,8 @@ exports.getSession = async (req, res) => {
         data: JSON.stringify({serverData: {username: user.username}}),
 
     };
+
+    console.log(mapSessions)
 
 
     // console.log(tokenOptions)
@@ -76,6 +79,10 @@ exports.getSession = async (req, res) => {
                 res.status(500).json({msg: error.toString()})
             });
     } else {
+console.log("EXISTS"+ role)
+        // if(role === 'SUBSCRIBER'){
+        //     res.json('end')
+        // }
 
         // New session
         console.log('New session ' + sessionName);
@@ -125,5 +132,11 @@ exports.getSession = async (req, res) => {
     }
 
 
+};
+
+exports.leaveSession = (req, res) => {
+    console.log(req.query)
+    delete mapSessions[req.query.sessionName];
+    res.json('Leaved session');
 };
 
