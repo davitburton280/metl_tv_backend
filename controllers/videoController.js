@@ -24,7 +24,6 @@ exports.saveVideoToken = async (req, res) => {
 exports.saveVideoData = async (req, res) => {
     let data = req.body;
     console.log(data)
-
     uploadVideoStreamFile(req, res, async (err) => {
         await to(VideoStreams.updateOne({status: 'pending', username: data.username}, {
             name: data.video_name,
@@ -32,6 +31,7 @@ exports.saveVideoData = async (req, res) => {
         }));
         res.json('OK');
     })
+
 };
 
 
