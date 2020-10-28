@@ -8,10 +8,19 @@ let VideoStreamsSchema = new mongoose.Schema({
     name: {
         type: String
     },
+    description: {
+        type: String
+    },
+    filename: {
+        type: String
+    },
     token: {
         type: String
     },
     username: {
+        type: String
+    },
+    author: {
         type: String
     },
     messages: {
@@ -21,6 +30,9 @@ let VideoStreamsSchema = new mongoose.Schema({
         ],
         default: []
     },
+    tags: [{
+        type: String
+    }],
     status: {
         type: String
     },

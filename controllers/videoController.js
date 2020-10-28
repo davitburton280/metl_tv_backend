@@ -23,10 +23,16 @@ exports.saveVideoToken = async (req, res) => {
 
 exports.saveVideoData = async (req, res) => {
     let data = req.body;
-    console.log(data)
+    let videoSettings = JSON.parse(data.video_settings);
+
     uploadVideoStreamFile(req, res, async (err) => {
         await to(VideoStreams.updateOne({status: 'pending', username: data.username}, {
-            name: data.video_name,
+            name: videoSettings.name,
+            description: videoSettings.description,
+            tags: videoSettings.tags,
+            category: videoSettings.category,
+            author: data.full_name,
+            filename: data.video_name,
             status: 'recorded'
         }));
         res.json('OK');
@@ -47,7 +53,7 @@ exports.saveVideoMessage = async (req, res) => {
 
 };
 
-exports.getUserVideos = async(req, res) => {
+exports.getUserVideos = async (req, res) => {
     let v = await VideoStreams.find({username: req.query.username});
     res.json(v);
 };
