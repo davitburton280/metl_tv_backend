@@ -46,3 +46,8 @@ exports.saveVideoMessage = async (req, res) => {
     console.log(videoStream)
 
 };
+
+exports.getUserVideos = async(req, res) => {
+    let v = await VideoStreams.find({username: req.query.username});
+    res.json(v);
+};

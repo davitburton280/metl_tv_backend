@@ -78,10 +78,10 @@ exports.getSession = async (req, res) => {
                 res.status(500).json({msg: error.toString()})
             });
     } else {
-console.log("EXISTS"+ role)
-        // if(role === 'SUBSCRIBER'){
-        //     res.json('end')
-        // }
+        console.log("EXISTS" + role)
+        if (role === 'SUBSCRIBER') {
+            res.status(500).json({msg: 'Session doesn\'t exist'})
+        }
 
         // New session
         console.log('New session ' + sessionName);
