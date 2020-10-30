@@ -7,10 +7,17 @@ let storage = multer.diskStorage({
     destination: async function (req, file, cb) {
         const data = req.body;
 
+        let dir;
+        if (file.fieldname === 'video_thumbnail_file') {
+            dir = path.join(__dirname, '../public/uploads/thumbnails');
+        } else {
+            dir = path.join(__dirname, '../public/uploads/videos');
+
+        }
+
         const folder = data.folder;
         const edit = !!data.id;
 
-        let dir = path.join(__dirname, '../public/uploads/videos');
 
         await fse.ensureDir(dir);
 
@@ -41,3 +48,4 @@ let upload = multer({
     }
 });
 global.uploadVideoStreamFile = upload.single('video_stream_file');
+global.uploadVideoThumbFile = upload.single('video_thumbnail_file');

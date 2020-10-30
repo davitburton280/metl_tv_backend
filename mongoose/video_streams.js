@@ -20,8 +20,20 @@ let VideoStreamsSchema = new mongoose.Schema({
     username: {
         type: String
     },
+    thumbnail: {
+        type: String
+    },
     author: {
         type: String
+    },
+    category:{
+        type: String
+    },
+    likes: {
+      type: Number
+    },
+    dislikes: {
+        type: Number
     },
     messages: {
         type: [

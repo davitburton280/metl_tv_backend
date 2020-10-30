@@ -27,51 +27,34 @@ exports.saveVideoData = async (req, res) => {
     // let videoSettings = data.video_settings;
     console.log(videoSettings)
 
-    let found = await to(VideoStreams.findOne({status: 'pending', username: data.username}));
-    console.log(found)
-    found.name = videoSettings.name;
-    found.description = videoSettings.description;
-    found.tags = videoSettings.tags;
-    found.category = videoSettings.category;
-    found.author = data.full_name;
-    found.filename = data.video_name;
-    found.status = 'recorded';
-    found.save();
 
+    uploadVideoStreamFile(req, res, async (err) => {
+        let found = await to(VideoStreams.findOne({status: 'pending', username: data.username}));
+        console.log(found)
+        found.name = videoSettings.name;
+        found.description = videoSettings.description;
+        found.tags = videoSettings.tags;
+        found.thumbnail = data.thumbnail;
+        found.category = videoSettings.category;
+        found.author = data.full_name;
+        found.filename = data.video_name;
+        found.status = 'recorded';
+        await found.save();
 
-    // uploadVideoStreamFile(req, res, async (err) => {
-    //
-    //
-    //     console.log('condition!!!!!')
-    //
-    //     console.log(videoSettings)
-    //     console.log({
-    //         name: videoSettings.name,
-    //         description: videoSettings.description,
-    //         tags: videoSettings.tags,
-    //         category: videoSettings.category,
-    //         author: data.full_name,
-    //         filename: data.video_name,
-    //         status: 'recorded'
-    //     })
-    //
-    //
-    //
-    //
-    //     await to(VideoStreams.updateOne({status: 'pending', username: data.username}, {
-    //         name: videoSettings.name,
-    //         description: videoSettings.description,
-    //         tags: videoSettings.tags,
-    //         category: videoSettings.category,
-    //         author: data.full_name,
-    //         filename: data.video_name,
-    //         status: 'recorded'
-    //     }));
-    res.json('OK');
-    // })
+        res.json('OK');
+    })
 
 };
 
+exports.saveVideoThumbnail = async (req, res) => {
+    const data = req.body;
+    const file = req.file;
+    // console.log('files!!!')
+    // console.log(req.file)
+    uploadVideoThumbFile(req, res, async (err) => {
+        res.json(file.filename)
+    });
+};
 
 exports.saveVideoMessage = async (req, res) => {
     const {token, from, message} = req.body;
@@ -94,4 +77,8 @@ exports.getUserVideos = async (req, res) => {
 exports.getVideoById = async (req, res) => {
     let v = await VideoStreams.findOne({_id: req.query._id});
     res.json(v);
+};
+
+exports.removeVideoThumbnail = async (req, res) => {
+
 };
