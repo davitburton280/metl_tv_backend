@@ -85,7 +85,9 @@ app.use('/videos', require('./routes/video'));
 let dist = path.join(__dirname, 'dist/');
 console.log(dist);
 
+// Static resources
 app.use(express.static(dist));
+app.use('/uploads/', express.static(path.join(__dirname, './public/uploads')));
 
 
 // Separating Angular routes
