@@ -56,6 +56,7 @@ exports.saveVideoThumbnail = async (req, res) => {
     });
 };
 
+
 exports.saveVideoMessage = async (req, res) => {
     const {token, from, message} = req.body;
     console.log(token)
