@@ -1,7 +1,7 @@
 const fse = require('fs-extra');
 const multer = require('multer');
 const path = require('path');
-const UPLOAD_MAX_FILE_SIZE = 2 * 1024 * 1024;
+const UPLOAD_MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 let storage = multer.diskStorage({
     destination: async function (req, file, cb) {
