@@ -16,9 +16,11 @@ exports.saveVideoToken = async (req, res) => {
         videoStream.name = name;
         videoStream.save();
     }
+
     // const user = await Users.findOne({where: {username: username}});
     res.json('OK');
 };
+
 
 
 exports.saveVideoData = async (req, res) => {

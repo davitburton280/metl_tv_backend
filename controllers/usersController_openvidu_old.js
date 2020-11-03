@@ -130,12 +130,17 @@ exports.getSession = async (req, res) => {
             });
     }
 
-
 };
+
 
 exports.leaveSession = (req, res) => {
     console.log(req.query)
-    delete mapSessions[req.query.sessionName];
+    const {role} = req.query;
+    if (role === 'publisher') {
+        delete mapSessions[req.query.sessionName];
+        console.log(mapSessions)
+    }
+    console.log('Leaved session!!!!!')
     res.json('Leaved session');
 };
 
