@@ -36,7 +36,7 @@ exports.saveVideoData = async (req, res) => {
         found.name = videoSettings.name;
         found.description = videoSettings.description;
         found.tags = videoSettings.tags;
-        found.thumbnail = data.thumbnail;
+        found.thumbnail = videoSettings.thumbnail;
         found.category = videoSettings.category;
         found.author = data.full_name;
         found.filename = data.video_name;

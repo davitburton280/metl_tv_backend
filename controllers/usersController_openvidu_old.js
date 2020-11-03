@@ -144,3 +144,27 @@ exports.leaveSession = (req, res) => {
     res.json('Leaved session');
 };
 
+exports.changeAvatar = async (req, res) => {
+    let {id, avatar} = req.body;
+
+    uploadAvatar(req, res, async (err) => {
+
+        console.log('aaaaa')
+        await Users.update({avatar: avatar}, {where: {id: id}});
+        res.json('OK')
+
+    });
+
+
+};
+
+exports.changeCover = async (req, res) => {
+    let {id, cover} = req.body;
+
+    uploadCover(req, res, async (err) => {
+        console.log('aaaaa')
+        await Users.update({cover: cover}, {where: {id: id}});
+        res.json('OK')
+    });
+};
+

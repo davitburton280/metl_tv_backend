@@ -10,10 +10,16 @@ let storage = multer.diskStorage({
         let dir;
         if (file.fieldname === 'video_thumbnail_file') {
             dir = path.join(__dirname, '../public/uploads/thumbnails');
+        } else if (file.fieldname === 'avatar_file') {
+            dir = path.join(__dirname, '../public/uploads/avatars');
+        } else if (file.fieldname === 'cover_file') {
+            dir = path.join(__dirname, '../public/uploads/covers');
         } else {
             dir = path.join(__dirname, '../public/uploads/videos');
 
         }
+
+        console.log(dir)
 
         const folder = data.folder;
         const edit = !!data.id;
@@ -49,3 +55,5 @@ let upload = multer({
 });
 global.uploadVideoStreamFile = upload.single('video_stream_file');
 global.uploadVideoThumbFile = upload.single('video_thumbnail_file');
+global.uploadAvatar = upload.single('avatar_file');
+global.uploadCover = upload.single('cover_file');
