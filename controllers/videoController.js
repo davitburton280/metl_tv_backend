@@ -22,7 +22,6 @@ exports.saveVideoToken = async (req, res) => {
 };
 
 
-
 exports.saveVideoData = async (req, res) => {
     let data = req.body;
     let videoSettings = JSON.parse(data.video_settings);
@@ -39,6 +38,7 @@ exports.saveVideoData = async (req, res) => {
         found.thumbnail = videoSettings.thumbnail;
         found.category = videoSettings.category;
         found.author = data.full_name;
+        found.avatar = data.avatar;
         found.filename = data.video_name;
         found.status = 'recorded';
         await found.save();
@@ -79,6 +79,28 @@ exports.getUserVideos = async (req, res) => {
 
 exports.getVideoById = async (req, res) => {
     let v = await VideoStreams.findOne({_id: req.query._id});
+    res.json(v);
+};
+
+exports.getVideosByAuthor = async (req, res) => {
+    let v = await VideoStreams.aggregate([
+        {
+            $group: {
+                _id: "$author",
+                obj: {$push: { name: "$name", thumbnail: "$thumbnail", avatar: "$avatar"}}
+            }
+        },
+        // {
+        //     $replaceRoot: {
+        //         newRoot: {
+        //             $let: {
+        //                 vars: {obj: [{k: {$substr: ["$_id", 0, -1]}, v: "$obj"}]},
+        //                 in: {$arrayToObject: "$$obj"}
+        //             }
+        //         }
+        //     }
+        // }
+    ]);
     res.json(v);
 };
 

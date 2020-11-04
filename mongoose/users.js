@@ -4,29 +4,29 @@ const moment = require('moment');
 // connects to mongo db
 // mongoose.connect('mongodb://localhost/chat');
 
-let VideoStreamsSchema = new mongoose.Schema({
-    name: {
-        type: String
-    },
-    description: {
-        type: String
-    },
-    filename: {
-        type: String
-    },
-    token: {
+let UserSchema = new mongoose.Schema({
+    full_name: {
         type: String
     },
     username: {
         type: String
     },
-    thumbnail: {
+    birthday: {
         type: String
     },
-    author_id: {
+    avatar: {
         type: String
     },
-    category: {
+    cover: {
+        type: String
+    },
+    phone: {
+        type: String
+    },
+    password: {
+        type: String
+    },
+    gender: {
         type: String
     },
     likes: {
@@ -35,16 +35,6 @@ let VideoStreamsSchema = new mongoose.Schema({
     dislikes: {
         type: Number
     },
-    messages: {
-        type: [
-            // {lat: {type: Number}, lng: {type: Number}}
-            {from: {type: String}, to: {type: String}, message: {type: String}}
-        ],
-        default: []
-    },
-    tags: [{
-        type: String
-    }],
     status: {
         type: String
     },
@@ -55,4 +45,4 @@ let VideoStreamsSchema = new mongoose.Schema({
 
 }, {strict: false});
 
-module.exports = mongoose.model('Video_Streams', VideoStreamsSchema);
+module.exports = mongoose.model('User', UserSchema);
