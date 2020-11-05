@@ -48,6 +48,10 @@ let VideoStreamsSchema = new mongoose.Schema({
     status: {
         type: String
     },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
     created: {
         type: Date,
         default: moment().format()

@@ -38,6 +38,10 @@ let UserSchema = new mongoose.Schema({
     status: {
         type: String
     },
+    videos: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Video_Streams'
+    }],
     created: {
         type: Date,
         default: moment().format()

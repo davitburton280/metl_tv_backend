@@ -29,8 +29,10 @@ var mapSessionNamesTokens = {};
 
 /* CONFIGURATION */
 
-const db = require('../models');
-const Users = db.users;
+// const db = require('../models');
+// const Users = db.users;
+
+const Users = require('../mongoose/users');
 
 const url = require('url');
 
@@ -41,9 +43,7 @@ exports.getSession = async (req, res) => {
     console.log('OK')
     console.log(req.query)
     console.log('ROLE:' + role + '!!!!!')
-    let user = await Users.findOne({
-        where: {email: email}
-    }, res);
+    let user = await Users.findOne({email: email});
 
     // The video-call to connect
     const tokenOptions = {

@@ -1,7 +1,8 @@
 const sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
-const db = require('../models');
-const Users = db.users;
+// const db = require('../models');
+// const Users = db.users;
+const Users = require('../mongoose/users');
 const bcrypt = require('bcryptjs');
 
 const nodemailer = require('nodemailer');
@@ -20,11 +21,12 @@ exports.login = async (req, res) => {
         let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
 
         // Selecting an employee that has an email matching request one
-        let user = await Users.findOne({
-            attributes: attributes,
-            include: [],
-            where: {email: email} //userTypeWhere
-        }, res);
+        let user = await Users.findOne(
+            // attributes: attributes,
+            // include: [],
+            // where:
+                {email: email} //userTypeWhere
+        );
 
 
 
@@ -123,7 +125,11 @@ exports.register = async (req, res) => {
         let originalPass = data.password;
         data.password = bcrypt.hashSync(originalPass, 10);
 
+        console.log(data)
+
         await Users.create(data);
+
+        // await Users.create(data);
 
         // Saving the original password again to request for authenticating the user at once
         data.password = originalPass;

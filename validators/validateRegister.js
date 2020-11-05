@@ -1,8 +1,9 @@
 // Express Validator
 const {body} = require('express-validator');
-const db = require('../models');
-const Users = db.users;
+// const db = require('../models');
+// const Users = db.users;
 
+const Users = require('../mongoose/users');
 
 const rules = [
     body('full_name').not().isEmpty().withMessage('Full name is required'),
@@ -24,7 +25,7 @@ const rules = [
         let email = req.email;
 
         // Retrieving a user with request email
-        let user = await Users.findOne({where: {email: email}});
+        let user = await Users.findOne({email: email});
 
         if (user != null) throw new Error('E-mail exists');
 

@@ -1,5 +1,7 @@
-const db = require('../models');
-const Users = db.users;
+// const db = require('../models');
+// const Users = db.users;
+
+const Users = require('../mongoose/users');
 
 const VideoStreams = require('../mongoose/video_streams');
 const to = require('../helpers/getPromiseResult');
@@ -37,8 +39,8 @@ exports.saveVideoData = async (req, res) => {
         found.tags = videoSettings.tags;
         found.thumbnail = videoSettings.thumbnail;
         found.category = videoSettings.category;
-        found.author = data.full_name;
-        found.avatar = data.avatar;
+        // found.author = data.full_name;
+        found.author_id = data.author_id;
         found.filename = data.video_name;
         found.status = 'recorded';
         await found.save();
@@ -73,7 +75,7 @@ exports.saveVideoMessage = async (req, res) => {
 };
 
 exports.getUserVideos = async (req, res) => {
-    let v = await VideoStreams.find({username: req.query.username});
+    let v = await VideoStreams.find({author_id: req.query.user_id});
     res.json(v);
 };
 
@@ -83,24 +85,43 @@ exports.getVideoById = async (req, res) => {
 };
 
 exports.getVideosByAuthor = async (req, res) => {
-    let v = await VideoStreams.aggregate([
+    // let v = await VideoStreams.aggregate([
+    //     {
+    //         $group: {
+    //             _id: "$author_id",
+    //             obj: {$push: { name: "$name", thumbnail: "$thumbnail", avatar: "$avatar"}}
+    //         }
+    //     },
+    //     // {
+    //     //     $replaceRoot: {
+    //     //         newRoot: {
+    //     //             $let: {
+    //     //                 vars: {obj: [{k: {$substr: ["$_id", 0, -1]}, v: "$obj"}]},
+    //     //                 in: {$arrayToObject: "$$obj"}
+    //     //             }
+    //     //         }
+    //     //     }
+    //     // }
+    // ]);
+
+    const v = await Users.aggregate([
         {
-            $group: {
-                _id: "$author",
-                obj: {$push: { name: "$name", thumbnail: "$thumbnail", avatar: "$avatar"}}
-            }
-        },
-        // {
-        //     $replaceRoot: {
-        //         newRoot: {
-        //             $let: {
-        //                 vars: {obj: [{k: {$substr: ["$_id", 0, -1]}, v: "$obj"}]},
-        //                 in: {$arrayToObject: "$$obj"}
-        //             }
-        //         }
-        //     }
-        // }
+            $lookup:
+                {
+                    from: 'video_streams',
+                    localField: 'author_id',
+                    foreignField: '_id',
+                    as: 'user_videos'
+                }
+        }
     ]);
+    //     .toArray(function(err, res) {
+    //     if (err) throw err;
+    //     console.log(res);
+    //     // db.close();
+    // });
+    // const v = await Users.find({}).populate('video_streams');
+    console.log(v)
     res.json(v);
 };
 
