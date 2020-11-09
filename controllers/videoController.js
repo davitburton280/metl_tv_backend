@@ -43,6 +43,8 @@ exports.saveVideoData = async (req, res) => {
 
     uploadVideoStreamFile(req, res, async (err) => {
 
+        console.log(err)
+
         let d = {
             name: videoSettings.name,
             description: videoSettings.description,
