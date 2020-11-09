@@ -18,7 +18,7 @@ module.exports = {
                 updated_at: new Date()
             },
             {
-                full_name: 'Test Operator',
+                full_name: 'Test User',
                 birthday: new Date(),
                 gender: 'female',
                 email: 'test@gmail.com',
