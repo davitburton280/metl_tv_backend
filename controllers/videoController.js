@@ -108,7 +108,8 @@ exports.getCategories = async (req, res) => {
 
 exports.getUserVideos = async (req, res) => {
     console.log(req.query)
-    let v = await Videos.findAll({author_id: req.query.user_id});
+    // let v = await Videos.findAll({author_id: req.query.user_id});
+    let v = await Users.findOne({where: {id: req.query.user_id}, include: [{model: Videos}],});
     res.json(v);
 };
 
@@ -118,7 +119,7 @@ exports.getVideoById = async (req, res) => {
 };
 
 exports.getVideosByAuthor = async (req, res) => {
-    let v = await Users.findAll({include: [{model:Videos}]});
+    let v = await Users.findAll({include: [{model: Videos}]});
     res.json(v);
     // let v = await VideoStreams.aggregate([
     //     {

@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         session_name: DataTypes.STRING,
         token: DataTypes.STRING,
         filename: DataTypes.STRING,
+        thumbnail: DataTypes.STRING,
         status: DataTypes.STRING
     }, {
         sequelize,
