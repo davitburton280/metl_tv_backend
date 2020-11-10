@@ -2,6 +2,8 @@ const sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const Users = db.users;
+const Channels = db.channels;
+
 const bcrypt = require('bcryptjs');
 
 const nodemailer = require('nodemailer');
@@ -14,7 +16,7 @@ exports.login = async (req, res) => {
         // Getting request data and setting user fields to return
         let {email} = req.body;
 
-        let attributes = [`full_name`, 'email','username', 'avatar','cover', 'password', 'id', 'status_id'];
+        let attributes = [`full_name`, 'email', 'username', 'avatar', 'cover', 'password', 'id', 'status_id'];
 
         // Active status selecting
         let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
@@ -22,10 +24,9 @@ exports.login = async (req, res) => {
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
             attributes: attributes,
-            include: [],
+            include: [{model: Channels}],
             where: {email: email} //userTypeWhere
         }, res);
-
 
 
         if (!res.headersSent) {
@@ -39,7 +40,7 @@ exports.login = async (req, res) => {
                 let {password, ...details} = user.toJSON();
                 console.log("'" + user.full_name + "' has logged in");
                 req.session.full_name = user.full_name;
-                console.log(req.session)
+                console.log(details)
                 res.status(200).json({
                     token: jwt.sign(details, 'secretkey', {expiresIn: '8h'}),
                     user_id: user.id,
@@ -123,7 +124,8 @@ exports.register = async (req, res) => {
         let originalPass = data.password;
         data.password = bcrypt.hashSync(originalPass, 10);
 
-        await Users.create(data);
+        let user = await Users.create(data);
+        await Channels.create({name: data.full_name, user_id: user.id});
 
         // Saving the original password again to request for authenticating the user at once
         data.password = originalPass;

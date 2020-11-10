@@ -31,6 +31,7 @@ var mapSessionNamesTokens = {};
 
 const db = require('../models');
 const Users = db.users;
+const Channels = db.channels;
 
 const url = require('url');
 
@@ -187,4 +188,10 @@ let changeJwt = async (req, res) => {
         user_id: user.id,
         full_name: full_name
     })
+};
+
+exports.getUserInfo = async (req, res) => {
+    let user = await Users.findOne({where: {username: req.query.username}, include: {model: Channels}});
+    console.log('OK!!!' + req.query.username)
+    res.json(user);
 };

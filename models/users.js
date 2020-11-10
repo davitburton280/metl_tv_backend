@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {timestamps: false, underscored: true});
     users.associate = function (models) {
         users.hasMany(models.videos, {foreignKey: 'author_id'});
+        users.hasOne(models.channels, {foreignKey: 'user_id'})
         // associations can be defined here
     };
     return users;
