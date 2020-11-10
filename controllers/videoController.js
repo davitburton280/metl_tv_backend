@@ -1,5 +1,6 @@
 const db = require('../models');
 const Users = db.users;
+const Channels = db.channels;
 const VideoCategories = db.video_categories;
 
 
@@ -7,6 +8,11 @@ const VideoStreams = require('../mongoose/video_streams');
 const to = require('../helpers/getPromiseResult');
 
 const Videos = db.videos;
+
+exports.getVideos = async (req, res) => {
+    let v = await Videos.findAll({include: [{model: Users, include: [{model: Channels}]}]});
+    res.json(v);
+};
 
 exports.saveVideoToken = async (req, res) => {
     const {token, name} = req.body;

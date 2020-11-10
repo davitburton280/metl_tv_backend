@@ -11,5 +11,6 @@ router.get('/get-user-videos', videoController.getUserVideos);
 router.get('/get-categories', videoController.getCategories);
 router.get('/get-video-by-id', videoController.getVideoById);
 router.get('/get-videos-by-author', videoController.getVideosByAuthor);
+router.get('/get', videoController.getVideos);
 
 module.exports = router;
