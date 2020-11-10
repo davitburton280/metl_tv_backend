@@ -149,12 +149,13 @@ exports.leaveSession = (req, res) => {
 
 exports.changeAvatar = async (req, res) => {
     let {id, avatar} = req.body;
+    let data = req.body;
 
     uploadAvatar(req, res, async (err) => {
 
         console.log('aaaaa')
         await Users.update({avatar: avatar}, {where: {id: id}});
-        await changeJwt(req, res);
+        await changeJwt(data, res);
 
     });
 
@@ -163,19 +164,20 @@ exports.changeAvatar = async (req, res) => {
 
 exports.changeCover = async (req, res) => {
     let {id, cover} = req.body;
+    let data = req.body;
+
 
     uploadCover(req, res, async (err) => {
-        console.log('aaaaa')
         await Users.update({cover: cover}, {where: {id: id}});
-        await changeJwt(req, res);
+        await changeJwt(data, res);
     });
 };
 
-let changeJwt = async (req, res) => {
-    let user = await Users.findOne({
-        _id: req.body.user_id
-    });
-    // console.log(req.body)
+let changeJwt = async (data, res) => {
+
+    let user = await Users.findOne({where: {id: data.id}, include: [{model: Channels}]});
+
+
     let full_name = user[`full_name`];
     let {
         password,
