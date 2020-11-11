@@ -53,7 +53,7 @@ require('dotenv').config();
 
 // Body-parser
 app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit:50000}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 50000}));
 
 // Mongoose
 //Import the mongoose module
@@ -81,6 +81,7 @@ app.use(passport.initialize({}));
 app.use('/auth', require('./routes/auth'));
 app.use('/users', require('./routes/users'));
 app.use('/videos', require('./routes/video'));
+app.use('/channels', require('./routes/channels'));
 
 let dist = path.join(__dirname, 'dist/');
 console.log(dist);

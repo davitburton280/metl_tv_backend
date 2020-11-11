@@ -12,10 +12,13 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
             videos.belongsTo(models.users, {foreignKey: 'author_id'})
+            videos.belongsTo(models.channels, {foreignKey: 'channel_id'})
         }
     };
+
     videos.init({
         author_id: DataTypes.INTEGER,
+        channel_id: DataTypes.INTEGER,
         category_id: DataTypes.INTEGER,
         name: DataTypes.STRING,
         description: DataTypes.TEXT,

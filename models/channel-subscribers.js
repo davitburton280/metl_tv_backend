@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     channel_id: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'subscribers',
+    modelName: 'channel_subscribers',
   });
   return subscribers;
 };

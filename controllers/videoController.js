@@ -120,7 +120,7 @@ exports.getUserVideos = async (req, res) => {
 };
 
 exports.getVideoById = async (req, res) => {
-    let v = await Videos.findOne({_id: req.query._id});
+    let v = await Videos.findOne({where: {id: req.query.id},include: [{model: Channels}]});
     res.json(v);
 };
 

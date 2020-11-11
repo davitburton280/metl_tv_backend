@@ -11,6 +11,9 @@ module.exports = {
             author_id: {
                 type: Sequelize.INTEGER
             },
+            channel_id: {
+                type: Sequelize.INTEGER
+            },
             category_id: {
                 type: Sequelize.INTEGER
             },
