@@ -9,6 +9,9 @@ const to = require('../helpers/getPromiseResult');
 
 const Videos = db.videos;
 
+const sequelize = require('sequelize');
+const Op = sequelize.Op;
+
 exports.getVideos = async (req, res) => {
     let v = await Videos.findAll({include: [{model: Users, include: [{model: Channels}]}]});
     res.json(v);
@@ -120,32 +123,37 @@ exports.getUserVideos = async (req, res) => {
 };
 
 exports.getVideoById = async (req, res) => {
-    let v = await Videos.findOne({where: {id: req.query.id},include: [{model: Channels}]});
+    let v = await Videos.findOne({where: {id: req.query.id}, include: [{model: Channels}]});
     res.json(v);
 };
 
 exports.getVideosByAuthor = async (req, res) => {
     let v = await Users.findAll({include: [{model: Videos}]});
     res.json(v);
-    // let v = await VideoStreams.aggregate([
-    //     {
-    //         $group: {
-    //             _id: "$author",
-    //             obj: {$push: {name: "$name", thumbnail: "$thumbnail", avatar: "$avatar"}}
-    //         }
-    //     },
-    //     // {
-    //     //     $replaceRoot: {
-    //     //         newRoot: {
-    //     //             $let: {
-    //     //                 vars: {obj: [{k: {$substr: ["$_id", 0, -1]}, v: "$obj"}]},
-    //     //                 in: {$arrayToObject: "$$obj"}
-    //     //             }
-    //     //         }
-    //     //     }
-    //     // }
-    // ]);
-    // res.json(v);
+};
+
+exports.searchInVideosByAuthor = async (req, res) => {
+    let search = req.query.search;
+    let v = await Users.findAll({
+        include: [{model: Videos}],
+        where: sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%'),
+    });
+    res.json(v);
+};
+
+
+exports.searchInUserVideos = async (req, res) => {
+    let {user_id, search} = req.query;
+    let v = await Users.findOne({
+        include: [{
+            model: Videos,
+            where: sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%')
+        }],
+        where: {
+            id: user_id
+        },
+    });
+    res.json(v);
 };
 
 exports.removeVideoThumbnail = async (req, res) => {
