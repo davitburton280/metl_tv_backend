@@ -18,6 +18,12 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 defaultValue: 0
             },
+            avatar: {
+                type: Sequelize.STRING
+            },
+            cover: {
+                type: Sequelize.STRING
+            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE,

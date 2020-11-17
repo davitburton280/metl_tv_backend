@@ -2,15 +2,18 @@ const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
 const Videos = db.videos;
+const ChannelSubscribers = db.channel_subscribers
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 exports.get = async (req, res) => {
     console.log('here!!!!!!!!!!!!!')
-    let channels = await Channels.findAll({include: [{model: Videos}, {model: Users}]});
+    let channels = await Channels.findAll({include: [{model: Videos}, {model: Users, as: 'subscribers'}]});
     res.json(channels);
 };
+
+// exports.getBy
 
 exports.searchChannelVideos = async (req, res) => {
     let search = req.query.search;
@@ -36,3 +39,118 @@ exports.searchChannelVideos = async (req, res) => {
         });
     res.json(channels);
 };
+
+exports.subscribeToChannel = async (req, res) => {
+    let {user_id, channel_id} = req.body;
+
+
+    let subscribedToChannel = await ChannelSubscribers.findOne({
+        where: {
+            subscriber_id: user_id,
+            channel_id: channel_id
+        },
+        attributes: {exclude: ['created_at', 'updated_at']},
+    });
+
+    if (!subscribedToChannel) {
+
+        // Getting maximum position id of the user's subscriptions
+        let userSubscriptions = await ChannelSubscribers.findOne({
+            where:
+                {subscriber_id: user_id},
+            attributes: [sequelize.fn('MAX', sequelize.col('position_id')), 'position_id'],
+            raw: true
+        });
+
+
+        await ChannelSubscribers.create({
+            subscriber_id: user_id,
+            channel_id: channel_id,
+            position_id: (userSubscriptions['MAX(`position_id`)'] + 1) || 1
+        });
+
+        res.json('Subscribed');
+
+    } else {
+        await ChannelSubscribers.destroy({
+            where:
+                {
+                    subscriber_id: user_id,
+                    channel_id: channel_id
+                }
+        });
+        res.json('Unsubscribed');
+    }
+
+
+};
+
+exports.checkChannelSubscription = async (req, res) => {
+    let {user_id, channel_id} = req.query;
+
+    let channelSubscriber = await ChannelSubscribers.findOne({
+        where: {
+            subscriber_id: user_id,
+            channel_id: channel_id
+        },
+        attributes: {exclude: ['created_at', 'updated_at']},
+    });
+
+    res.json(channelSubscriber === null ? 'Unsubscribed' : 'Subscribed');
+};
+
+exports.getUserChannelSubscriptions = async (req, res) => {
+    let {user_id} = req.query;
+    console.log('user channel subscriptions!!!!!')
+    let userSubscriptions = await Channels.findAll({
+        // where: {user_id: user_id},
+        //
+        include: [
+            {
+                model: Users, as: 'subscribers',
+                attributes: ['email', 'full_name', 'id'],
+                where:
+                    sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
+            }
+        ],
+        attributes: {exclude: ['createdAt', 'updatedAt']},
+    }).map(it => {
+        it.subscribers_count = it.subscribers.length;
+        return it;
+    });
+
+    res.json(userSubscriptions)
+};
+
+exports.changeSubscriptionPriority = async (req, res) => {
+    let {user_id} = req.body;
+    console.log(req.body)
+    console.log('change subscription priority!!!!!')
+    // let userSubscriptions = await Users.findAll({
+    //     include: [
+    //         {
+    //             model: Channels, as: 'subscriptions',
+    //             attributes: {exclude: ['avatar', 'role_id', 'status_id', 'cover', 'subscribers_count', 'createdAt', 'updatedAt']},
+    //             where:
+    //                 sequelize.where(sequelize.col('subscriptions->channel_subscribers.subscriber_id'), user_id),
+    //         }
+    //     ],
+    //     attributes: {exclude: ['avatar', 'cover', 'role_id', 'status_id', 'phone', 'birthday', 'gender', 'password', 'createdAt', 'updatedAt']},
+    // });
+
+    let userSubscriptions = await Channels.findAll({
+        // where: {user_id: user_id},
+        where: sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
+        include: [
+            {
+                model: Users, as: 'subscribers',
+                through: {attributes: ['position_id']},
+                attributes: ['full_name', 'id'],
+            }
+        ],
+        attributes: {exclude: ['createdAt', 'updatedAt']},
+    });
+    // userSubscriptions[0].updateAttributes()
+    res.json(userSubscriptions)
+};
+

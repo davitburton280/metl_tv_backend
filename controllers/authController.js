@@ -125,7 +125,7 @@ exports.register = async (req, res) => {
         data.password = bcrypt.hashSync(originalPass, 10);
 
         let user = await Users.create(data);
-        await Channels.create({name: data.full_name, user_id: user.id});
+        await Channels.create({name: data.full_name, user_id: user.id, avatar: user.avatar, cover: user.cover});
 
         // Saving the original password again to request for authenticating the user at once
         data.password = originalPass;

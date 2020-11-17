@@ -155,10 +155,11 @@ exports.changeAvatar = async (req, res) => {
 
         console.log('aaaaa')
         await Users.update({avatar: avatar}, {where: {id: id}});
+        await Channels.update({avatar: avatar}, {where: {id: id}});
+
         await changeJwt(data, res);
 
     });
-
 
 };
 
@@ -169,6 +170,7 @@ exports.changeCover = async (req, res) => {
 
     uploadCover(req, res, async (err) => {
         await Users.update({cover: cover}, {where: {id: id}});
+        await Channels.update({cover: cover}, {where: {id: id}});
         await changeJwt(data, res);
     });
 };
