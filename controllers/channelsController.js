@@ -62,6 +62,9 @@ exports.subscribeToChannel = async (req, res) => {
             raw: true
         });
 
+        // await Channels.update();
+        let i = await Channels.increment('subscribers_count', {by: 1, where: {id: channel_id}});
+        console.log(i)
 
         await ChannelSubscribers.create({
             subscriber_id: user_id,
@@ -69,9 +72,16 @@ exports.subscribeToChannel = async (req, res) => {
             position_id: (userSubscriptions['MAX(`position_id`)'] + 1) || 1
         });
 
-        res.json('Subscribed');
+        let channelSubscribers = await Channels.findOne({where: {id: channel_id}, attributes: ['subscribers_count']});
+        console.log(channelSubscribers.dataValues)
+        res.json({status: 'Subscribed', ...channelSubscribers.dataValues});
+        // res.json('Subscribed');
 
     } else {
+
+
+        await Channels.decrement('subscribers_count', {by: 1, where: {id: channel_id}});
+
         await ChannelSubscribers.destroy({
             where:
                 {
@@ -79,7 +89,11 @@ exports.subscribeToChannel = async (req, res) => {
                     channel_id: channel_id
                 }
         });
-        res.json('Unsubscribed');
+
+        let channelSubscribers = await Channels.findOne({where: {id: channel_id}, attributes: ['subscribers_count']});
+        console.log(channelSubscribers.dataValues)
+        res.json({status: 'Unsubscribed', ...channelSubscribers.dataValues});
+        // res.json('Unsubscribed');
     }
 
 
@@ -96,7 +110,10 @@ exports.checkChannelSubscription = async (req, res) => {
         attributes: {exclude: ['created_at', 'updated_at']},
     });
 
-    res.json(channelSubscriber === null ? 'Unsubscribed' : 'Subscribed');
+    let channelSubscribers = await Channels.findOne({where: {id: channel_id}, attributes: ['subscribers_count']});
+    console.log(channelSubscribers.dataValues)
+    res.json({status: (channelSubscriber === null ? 'Unsubscribed' : 'Subscribed'), ...channelSubscribers.dataValues});
+
 };
 
 exports.getUserChannelSubscriptions = async (req, res) => {
@@ -113,6 +130,7 @@ exports.getUserChannelSubscriptions = async (req, res) => {
                     sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
             }
         ],
+        order: [sequelize.col('subscribers->channel_subscribers.position_id')],
         attributes: {exclude: ['createdAt', 'updatedAt']},
     }).map(it => {
         it.subscribers_count = it.subscribers.length;
@@ -123,8 +141,11 @@ exports.getUserChannelSubscriptions = async (req, res) => {
 };
 
 exports.changeSubscriptionPriority = async (req, res) => {
-    let {user_id} = req.body;
-    console.log(req.body)
+    let {user_id, rows} = req.body;
+    rows = JSON.parse(rows);
+
+    // let {user_id} = req.body;
+    console.log(rows)
     console.log('change subscription priority!!!!!')
     // let userSubscriptions = await Users.findAll({
     //     include: [
@@ -138,19 +159,32 @@ exports.changeSubscriptionPriority = async (req, res) => {
     //     attributes: {exclude: ['avatar', 'cover', 'role_id', 'status_id', 'phone', 'birthday', 'gender', 'password', 'createdAt', 'updatedAt']},
     // });
 
-    let userSubscriptions = await Channels.findAll({
-        // where: {user_id: user_id},
-        where: sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
-        include: [
-            {
-                model: Users, as: 'subscribers',
-                through: {attributes: ['position_id']},
-                attributes: ['full_name', 'id'],
+    // let userSubscriptions = await Channels.findAll({
+    //     // where: {user_id: user_id},
+    //     where: sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
+    //     include: [
+    //         {
+    //             model: Users, as: 'subscribers',
+    //             through: {attributes: ['position_id']},
+    //             attributes: ['full_name', 'id'],
+    //         }
+    //     ],
+    //     attributes: {exclude: ['createdAt', 'updatedAt']},
+    // });
+
+    rows.map(async (r) => {
+        await ChannelSubscribers.update({position_id: rows.indexOf(r) + 1}, {
+            where: {
+                subscriber_id: user_id,
+                channel_id: r.id
             }
-        ],
-        attributes: {exclude: ['createdAt', 'updatedAt']},
+        });
     });
+
+    // console.log(userSubscriptions[0])
+
+
     // userSubscriptions[0].updateAttributes()
-    res.json(userSubscriptions)
+    res.json('updated')
 };
 
