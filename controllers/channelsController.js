@@ -104,7 +104,7 @@ exports.checkChannelSubscription = async (req, res) => {
 
     let channelSubscriber = await ChannelSubscribers.findOne({
         where: {
-            subscriber_id: user_id,
+            // subscriber_id: user_id,
             channel_id: channel_id
         },
         attributes: {exclude: ['created_at', 'updated_at']},
