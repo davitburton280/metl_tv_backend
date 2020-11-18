@@ -58,7 +58,7 @@ exports.subscribeToChannel = async (req, res) => {
         let userSubscriptions = await ChannelSubscribers.findOne({
             where:
                 {subscriber_id: user_id},
-            attributes: [sequelize.fn('MAX', sequelize.col('position_id')), 'position_id'],
+            attributes: [sequelize.fn('MAX', sequelize.col('position_id'))],
             raw: true
         });
 
