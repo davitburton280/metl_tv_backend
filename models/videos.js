@@ -11,8 +11,9 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
-            videos.belongsTo(models.users, {foreignKey: 'author_id'})
-            videos.belongsTo(models.channels, {foreignKey: 'channel_id'})
+            videos.belongsTo(models.users, {foreignKey: 'author_id'});
+            videos.belongsTo(models.channels, {foreignKey: 'channel_id'});
+            videos.hasMany(models.video_tags, {as: 'tags', foreignKey: 'video_id'});
         }
     };
 
@@ -20,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
         author_id: DataTypes.INTEGER,
         channel_id: DataTypes.INTEGER,
         category_id: DataTypes.INTEGER,
+        privacy_id: DataTypes.INTEGER,
+        likes: DataTypes.INTEGER,
+        dislikes: DataTypes.INTEGER,
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
         session_name: DataTypes.STRING,

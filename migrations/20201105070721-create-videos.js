@@ -17,6 +17,15 @@ module.exports = {
             category_id: {
                 type: Sequelize.INTEGER
             },
+            privacy_id: {
+                type: Sequelize.INTEGER
+            },
+            likes: {
+                type: Sequelize.INTEGER
+            },
+            dislikes: {
+                type: Sequelize.INTEGER
+            },
             name: {
                 type: Sequelize.STRING
             },

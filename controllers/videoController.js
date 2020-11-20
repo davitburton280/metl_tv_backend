@@ -2,6 +2,8 @@ const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
 const VideoCategories = db.video_categories;
+const VideoTags = db.video_tags;
+const PrivacyTypes = db.privacy_types;
 
 
 const VideoStreams = require('../mongoose/video_streams');
@@ -18,13 +20,16 @@ exports.getVideos = async (req, res) => {
 };
 
 exports.saveVideoToken = async (req, res) => {
-    const {token, name} = req.body;
+    const data = req.body;
+    const {token, name} = data;
 
     let v = await Videos.findOne({where: {token: token}});
-    console.log(req.body)
 
     if (!v) {
-        Videos.create(req.body);
+        let video = await Videos.create(data);
+        data.tags.map(async (t) => {
+            await VideoTags.create({name: t, video_id: video.id})
+        })
     }
 
     // const videoStream = await VideoStreams.findOne({token: token});
@@ -52,13 +57,17 @@ exports.saveVideoData = async (req, res) => {
 
     uploadVideoStreamFile(req, res, async (err) => {
 
-        console.log(err)
+
+        let privacy_id = await PrivacyTypes.findOne({where: {name: videoSettings.privacy}, attributes: ['id']});
+
+        console.log(privacy_id.dataValues)
 
         let d = {
             name: videoSettings.name,
             description: videoSettings.description,
             thumbnail: videoSettings.thumbnail,
             category_id: videoSettings.category_id,
+            privacy_id: privacy_id.dataValues.id,
             author: data.full_name,
             avatar: data.avatar,
             filename: data.video_name,
@@ -123,7 +132,10 @@ exports.getUserVideos = async (req, res) => {
 };
 
 exports.getVideoById = async (req, res) => {
-    let v = await Videos.findOne({where: {id: req.query.id}, include: [{model: Channels}]});
+    let v = await Videos.findOne({
+        where: {id: req.query.id},
+        include: [{model: Channels}, {model: VideoTags, as: 'tags'}]
+    });
     res.json(v);
 };
 
