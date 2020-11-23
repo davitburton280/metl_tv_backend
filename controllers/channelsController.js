@@ -128,7 +128,8 @@ exports.getUserChannelSubscriptions = async (req, res) => {
                 attributes: ['email', 'full_name', 'id'],
                 where:
                     sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
-            }
+            },
+            {model: Users, attributes: ['username']}
         ],
         order: [sequelize.col('subscribers->channel_subscribers.position_id')],
         attributes: {exclude: ['createdAt', 'updatedAt']},

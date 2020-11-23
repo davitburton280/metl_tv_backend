@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
 
+
     videos.init({
         author_id: DataTypes.INTEGER,
         channel_id: DataTypes.INTEGER,

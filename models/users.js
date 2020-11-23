@@ -18,7 +18,11 @@ module.exports = (sequelize, DataTypes) => {
     users.associate = function (models) {
         users.hasMany(models.videos, {foreignKey: 'author_id'});
         users.hasOne(models.channels, {foreignKey: 'user_id'})
-        users.belongsToMany(models.channels, {as: 'subscriptions',through: models.channel_subscribers, foreignKey: 'subscriber_id'})
+        users.belongsToMany(models.channels, {
+            as: 'subscriptions',
+            through: models.channel_subscribers,
+            foreignKey: 'subscriber_id'
+        });
         // associations can be defined here
     };
     return users;

@@ -21,10 +21,12 @@ module.exports = {
                 type: Sequelize.INTEGER
             },
             likes: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             dislikes: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             name: {
                 type: Sequelize.STRING
