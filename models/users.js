@@ -16,12 +16,17 @@ module.exports = (sequelize, DataTypes) => {
         // access_token: DataTypes.STRING
     }, {timestamps: false, underscored: true});
     users.associate = function (models) {
-        users.hasMany(models.videos, {foreignKey: 'author_id'});
+        users.hasMany(models.videos, {as: 'videos', foreignKey: 'author_id'});
         users.hasOne(models.channels, {foreignKey: 'user_id'})
         users.belongsToMany(models.channels, {
             as: 'subscriptions',
             through: models.channel_subscribers,
             foreignKey: 'subscriber_id'
+        });
+        users.belongsToMany(models.videos, {
+            as: 'users_vids',
+            through: models.users_videos,
+            foreignKey: 'user_id'
         });
         // associations can be defined here
     };

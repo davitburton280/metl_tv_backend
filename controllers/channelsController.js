@@ -17,27 +17,33 @@ exports.get = async (req, res) => {
 
 exports.searchChannelVideos = async (req, res) => {
     let search = req.query.search;
-    let channels = await Channels.findAll(
-        {
-            include: [{model: Videos}, {model: Users}],
-            where: {
-                [Op.or]: [
-                    {
-                        name: {
-                            [Op.like]: '%' + search + '%'
-                        }
-                    },
-                    sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%')
-                    // {
-                    //     id: {
-                    //         [Op.like]: '%' + search + '%'
-                    //     }
-                    // }
-                ]
+    if (search) {
 
-            }
-        });
-    res.json(channels);
+
+        let channels = await Channels.findAll(
+            {
+                include: [{model: Videos}, {model: Users}],
+                where: {
+                    [Op.or]: [
+                        {
+                            name: {
+                                [Op.like]: '%' + search + '%'
+                            }
+                        },
+                        sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%')
+                        // {
+                        //     id: {
+                        //         [Op.like]: '%' + search + '%'
+                        //     }
+                        // }
+                    ]
+
+                }
+            });
+        res.json(channels);
+    } else {
+        res.json([])
+    }
 };
 
 exports.subscribeToChannel = async (req, res) => {

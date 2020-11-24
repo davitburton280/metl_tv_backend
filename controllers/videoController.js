@@ -4,6 +4,7 @@ const Channels = db.channels;
 const VideoCategories = db.video_categories;
 const VideoTags = db.video_tags;
 const PrivacyTypes = db.privacy_types;
+const UsersVideos = db.users_videos;
 
 
 const VideoStreams = require('../mongoose/video_streams');
@@ -15,7 +16,7 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 exports.getVideos = async (req, res) => {
-    let v = await Videos.findAll({include: [{model: Users, include: [{model: Channels}]}]});
+    let v = await Videos.findAll({include: [{model: Users, as: 'user', include: [{model: Channels}]}]});
     res.json(v);
 };
 
@@ -127,20 +128,42 @@ exports.getCategories = async (req, res) => {
 exports.getUserVideos = async (req, res) => {
     console.log(req.query)
     // let v = await Videos.findAll({author_id: req.query.user_id});
-    let v = await Users.findOne({where: {id: req.query.user_id}, include: [{model: Videos}],});
+    let v = await Users.findOne({
+        where: {id: req.query.user_id},
+        include: [{model: Videos, as: 'videos'}],
+    });
     res.json(v);
 };
 
 exports.getVideoById = async (req, res) => {
+    let {id, user_id} = req.query;
+    let idWhere = {id: id};
     let v = await Videos.findOne({
-        where: {id: req.query.id},
-        include: [{model: Channels}, {model: VideoTags, as: 'tags'}]
+        where: idWhere,
+        // where: [idWhere, sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id)],
+        required: false,
+
+        include: [
+            {model: Channels, attributes: ['id', 'subscribers_count', 'name', 'avatar']}, {
+                model: VideoTags,
+                as: 'tags'
+            },
+            {
+                model: Users,
+                as: 'users_vids',
+                attributes: ['id', 'full_name','username'],
+                // where: {id: user_id},
+                // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
+                through: {attributes: ['liked', 'disliked']}
+            }
+        ],
+        attributes: ['id', 'likes', 'name', 'dislikes', 'filename']
     });
     res.json(v);
 };
 
 exports.getVideosByAuthor = async (req, res) => {
-    let v = await Users.findAll({include: [{model: Videos}]});
+    let v = await Users.findAll({include: [{model: Videos, as: 'videos'}]});
     res.json(v);
 };
 
@@ -171,3 +194,32 @@ exports.searchInUserVideos = async (req, res) => {
 exports.removeVideoThumbnail = async (req, res) => {
 
 };
+
+exports.updateLikes = async (req, res) => {
+    let data = req.body;
+    const {user_id, video_id, likes, dislikes, likeStatus} = data;
+
+
+    let found = await UsersVideos.findOne({
+        where: {
+            user_id: user_id,
+            video_id: video_id
+        }
+    });
+
+    console.log(found)
+
+    if (!found) {
+        await UsersVideos.create({...data, disliked: likeStatus === 'disliked', liked: likeStatus === 'liked'});
+
+    } else {
+        await UsersVideos.update({disliked: likeStatus === 'disliked', liked: likeStatus === 'liked'}, {
+            where: {
+                user_id: user_id,
+                video_id: video_id
+            }
+        });
+    }
+    await Videos.update({disliked: likeStatus === 'disliked', liked: likeStatus === 'liked'}, {where: {id: video_id}});
+    res.json('OK');
+}
