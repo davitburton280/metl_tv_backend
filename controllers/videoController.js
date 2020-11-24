@@ -151,7 +151,7 @@ exports.getVideoById = async (req, res) => {
             {
                 model: Users,
                 as: 'users_vids',
-                attributes: ['id', 'full_name','username'],
+                attributes: ['id', 'full_name', 'username'],
                 // where: {id: user_id},
                 // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
                 through: {attributes: ['liked', 'disliked']}
@@ -170,7 +170,7 @@ exports.getVideosByAuthor = async (req, res) => {
 exports.searchInVideosByAuthor = async (req, res) => {
     let search = req.query.search;
     let v = await Users.findAll({
-        include: [{model: Videos}],
+        include: [{model: Videos, as: 'videos'}],
         where: sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%'),
     });
     res.json(v);
@@ -181,7 +181,7 @@ exports.searchInUserVideos = async (req, res) => {
     let {user_id, search} = req.query;
     let v = await Users.findOne({
         include: [{
-            model: Videos,
+            model: Videos, as: 'videos',
             where: sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%')
         }],
         where: {
@@ -222,4 +222,4 @@ exports.updateLikes = async (req, res) => {
     }
     await Videos.update({disliked: likeStatus === 'disliked', liked: likeStatus === 'liked'}, {where: {id: video_id}});
     res.json('OK');
-}
+};
