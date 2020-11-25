@@ -135,6 +135,22 @@ exports.getUserVideos = async (req, res) => {
     res.json(v);
 };
 
+exports.getUserSavedVideos = async (req, res) => {
+    console.log(req.query)
+    let userWhere = {id: req.query.user_id}
+    let v = await Users.findOne({
+        where: userWhere,
+        include: [{
+            model: Videos,
+            as: 'users_vids',
+            where: [sequelize.where(sequelize.col('`users_vids->users_videos`.`saved`'), 1)],
+            include: [{model: Channels}]
+        }],
+
+    });
+    res.json(v);
+};
+
 exports.getVideoById = async (req, res) => {
     let {id, user_id} = req.query;
     let idWhere = {id: id};
@@ -154,7 +170,7 @@ exports.getVideoById = async (req, res) => {
                 attributes: ['id', 'full_name', 'username'],
                 // where: {id: user_id},
                 // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
-                through: {attributes: ['liked', 'disliked']}
+                through: {attributes: ['liked', 'disliked', 'saved']}
             }
         ],
         attributes: ['id', 'likes', 'name', 'dislikes', 'filename']
@@ -220,6 +236,39 @@ exports.updateLikes = async (req, res) => {
             }
         });
     }
-    await Videos.update({disliked: likeStatus === 'disliked', liked: likeStatus === 'liked'}, {where: {id: video_id}});
+    await Videos.update({dislikes: dislikes, likes: likes}, {where: {id: video_id}});
     res.json('OK');
 };
+
+exports.saveVideo = async (req, res) => {
+
+    let data = req.body;
+    const {user_id, video_id, saved} = data;
+    console.log(data)
+
+    let found = await UsersVideos.findOne({
+        where: {
+            user_id: user_id,
+            video_id: video_id
+        }
+    });
+
+    let ret;
+    if (!found) {
+        ret = await UsersVideos.create(data);
+
+    } else {
+        console.log('update')
+        found.saved = saved;
+        console.log(found)
+        ret = await found.save();
+        // await UsersVideos.update({saved: saved}, {
+        //     where: {
+        //         user_id: user_id,
+        //         video_id: video_id
+        //     }
+        // });
+    }
+    res.json(ret);
+}
+;
