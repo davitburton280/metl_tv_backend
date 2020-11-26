@@ -84,8 +84,8 @@ exports.sendVerificationCode = async (req, res) => {
 
         // setup email data with unicode symbols
         let mailOptions = {
-            from: '"Trading " <info@metl.tv>', // sender address
-            to: 'sofiabruno3003@gmail.com', // list of receivers
+            from: '"Metl.tv " <info@metl.tv>', // sender address
+            to: req.body.email, // list of receivers
             subject: 'Confirmation email', // Subject line
             text: 'You recently requested a password reset', // plain text body
             html: `${randomCode}` // html body
