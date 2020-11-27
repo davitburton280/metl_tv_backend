@@ -1,25 +1,23 @@
-// Express Validator
+const {NO_SPACE_PATTERN, TEXT_ONLY_WITHOUT_SPECIALS_PATTERN, NUMBER_AFTER_TEXT_PATTERN} = require('../config/constants');
+
 const {body} = require('express-validator');
 const db = require('../models');
 const Users = db.users;
 
 
 const rules = [
-    body('full_name').not().isEmpty().withMessage('Full name is required'),
-    // body('last_name').not().isEmpty().withMessage('Last name is required'),
+    body('full_name')
+        .matches(TEXT_ONLY_WITHOUT_SPECIALS_PATTERN).withMessage('Full name should contain only alphabetical characters')
+        .not().isEmpty().withMessage('Full name is required'),
+    body('username')
+        .not().isEmpty().withMessage('Username is required')
+        .matches(NUMBER_AFTER_TEXT_PATTERN).withMessage('Please write alphabetical characters before numbers for username'),
     body('email').not().isEmpty().withMessage('E-mail is required').isEmail().withMessage('E-mail is invalid'),
-    body('password', 'Password is required').not().isEmpty(),
-    body('birthday', 'Birth day is required').not().isEmpty(),
-    // body('user_type', 'User type is required').not().isEmpty(),
-    // body('field_type')
-    //     .custom(async (type, {req}) => {
-    //         let data = req.body;
-    //         if (data.user_type === 'customer') return true;
-    //         else if (!data.field_type) {
-    //             throw new Error('Field type is required');
-    //         }
-    //         return true;
-    //     }),
+    body('password')
+        .matches(NO_SPACE_PATTERN).withMessage('Password should not contain spaces')
+        .not().isEmpty().withMessage('Password is required'),
+    body('birthday')
+        .not().isEmpty().withMessage('Birth day is required'),
     body().custom(async (req) => {
         let email = req.email;
 
@@ -28,8 +26,11 @@ const rules = [
 
         if (user != null) throw new Error('E-mail exists');
 
-        // return true;
+        if (req.password !== req.confirm_password) {
+            throw new Error('Passwords not match');
+        }
     }),
+
 
 
 ];
