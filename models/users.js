@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {timestamps: false, underscored: true});
     users.associate = function (models) {
         users.hasMany(models.videos, {as: 'videos', foreignKey: 'author_id'});
-        users.hasOne(models.channels, {foreignKey: 'user_id'})
+        users.hasOne(models.channels, {foreignKey: 'user_id', as: 'channel'})
         users.belongsToMany(models.channels, {
             as: 'subscriptions',
             through: models.channel_subscribers,

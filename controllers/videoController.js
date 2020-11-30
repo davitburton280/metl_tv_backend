@@ -16,7 +16,7 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 exports.getVideos = async (req, res) => {
-    let v = await Videos.findAll({include: [{model: Users, as: 'user', include: [{model: Channels}]}]});
+    let v = await Videos.findAll({include: [{model: Users, as: 'user', include: [{model: Channels, as: 'channel'}]}]});
     res.json(v);
 };
 
@@ -144,7 +144,7 @@ exports.getUserSavedVideos = async (req, res) => {
             model: Videos,
             as: 'users_vids',
             where: [sequelize.where(sequelize.col('`users_vids->users_videos`.`saved`'), 1)],
-            include: [{model: Channels}]
+            include: [{model: Channels, as: 'channel'}]
         }],
 
     });
@@ -157,10 +157,8 @@ exports.getVideoById = async (req, res) => {
     let v = await Videos.findOne({
         where: idWhere,
         // where: [idWhere, sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id)],
-        required: false,
-
         include: [
-            {model: Channels, attributes: ['id', 'subscribers_count', 'name', 'avatar']}, {
+            {model: Channels, as: 'channel', attributes: ['id', 'subscribers_count', 'name', 'avatar']}, {
                 model: VideoTags,
                 as: 'tags'
             },

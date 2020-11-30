@@ -13,6 +13,12 @@ exports.get = async (req, res) => {
     res.json(channels);
 };
 
+exports.getSubscriptions = async (req, res) => {
+    console.log(req.query)
+    let channels = await Users.findOne({where: {id: req.query.user_id}, include: [{model: Channels, as: 'subscriptions'}]});
+    res.json(channels);
+};
+
 // exports.getBy
 
 exports.searchChannelVideos = async (req, res) => {
@@ -22,7 +28,7 @@ exports.searchChannelVideos = async (req, res) => {
 
         let channels = await Channels.findAll(
             {
-                include: [{model: Videos}, {model: Users}],
+                include: [{model: Videos}, {model: Users, as: 'channels'}],
                 where: {
                     [Op.or]: [
                         {
@@ -122,7 +128,7 @@ exports.checkChannelSubscription = async (req, res) => {
 
 };
 
-exports.getUserChannelSubscriptions = async (req, res) => {
+exports.getSubscribers = async (req, res) => {
     let {user_id} = req.query;
     console.log('user channel subscriptions!!!!!')
     let userSubscriptions = await Channels.findAll({

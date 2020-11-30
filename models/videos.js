@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
             videos.belongsTo(models.users, {as:'user',foreignKey: 'author_id'});
-            videos.belongsTo(models.channels, {foreignKey: 'channel_id'});
+            videos.belongsTo(models.channels, {foreignKey: 'channel_id', as: 'channel'});
             videos.hasMany(models.video_tags, {as: 'tags', foreignKey: 'video_id'});
             videos.belongsToMany(models.users, {
                 as: 'users_vids',
