@@ -178,7 +178,7 @@ exports.changeCover = async (req, res) => {
 
 let changeJwt = async (data, res) => {
 
-    let user = await Users.findOne({where: {id: data.id}, include: [{model: Channels}]});
+    let user = await Users.findOne({where: {id: data.id}, include: [{model: Channels, as: 'channel'}]});
 
 
     let full_name = user[`full_name`];

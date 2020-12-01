@@ -24,8 +24,9 @@ exports.login = async (req, res) => {
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
             attributes: attributes,
-            include: [{model: Channels}],
+            include: [{model: Channels, as: 'channel'}],
             where: {email: email} //userTypeWhere
+
         }, res);
 
 
