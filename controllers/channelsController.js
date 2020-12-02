@@ -28,7 +28,7 @@ exports.searchChannelVideos = async (req, res) => {
 
         let channels = await Channels.findAll(
             {
-                include: [{model: Videos}, {model: Users, as: 'channels'}],
+                include: [{model: Videos}, {model: Users, as: 'user'}],
                 where: {
                     [Op.or]: [
                         {
@@ -68,8 +68,7 @@ exports.subscribeToChannel = async (req, res) => {
 
         // Getting maximum position id of the user's subscriptions
         let userSubscriptions = await ChannelSubscribers.findOne({
-            where:
-                {subscriber_id: user_id},
+            where: {subscriber_id: user_id},
             attributes: [sequelize.fn('MAX', sequelize.col('position_id'))],
             raw: true
         });

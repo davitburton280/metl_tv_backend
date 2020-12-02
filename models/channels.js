@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
-            channels.belongsTo(models.users, {foreignKey: 'user_id'});
+            channels.belongsTo(models.users, {foreignKey: 'user_id', as: 'user'});
             channels.hasMany(models.videos, {foreignKey: 'channel_id'});
             channels.belongsToMany(models.users, {
                 as: 'subscribers',
