@@ -14,6 +14,9 @@ module.exports = {
             name: {
                 type: Sequelize.STRING
             },
+            description: {
+                type: Sequelize.TEXT
+            },
             subscribers_count: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0

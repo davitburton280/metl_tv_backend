@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     channels.init({
         user_id: DataTypes.INTEGER,
         name: DataTypes.STRING,
+        description: DataTypes.TEXT,
         avatar: DataTypes.STRING,
         cover: DataTypes.STRING,
         subscribers_count: DataTypes.NUMBER

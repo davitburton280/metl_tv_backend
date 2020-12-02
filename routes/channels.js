@@ -9,5 +9,6 @@ router.get('/check-subscription', channelsController.checkChannelSubscription);
 router.get('/get-subscriptions', channelsController.getSubscribers);
 router.put('/subscribe', channelsController.subscribeToChannel);
 router.put('/subscriptions/update-priority', channelsController.changeSubscriptionPriority);
+router.put('/save-description', channelsController.saveDescription);
 
 module.exports = router;

@@ -2,7 +2,9 @@ const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
 const Videos = db.videos;
-const ChannelSubscribers = db.channel_subscribers
+const ChannelSubscribers = db.channel_subscribers;
+
+const usersController = require('./usersController');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
@@ -15,7 +17,10 @@ exports.get = async (req, res) => {
 
 exports.getSubscriptions = async (req, res) => {
     console.log(req.query)
-    let channels = await Users.findOne({where: {id: req.query.user_id}, include: [{model: Channels, as: 'subscriptions'}]});
+    let channels = await Users.findOne({
+        where: {id: req.query.user_id},
+        include: [{model: Channels, as: 'subscriptions'}]
+    });
     res.json(channels);
 };
 
@@ -140,7 +145,7 @@ exports.getSubscribers = async (req, res) => {
                 where:
                     sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
             },
-            {model: Users, attributes: ['username']}
+            {model: Users, attributes: ['username'], as: 'user'}
         ],
         order: [sequelize.col('subscribers->channel_subscribers.position_id')],
         attributes: {exclude: ['createdAt', 'updatedAt']},
@@ -200,3 +205,12 @@ exports.changeSubscriptionPriority = async (req, res) => {
     res.json('updated')
 };
 
+exports.saveDescription = async (req, res) => {
+    const {id, ...rest} = req.body;
+    req.query = req.body;
+    console.log('save description')
+    console.log(rest)
+    await Channels.update(rest, {where: {id: id}});
+    let userInfo = await usersController.getUserInfo(req, res);
+    res.json(userInfo);
+};
