@@ -80,7 +80,8 @@ app.use(passport.initialize({}));
 
 app.use('/auth', require('./routes/auth'));
 app.use('/users', require('./routes/users'));
-app.use('/videos', require('./routes/video'));
+app.use('/videos', require('./routes/videos'));
+app.use('/playlists', require('./routes/playlists'));
 app.use('/channels', require('./routes/channels'));
 
 let dist = path.join(__dirname, 'dist/');

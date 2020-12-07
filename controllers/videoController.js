@@ -75,7 +75,17 @@ exports.saveVideoData = async (req, res) => {
             status: 'recorded'
         };
 
-        let found = await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
+        let video = await Videos.findOne({where: {status: 'live', author_id: data.author_id}});
+        console.log('video id')
+        console.log(video)
+
+        let userVideo = await UsersVideos.create({
+            // where: {
+                user_id: data.author_id,
+                video_id: video.id
+            // }
+        });
+        await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
 
 
         // let found = await to(VideoStreams.findOne({status: 'pending', username: data.username}));
@@ -154,6 +164,7 @@ exports.getUserSavedVideos = async (req, res) => {
 exports.getVideoById = async (req, res) => {
     let {id, user_id} = req.query;
     let idWhere = {id: id};
+    console.log('get video by id!!!')
     let v = await Videos.findOne({
         where: idWhere,
         // where: [idWhere, sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id)],
