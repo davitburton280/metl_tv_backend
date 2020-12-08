@@ -60,8 +60,8 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 50
 const mongoose = require('mongoose');
 
 //Set up default mongoose connection
-const mongoDB = 'mongodb://127.0.0.1/metltv';
-mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
+// const mongoDB = 'mongodb://127.0.0.1/metltv';
+// mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 
 
 //Get the default connection

@@ -8,14 +8,24 @@ exports.add = async (req, res) => {
 };
 
 exports.get = async (req, res) => {
-    const playlists = await Playlists.findAll({});
+    console.log('playlist get!!!')
+    const playlists = await Playlists.findAll({include: [{model: Videos, as: 'videos'}]});
+    console.log(playlists)
     res.json(playlists);
 };
 
 exports.getById = async (req, res) => {
     const playlists = await Playlists.findOne({
-        id: req.query.id,
-        // include: [{model: Videos}]
+        where: {id: req.query.id},
+        include: [{model: Videos, as: 'videos'}]
     });
+
     res.json(playlists);
+};
+
+
+exports.updatePrivacy = async (req, res) => {
+    const {id, privacy} = req.body;
+    console.log(id, privacy)
+    // await Playlists.update();
 };

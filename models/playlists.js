@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             playlists.belongsToMany(models.videos, {
-                as: 'playlist_videos',
+                as: 'videos',
                 through: models.playlists_videos,
                 foreignKey: 'playlist_id'
             })
@@ -21,11 +21,14 @@ module.exports = (sequelize, DataTypes) => {
     playlists.init({
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
-        privacy: DataTypes.INTEGER
+        privacy: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'playlists',
-        underscored: true
+        underscored: true,
+        timestamps: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
     });
     return playlists;
 };
