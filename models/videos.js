@@ -19,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
                 through: models.users_videos,
                 foreignKey: 'video_id'
             });
+            videos.belongsToMany(models.playlists, {
+                as: 'playlist_videos',
+                through: models.playlists_videos,
+                foreignKey: 'video_id'
+            });
         }
     };
 

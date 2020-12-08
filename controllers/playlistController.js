@@ -13,6 +13,9 @@ exports.get = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-    const playlists = await Playlists.findOne({id: req.query.id, include: [{model: Videos}]});
+    const playlists = await Playlists.findOne({
+        id: req.query.id,
+        // include: [{model: Videos}]
+    });
     res.json(playlists);
 };
