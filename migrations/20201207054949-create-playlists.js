@@ -18,10 +18,12 @@ module.exports = {
                 type: Sequelize.INTEGER
             },
             created_at: {
+                defaultValue: Sequelize.fn('NOW'),
                 allowNull: false,
                 type: Sequelize.DATE
             },
             updated_at: {
+                defaultValue: Sequelize.fn('NOW'),
                 allowNull: false,
                 type: Sequelize.DATE
             }
