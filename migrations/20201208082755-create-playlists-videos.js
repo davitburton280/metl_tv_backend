@@ -17,6 +17,9 @@ module.exports = {
       channel_id: {
         type: Sequelize.INTEGER
       },
+      position: {
+        type: Sequelize.INTEGER
+      },
       created_at: {
         defaultValue: Sequelize.fn('NOW'),
         allowNull: false,

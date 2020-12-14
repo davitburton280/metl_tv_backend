@@ -81,8 +81,8 @@ exports.saveVideoData = async (req, res) => {
 
         let userVideo = await UsersVideos.create({
             // where: {
-                user_id: data.author_id,
-                video_id: video.id
+            user_id: data.author_id,
+            video_id: video.id
             // }
         });
         await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
@@ -140,7 +140,7 @@ exports.getUserVideos = async (req, res) => {
     // let v = await Videos.findAll({author_id: req.query.user_id});
     let v = await Users.findOne({
         where: {id: req.query.user_id},
-        include: [{model: Videos, as: 'videos'}],
+        include: [{model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}]}],
     });
     res.json(v);
 };
@@ -212,6 +212,15 @@ exports.searchInUserVideos = async (req, res) => {
         where: {
             id: user_id
         },
+    });
+    res.json(v);
+};
+
+exports.searchInAllVideos = async (req, res) => {
+    let {search} = req.query;
+    let v = await Videos.findAll({
+        where:sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%'),
+        include: [{model:Channels, as : 'channel'}]
     });
     res.json(v);
 };

@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
     playlists_videos.init({
         playlist_id: DataTypes.INTEGER,
         video_id: DataTypes.INTEGER,
-        channel_id: DataTypes.INTEGER
+        channel_id: DataTypes.INTEGER,
+        position: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'playlists_videos',
