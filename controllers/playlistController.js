@@ -29,7 +29,7 @@ exports.get = async (req, res) => {
 
 exports.getById = async (req, res) => {
     const playlists = await Playlists.findOne({
-        where: {id: req.query.id},
+        where: {id: req.query.playlist_id},
         include: [{model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}]}],
         order: [sequelize.col('`videos->playlists_videos.position`')]
     });
@@ -42,7 +42,7 @@ exports.updatePrivacy = async (req, res) => {
     const {id, privacy} = req.body;
     console.log(id, privacy)
     await Playlists.update({privacy: privacy}, {where: {id: id}});
-    req.query = req.body;
+    req.query.playlist_id = req.body.id;
     this.getById(req, res);
 };
 
@@ -51,7 +51,7 @@ exports.changeThumbnail = async (req, res) => {
     console.log('thumbnail!!!!')
     console.log(data)
     await Playlists.update({thumbnail: data.thumbnail}, {where: {id: data.playlist_id}});
-    req.query.id = req.body.playlist_id;
+    req.query = req.body;
     this.getById(req, res);
 };
 
@@ -59,7 +59,7 @@ exports.updatePlaylistInfo = async (req, res) => {
     let data = req.body;
     const {id, name, description} = data
     await Playlists.update({name: name, description: description}, {where: {id: id}});
-    req.query = req.body;
+    req.query.playlist_id = req.body.id;
     console.log(req.query)
     this.getById(req, res);
 };
