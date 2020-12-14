@@ -17,6 +17,9 @@ module.exports = {
             privacy: {
                 type: Sequelize.INTEGER
             },
+            thumbnail: {
+                type: Sequelize.STRING
+            },
             created_at: {
                 defaultValue: Sequelize.fn('NOW'),
                 allowNull: false,

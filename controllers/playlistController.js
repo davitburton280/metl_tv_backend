@@ -44,6 +44,15 @@ exports.updatePrivacy = async (req, res) => {
     // await Playlists.update();
 };
 
+exports.changeThumbnail = async (req, res) => {
+    let data = req.body;
+    console.log('thumbnail!!!!')
+    console.log(data)
+    await Playlists.update({thumbnail: data.thumbnail}, {where: {id: data.playlist_id}});
+    req.query = req.body;
+    this.getById(req, res);
+};
+
 exports.updateVideoPosition = async (req, res) => {
     let {playlist_id, rows} = req.body;
     rows = JSON.parse(rows);

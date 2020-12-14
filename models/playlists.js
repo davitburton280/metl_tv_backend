@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     playlists.init({
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
+        thumbnail: DataTypes.STRING,
         privacy: DataTypes.INTEGER,
     }, {
         sequelize,
