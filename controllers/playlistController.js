@@ -41,7 +41,9 @@ exports.getById = async (req, res) => {
 exports.updatePrivacy = async (req, res) => {
     const {id, privacy} = req.body;
     console.log(id, privacy)
-    // await Playlists.update();
+    await Playlists.update({privacy: privacy}, {where: {id: id}});
+    req.query.playlist_id = req.body.id;
+    this.getById(req, res);
 };
 
 exports.changeThumbnail = async (req, res) => {
@@ -50,6 +52,15 @@ exports.changeThumbnail = async (req, res) => {
     console.log(data)
     await Playlists.update({thumbnail: data.thumbnail}, {where: {id: data.playlist_id}});
     req.query = req.body;
+    this.getById(req, res);
+};
+
+exports.updatePlaylistInfo = async (req, res) => {
+    let data = req.body;
+    const {id, name, description} = data
+    await Playlists.update({name: name, description: description}, {where: {id: id}});
+    req.query.playlist_id = req.body.id;
+    console.log(req.query)
     this.getById(req, res);
 };
 
@@ -66,6 +77,7 @@ exports.updateVideoPosition = async (req, res) => {
     });
     res.json('updated');
 };
+
 
 exports.removeVideo = async (req, res) => {
     const {playlist_id, video_id} = req.query;
