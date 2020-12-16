@@ -14,9 +14,37 @@ exports.addVideos = async (req, res) => {
     const data = req.body;
     const videoIds = JSON.parse(data.video_ids);
     videoIds.map(async (id) => {
-        await PlaylistsVideos.create({playlist_id: data.playlist_id, video_id: id});
+        let lastPosition = await PlaylistsVideos.findOne({
+            where: {video_id: id},
+            attributes: [sequelize.fn('MAX', sequelize.col('position'))],
+        });
+        await PlaylistsVideos.create({
+            playlist_id: data.playlist_id,
+            video_id: id,
+            position: (lastPosition['MAX(`position_id`)'] + 1) || 1
+        });
     });
     console.log(videoIds)
+    res.json('OK');
+};
+
+exports.addVideosToOtherPlaylists = async (req, res) => {
+    const data = req.body;
+    console.log(data)
+    data.playlists.map(async (p) => {
+        await PlaylistsVideos.destroy({where: {video_id: data.video_id}});
+        if (p.checked) {
+            let lastPosition = await PlaylistsVideos.findOne({
+                where: {video_id: data.video_id},
+                attributes: [sequelize.fn('MAX', sequelize.col('position'))],
+            });
+            await PlaylistsVideos.create({
+                playlist_id: p.id,
+                video_id: data.video_id,
+                position: (lastPosition['MAX(`position_id`)'] + 1) || 1
+            });
+        }
+    });
     res.json('OK');
 };
 
