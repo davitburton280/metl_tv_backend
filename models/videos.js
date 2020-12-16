@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: 'video_id'
             });
             videos.belongsToMany(models.playlists, {
-                as: 'playlist_videos',
+                as: 'playlists',
                 through: models.playlists_videos,
                 foreignKey: 'video_id'
             });

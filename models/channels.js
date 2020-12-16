@@ -31,7 +31,9 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         sequelize,
         modelName: 'channels',
-        underscored: true
+        underscored: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
     });
     return channels;
 };

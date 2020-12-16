@@ -11,12 +11,27 @@ const VideoStreams = require('../mongoose/video_streams');
 const to = require('../helpers/getPromiseResult');
 
 const Videos = db.videos;
+const Playlists = db.playlists;
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 exports.getVideos = async (req, res) => {
-    let v = await Videos.findAll({include: [{model: Users, as: 'user', include: [{model: Channels, as: 'channel'}]}]});
+    let v = await Videos.findAll({
+        include: [
+            {
+                model: Users, as: 'user', include: [
+                    {model: Channels, as: 'channel'}
+                ]
+            },
+            // {
+            //     model: Playlists,
+            //     as: 'playlists',
+            // }
+        ]
+    });
+
+    let p = await Playlists.findAll();
     res.json(v);
 };
 
@@ -219,8 +234,8 @@ exports.searchInUserVideos = async (req, res) => {
 exports.searchInAllVideos = async (req, res) => {
     let {search} = req.query;
     let v = await Videos.findAll({
-        where:sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%'),
-        include: [{model:Channels, as : 'channel'}]
+        where: sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%'),
+        include: [{model: Channels, as: 'channel'}]
     });
     res.json(v);
 };
