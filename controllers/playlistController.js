@@ -60,6 +60,15 @@ exports.get = async (req, res) => {
     res.json(playlists);
 };
 
+exports.search = async (req, res) => {
+    const {search} = req.query;
+    const playlists = await Playlists.findAll({
+        include: [{model: Videos, as: 'videos'}],
+        where: {name: search}
+    });
+    res.json(playlists);
+};
+
 exports.getById = async (req, res) => {
     const playlists = await Playlists.findOne({
         where: {id: req.query.playlist_id},
