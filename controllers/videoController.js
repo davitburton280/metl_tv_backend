@@ -209,9 +209,10 @@ exports.getVideosByAuthor = async (req, res) => {
 
 exports.searchInVideosByAuthor = async (req, res) => {
     let search = req.query.search;
+    let where = search ? sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%') : {};
     let v = await Users.findAll({
         include: [{model: Videos, as: 'videos'}],
-        where: sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%'),
+        where: where,
     });
     res.json(v);
 };
@@ -219,10 +220,11 @@ exports.searchInVideosByAuthor = async (req, res) => {
 
 exports.searchInUserVideos = async (req, res) => {
     let {user_id, search} = req.query;
+    let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
     let v = await Users.findOne({
         include: [{
             model: Videos, as: 'videos',
-            where: sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%')
+            where: where
         }],
         where: {
             id: user_id

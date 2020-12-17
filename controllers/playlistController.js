@@ -51,9 +51,10 @@ exports.addVideosToOtherPlaylists = async (req, res) => {
 exports.get = async (req, res) => {
     console.log('playlist get!!!')
     const {channel_id} = req.query;
+    const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
         include: [{model: Videos, as: 'videos'}],
-        where: {channel_id: channel_id}
+        where: where
     });
     // console.log(playlists)
     res.json(playlists);
