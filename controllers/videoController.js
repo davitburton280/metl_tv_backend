@@ -197,7 +197,7 @@ exports.getVideoById = async (req, res) => {
                 through: {attributes: ['liked', 'disliked', 'saved']}
             }
         ],
-        attributes: ['id', 'likes', 'name', 'dislikes', 'filename']
+        attributes: ['id', 'likes', 'name', 'dislikes', 'filename', 'created_at']
     });
     res.json(v);
 };
