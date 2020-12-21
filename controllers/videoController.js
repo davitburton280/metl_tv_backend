@@ -17,6 +17,7 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 exports.getVideos = async (req, res) => {
+    let ret = {};
     let v = await Videos.findAll({
         include: [
             {
@@ -31,8 +32,10 @@ exports.getVideos = async (req, res) => {
         ]
     });
 
-    let p = await Playlists.findAll();
-    res.json(v);
+    let p = await Playlists.findAll({include:[{model:Videos, as: 'videos'}]});
+    ret['videos'] = v;
+    ret['playlists']=p;
+    res.json(ret);
 };
 
 exports.saveVideoToken = async (req, res) => {
