@@ -17,7 +17,9 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 exports.getVideos = async (req, res) => {
+    let {withPlaylists, limit} = req.query;
     let ret = {};
+    let limitOption = limit? {limit: +limit}:{};
     let v = await Videos.findAll({
         include: [
             {
@@ -29,12 +31,17 @@ exports.getVideos = async (req, res) => {
             //     model: Playlists,
             //     as: 'playlists',
             // }
-        ]
+        ],
+        limitOption
     });
-
-    let p = await Playlists.findAll({include:[{model:Videos, as: 'videos'}]});
-    ret['videos'] = v;
-    ret['playlists']=p;
+    console.log(withPlaylists)
+    if (withPlaylists) {
+        let p = await Playlists.findAll({include: [{model: Videos, as: 'videos'}]});
+        ret['videos'] = v;
+        ret['playlists'] = p;
+    } else {
+        ret = v;
+    }
     res.json(ret);
 };
 
@@ -180,11 +187,13 @@ exports.getUserSavedVideos = async (req, res) => {
 };
 
 exports.getVideoById = async (req, res) => {
-    let {id, user_id} = req.query;
+    let {id, playlist_id} = req.query;
     let idWhere = {id: id};
+    // let playlistWhere = playlist_id ? sequelize.where(sequelize.col(`playlists->playlists_videos.playlist_id`), playlist_id) : {};
     console.log('get video by id!!!')
     let v = await Videos.findOne({
-        where: idWhere,
+        // where: idWhere,
+        where: [idWhere],
         // where: [idWhere, sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id)],
         include: [
             {model: Channels, as: 'channel', attributes: ['id', 'subscribers_count', 'name', 'avatar']}, {
@@ -198,7 +207,8 @@ exports.getVideoById = async (req, res) => {
                 // where: {id: user_id},
                 // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
                 through: {attributes: ['liked', 'disliked', 'saved']}
-            }
+            },
+            {model: Playlists, as: 'playlists', attributes: ['id'] } //where: playlistWhere
         ],
         attributes: ['id', 'likes', 'name', 'dislikes', 'filename', 'created_at']
     });

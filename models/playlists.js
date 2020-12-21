@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
                 as: 'videos',
                 through: models.playlists_videos,
                 foreignKey: 'playlist_id'
+            });
+            playlists.belongsTo(models.channels, {
+                as: 'channel'
             })
             // define association here
         }

@@ -1,6 +1,7 @@
 const db = require('../models');
 const Playlists = db.playlists;
 const Videos = db.videos;
+const Users = db.users;
 const Channels = db.channels;
 const PlaylistsVideos = db.playlists_videos;
 const sequelize = require('sequelize');
@@ -72,7 +73,12 @@ exports.search = async (req, res) => {
 exports.getById = async (req, res) => {
     const playlists = await Playlists.findOne({
         where: {id: req.query.playlist_id},
-        include: [{model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}]}],
+        include: [
+            {
+                model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}]
+            },
+            {model: Channels, as: 'channel'}
+        ],
         order: [sequelize.col('`videos->playlists_videos.position`')]
     });
 
