@@ -8,8 +8,8 @@ const sequelize = require('sequelize');
 
 exports.add = async (req, res) => {
     const data = req.body;
-    await Playlists.create(data);
-    res.json('OK');
+    let p = await Playlists.create(data);
+    res.json(p);
 };
 exports.addVideos = async (req, res) => {
     const data = req.body;
