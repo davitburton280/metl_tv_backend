@@ -75,9 +75,10 @@ exports.getById = async (req, res) => {
         where: {id: req.query.playlist_id},
         include: [
             {
-                model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}]
+                model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}] //{model: Users, as: 'user'}
             },
-            {model: Channels, as: 'channel'}
+            {model: Channels, as: 'channel'},
+
         ],
         order: [sequelize.col('`videos->playlists_videos.position`')]
     });

@@ -17,7 +17,11 @@ module.exports = (sequelize, DataTypes) => {
             });
             playlists.belongsTo(models.channels, {
                 as: 'channel'
-            })
+            });
+
+            // playlists.belongsTo(models.users, {
+            //     as: 'user'
+            // })
             // define association here
         }
     };

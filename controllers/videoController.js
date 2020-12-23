@@ -27,10 +27,10 @@ exports.getVideos = async (req, res) => {
                     {model: Channels, as: 'channel'}
                 ]
             },
-            // {
-            //     model: Playlists,
-            //     as: 'playlists',
-            // }
+            {
+                model: Channels,
+                as: 'channel',
+            }
         ],
         limitOption
     });
