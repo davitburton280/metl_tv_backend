@@ -13,7 +13,9 @@ module.exports = (sequelize, DataTypes) => {
             playlists.belongsToMany(models.videos, {
                 as: 'videos',
                 through: models.playlists_videos,
-                foreignKey: 'playlist_id'
+                foreignKey: 'playlist_id',
+                onDelete: 'cascade',
+                hooks: true
             });
             playlists.belongsTo(models.channels, {
                 as: 'channel'

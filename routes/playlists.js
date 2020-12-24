@@ -13,5 +13,6 @@ router.put('/update-playlist-info', playlistController.updatePlaylistInfo);
 router.put('/change-thumbnail', playlistController.changeThumbnail);
 router.put('/update-video-position', playlistController.updateVideoPosition);
 router.delete('/remove-video', playlistController.removeVideo);
+router.delete('/remove', playlistController.remove);
 
 module.exports = router;

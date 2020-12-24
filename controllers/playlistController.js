@@ -133,3 +133,10 @@ exports.removeVideo = async (req, res) => {
     await PlaylistsVideos.destroy({where: {playlist_id: playlist_id, video_id: video_id}});
     this.getById(req, res);
 };
+
+exports.remove = async (req, res) => {
+    const {id} = req.query;
+    await Playlists.destroy({where: {id: id}});
+    // await PlaylistsVideos.destroy({where:{playlist_id: id}});
+    this.get(req,res);
+};

@@ -318,5 +318,4 @@ exports.saveVideo = async (req, res) => {
         // });
     }
     res.json(ret);
-}
-;
+};
