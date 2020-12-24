@@ -18,4 +18,5 @@ router.get('/get', videoController.getVideos);
 router.get('/get-saved', videoController.getUserSavedVideos);
 router.put('/update-likes', videoController.updateLikes);
 router.put('/save-video', videoController.saveVideo);
+router.delete('/remove', uploadVideoThumbFile, videoController.removeVideo);
 module.exports = router;

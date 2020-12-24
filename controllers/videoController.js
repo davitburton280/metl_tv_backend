@@ -19,7 +19,7 @@ const Op = sequelize.Op;
 exports.getVideos = async (req, res) => {
     let {withPlaylists, limit} = req.query;
     let ret = {};
-    let limitOption = limit? {limit: +limit}:{};
+    let limitOption = limit ? {limit: +limit} : {};
     let v = await Videos.findAll({
         include: [
             {
@@ -208,7 +208,7 @@ exports.getVideoById = async (req, res) => {
                 // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
                 through: {attributes: ['liked', 'disliked', 'saved']}
             },
-            {model: Playlists, as: 'playlists', attributes: ['id'] } //where: playlistWhere
+            {model: Playlists, as: 'playlists', attributes: ['id']} //where: playlistWhere
         ],
         attributes: ['id', 'likes', 'name', 'dislikes', 'filename', 'created_at']
     });
@@ -255,9 +255,6 @@ exports.searchInAllVideos = async (req, res) => {
     res.json(v);
 };
 
-exports.removeVideoThumbnail = async (req, res) => {
-
-};
 
 exports.updateLikes = async (req, res) => {
     let data = req.body;
@@ -318,4 +315,16 @@ exports.saveVideo = async (req, res) => {
         // });
     }
     res.json(ret);
+};
+
+
+exports.removeVideo = async (req, res) => {
+    let {id} = req.query;
+    console.log(id)
+    await Videos.destroy({where: {id: id}})
+    this.getVideosByAuthor(req, res);
+};
+
+exports.removeVideoThumbnail = async (req, res) => {
+
 };
