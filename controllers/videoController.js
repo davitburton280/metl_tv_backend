@@ -5,6 +5,9 @@ const VideoCategories = db.video_categories;
 const VideoTags = db.video_tags;
 const PrivacyTypes = db.privacy_types;
 const UsersVideos = db.users_videos;
+const PlaylistsVideos = db.playlists_videos;
+
+const usersController = require('../controllers/usersController');
 
 
 const VideoStreams = require('../mongoose/video_streams');
@@ -321,8 +324,10 @@ exports.saveVideo = async (req, res) => {
 exports.removeVideo = async (req, res) => {
     let {id} = req.query;
     console.log(id)
-    await Videos.destroy({where: {id: id}})
-    this.getVideosByAuthor(req, res);
+    await PlaylistsVideos.destroy({where:{video_id: id}});
+    await Videos.destroy({where: {id: id}});
+    await usersController.getUserInfo(req, res);
+
 };
 
 exports.removeVideoThumbnail = async (req, res) => {
