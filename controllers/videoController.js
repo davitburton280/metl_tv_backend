@@ -19,6 +19,9 @@ const Playlists = db.playlists;
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
+const fse = require('fs-extra');
+const path = require('path');
+
 exports.getVideos = async (req, res) => {
     let {withPlaylists, limit} = req.query;
     let ret = {};
@@ -322,11 +325,18 @@ exports.saveVideo = async (req, res) => {
 
 
 exports.removeVideo = async (req, res) => {
-    let {id} = req.query;
-    console.log(id)
-    await PlaylistsVideos.destroy({where:{video_id: id}});
-    await Videos.destroy({where: {id: id}});
-    await usersController.getUserInfo(req, res);
+    let {id, filename} = req.query;
+
+    let file = path.join(path.join(__dirname, '../public/uploads/videos/') + filename);
+    let removeResult;
+    if (await fse.exists(file)) {
+        removeResult = await to(fse.remove(file));
+    }
+    if (!removeResult) {
+        await PlaylistsVideos.destroy({where: {video_id: id}});
+        await Videos.destroy({where: {id: id}});
+        await usersController.getUserInfo(req, res);
+    }
 
 };
 
