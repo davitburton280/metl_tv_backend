@@ -3,12 +3,15 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const validateRegister = require('../validators/validateRegister');
 const validateLogin = require('../validators/validateLogin');
+const validateResetPass = require('../validators/validateResetPass');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
 // Regular auth routes and social auth logout route
 router.post('/register', validateRegister.rules, authController.register);
 router.post('/send-verification-code', validateRegister.rules, authController.sendVerificationCode);
+router.post('/send-forgot-pass-email', authController.sendForgotPassEmail);
+router.post('/reset-password', validateResetPass.rules, authController.resetPassword);
 router.post('/login', validateLogin.rules, authController.login);
 router.get('/logout', authController.logout);
 
@@ -24,14 +27,14 @@ router.get('/facebook/callback', passport.authenticate('facebook', {
 });
 
 // Passport.js Facebook-token auth route
-router.post('/facebook/token', passport.authenticate('facebook-token', {session: false}), (req, res) => {
+router.post('/facebook/token', passport.authenticate('facebook-token', {session: false}, (req, res) => {
     if (!req.user) {
         return res.send(401, 'User Not Authenticated');
     } else {
         let token = jwt.sign(req.user, 'secretkey', {expiresIn: '8h'});
         res.json({token});
     }
-});
+}));
 
 
 // Passport.js Google auth routes

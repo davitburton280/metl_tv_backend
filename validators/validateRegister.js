@@ -27,7 +27,7 @@ const rules = [
         if (user != null) throw new Error('E-mail exists');
 
         if (req.password !== req.confirm_password) {
-            throw new Error('Passwords not match');
+            throw new Error('Passwords don\'t match');
         }
     }),
 

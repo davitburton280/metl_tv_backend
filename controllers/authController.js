@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs');
 
 const nodemailer = require('nodemailer');
 const showIfErrors = require('../helpers/showIfErrors');
+const to = require('../helpers/getPromiseResult');
 
 exports.login = async (req, res) => {
 
@@ -88,8 +89,61 @@ exports.sendVerificationCode = async (req, res) => {
             from: '"Metl.tv " <info@metl.tv>', // sender address
             to: req.body.email, // list of receivers
             subject: 'Confirmation email', // Subject line
-            text: 'You recently requested a password reset', // plain text body
+            text: 'Account confirmation code', // plain text body
             html: `${randomCode}` // html body
+        };
+
+        // send mail with defined transport object
+        transporter.sendMail(mailOptions, (error, info) => {
+            console.log(info)
+            console.log(error)
+            if (error) {
+                res.status(500).json({msg: error.toString()})
+            } else if (info) {
+
+                console.log('Message sent: %s', info.messageId);
+                // Preview only available when sending through an Ethereal account
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                res.json(randomCode);
+            }
+            transporter.close();
+
+
+        });
+    }
+}
+
+
+exports.sendForgotPassEmail = async (req, res) => {
+
+    let data = req.body;
+
+    console.log('OK')
+    if (!showIfErrors(req, res)) {
+
+
+        let transporter = nodemailer.createTransport({
+            // host: 'smtp.gmail.com',
+            service: 'gmail',
+            // port: 465,
+            // secure: false, // true for 465, false for other ports
+            auth: {
+                user: 'sofiabruno3003@gmail.com', // generated ethereal user
+                pass: 'davmark11' // generated ethereal password
+            }
+        });
+
+        let randomCode = Math.floor(1000 + Math.random() * 9000);
+        console.log("CODE" + randomCode)
+        // console.log(process.env)
+
+        // setup email data with unicode symbols
+        let mailOptions = {
+            from: '"Metl.tv " <info@metl.tv>', // sender address
+            to: data.email, // list of receivers
+            subject: 'Forgot Password email', // Subject line
+            text: 'You recently requested a password reset', // plain text body
+            html: `<p>You recently requested a password reset. Please click on this <a href="${process.env.FRONTEND_URL}auth/reset-password?email=${data.email}">link</a> to proceed</p>` // html body
         };
 
         // send mail with defined transport object
@@ -136,4 +190,20 @@ exports.register = async (req, res) => {
 
         this.login(req, res);
     }
+};
+
+exports.resetPassword = async (req, res) => {
+    console.log('here!!!!')
+    let data = req.body;
+    let newPassword = data.password;
+    if (!showIfErrors(req, res)) {
+
+
+        data.password = bcrypt.hashSync(newPassword, 10);
+
+        await to(Users.update({password: data.password}, {where: {email: data.email}}), res);
+        this.login(req, res);
+    }
+
+
 };
