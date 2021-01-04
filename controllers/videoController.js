@@ -36,6 +36,9 @@ exports.getVideos = async (req, res) => {
             {
                 model: Channels,
                 as: 'channel',
+            },
+            {
+                model: Users, as: 'users_vids', attributes: ['username']
             }
         ],
         limitOption
