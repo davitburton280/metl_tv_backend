@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         video_id: DataTypes.INTEGER,
         liked: DataTypes.INTEGER,
         disliked: DataTypes.INTEGER,
+        viewed: DataTypes.INTEGER,
         saved: DataTypes.INTEGER
     }, {
         sequelize,

@@ -17,6 +17,7 @@ router.get('/search-in-all-videos', videoController.searchInAllVideos);
 router.get('/get', videoController.getVideos);
 router.get('/get-saved', videoController.getUserSavedVideos);
 router.put('/update-likes', videoController.updateLikes);
+router.put('/update-views', videoController.updateViews);
 router.put('/save-video', videoController.saveVideo);
 router.delete('/remove', uploadVideoThumbFile, videoController.removeVideo);
 module.exports = router;

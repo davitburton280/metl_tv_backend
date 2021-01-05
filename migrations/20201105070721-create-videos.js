@@ -28,6 +28,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 defaultValue: 0
             },
+            views: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
             name: {
                 type: Sequelize.STRING
             },

@@ -23,9 +23,10 @@ const fse = require('fs-extra');
 const path = require('path');
 
 exports.getVideos = async (req, res) => {
-    let {withPlaylists, limit} = req.query;
+    let {withPlaylists, trending, limit} = req.query;
     let ret = {};
     let limitOption = limit ? {limit: +limit} : {};
+    let trendingOption = +trending ? [['views', 'DESC']] : [['created_at','DESC']];
     let v = await Videos.findAll({
         include: [
             {
@@ -41,15 +42,13 @@ exports.getVideos = async (req, res) => {
                 model: Users, as: 'users_vids', attributes: ['username']
             }
         ],
+        order: trendingOption,
         limitOption
     });
-    console.log(withPlaylists)
-    if (withPlaylists) {
+    ret['videos'] = v;
+    if (+withPlaylists) {
         let p = await Playlists.findAll({include: [{model: Videos, as: 'videos'}]});
-        ret['videos'] = v;
         ret['playlists'] = p;
-    } else {
-        ret = v;
     }
     res.json(ret);
 };
@@ -215,11 +214,11 @@ exports.getVideoById = async (req, res) => {
                 attributes: ['id', 'full_name', 'username'],
                 // where: {id: user_id},
                 // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
-                through: {attributes: ['liked', 'disliked', 'saved']}
+                through: {attributes: ['liked', 'disliked', 'saved', 'viewed']}
             },
             {model: Playlists, as: 'playlists', attributes: ['id']} //where: playlistWhere
         ],
-        attributes: ['id', 'likes', 'name', 'dislikes', 'filename', 'created_at']
+        attributes: ['id', 'likes', 'name', 'dislikes', 'views', 'filename', 'created_at']
     });
     res.json(v);
 };
@@ -292,6 +291,34 @@ exports.updateLikes = async (req, res) => {
     }
     await Videos.update({dislikes: dislikes, likes: likes}, {where: {id: video_id}});
     res.json('OK');
+};
+
+
+exports.updateViews = async (req, res) => {
+    let data = req.body;
+    const {user_id, video_id} = data;
+
+    let found = await UsersVideos.findOne({
+        where: {
+            user_id: user_id,
+            video_id: video_id
+        }
+    });
+
+    if (!found) {
+        await UsersVideos.create({...data, viewed: 1});
+    } else {
+        await UsersVideos.update({viewed: 1}, {
+            where: {
+                user_id: user_id,
+                video_id: video_id
+            }
+        });
+    }
+
+    await Videos.increment({views: 1}, {where: {id: video_id}});
+    req.query.id = video_id;
+    this.getVideoById(req, res);
 };
 
 exports.saveVideo = async (req, res) => {

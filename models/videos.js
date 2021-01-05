@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         privacy_id: DataTypes.INTEGER,
         likes: DataTypes.INTEGER,
         dislikes: DataTypes.INTEGER,
+        views: DataTypes.INTEGER,
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
         session_name: DataTypes.STRING,
