@@ -44,6 +44,9 @@ module.exports = {
             cover: {
                 type: Sequelize.STRING
             },
+            verification_code : {
+                type: Sequelize.TINYINT
+            },
             created_at: {
                 defaultValue: Sequelize.fn('NOW'),
                 allowNull: false,

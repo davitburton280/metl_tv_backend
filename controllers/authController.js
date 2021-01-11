@@ -66,6 +66,7 @@ exports.logout = (req, res) => {
 
 exports.sendVerificationCode = async (req, res) => {
     console.log('OK')
+    let data = req.body;
     if (!showIfErrors(req, res)) {
 
 
@@ -81,6 +82,7 @@ exports.sendVerificationCode = async (req, res) => {
         });
 
         let randomCode = Math.floor(1000 + Math.random() * 9000);
+        req.body.verification_code = randomCode;
         console.log("CODE" + randomCode)
         // console.log(process.env)
 
@@ -94,17 +96,22 @@ exports.sendVerificationCode = async (req, res) => {
         };
 
         // send mail with defined transport object
-        transporter.sendMail(mailOptions, (error, info) => {
+        transporter.sendMail(mailOptions, async (error, info) => {
             console.log(info)
             console.log(error)
             if (error) {
                 res.status(500).json({msg: error.toString()})
             } else if (info) {
-
+                if (!data.resend) {
+                    this.register(req, res);
+                } else {
+                    console.log(data)
+                    await Users.update({verification_code: data.verification_code}, {where: {email: data.email}});
+                }
                 console.log('Message sent: %s', info.messageId);
                 // Preview only available when sending through an Ethereal account
                 console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-                res.json(randomCode);
+                res.json('OK');
             }
             transporter.close();
 
@@ -164,7 +171,7 @@ exports.sendForgotPassEmail = async (req, res) => {
 
         });
     }
-}
+};
 
 
 exports.register = async (req, res) => {
@@ -178,7 +185,7 @@ exports.register = async (req, res) => {
         // Saving the original password of user and hashing it to save in db
         let originalPass = data.password;
         data.password = bcrypt.hashSync(originalPass, 10);
-
+        console.log(data)
         let user = await Users.create(data);
         await Channels.create({name: data.full_name, user_id: user.id, avatar: user.avatar, cover: user.cover});
 
@@ -188,7 +195,11 @@ exports.register = async (req, res) => {
 
         // res.json("OK");
 
-        this.login(req, res);
+        if (!data.hasOwnProperty('verification_code')) {
+            this.login(req, res);
+        } else {
+            return true;
+        }
     }
 };
 
