@@ -45,7 +45,7 @@ module.exports = {
                 type: Sequelize.STRING
             },
             verification_code : {
-                type: Sequelize.TINYINT
+                type: Sequelize.INTEGER
             },
             created_at: {
                 defaultValue: Sequelize.fn('NOW'),

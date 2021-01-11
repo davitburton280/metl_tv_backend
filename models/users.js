@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         password: DataTypes.STRING,
         avatar: DataTypes.STRING,
         cover: DataTypes.STRING,
-        verification_code: DataTypes.TINYINT,
+        verification_code: DataTypes.INTEGER,
         // access_token: DataTypes.STRING
     }, {timestamps: false, underscored: true});
     users.associate = function (models) {
