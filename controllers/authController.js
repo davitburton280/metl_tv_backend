@@ -141,7 +141,7 @@ exports.sendForgotPassEmail = async (req, res) => {
         let mailOptions = {
             from: '"Metl.tv " <info@metl.tv>', // sender address
             to: data.email, // list of receivers
-            subject: 'Forgot Password email', // Subject line
+            subject: 'Forgot Password e-mail', // Subject line
             text: 'You recently requested a password reset', // plain text body
             html: `<p>You recently requested a password reset. Please click on this <a href="${process.env.FRONTEND_URL}auth/reset-password?email=${data.email}">link</a> to proceed</p>` // html body
         };

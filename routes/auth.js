@@ -4,13 +4,14 @@ const authController = require('../controllers/authController');
 const validateRegister = require('../validators/validateRegister');
 const validateLogin = require('../validators/validateLogin');
 const validateResetPass = require('../validators/validateResetPass');
+const validateForgotPass = require('../validators/validateForgotPass');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
 // Regular auth routes and social auth logout route
 router.post('/register', validateRegister.rules, authController.register);
 router.post('/send-verification-code', validateRegister.rules, authController.sendVerificationCode);
-router.post('/send-forgot-pass-email', authController.sendForgotPassEmail);
+router.post('/send-forgot-pass-email', validateForgotPass.rules, authController.sendForgotPassEmail);
 router.post('/reset-password', validateResetPass.rules, authController.resetPassword);
 router.post('/login', validateLogin.rules, authController.login);
 router.get('/logout', authController.logout);
