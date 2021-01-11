@@ -95,6 +95,18 @@ exports.sendVerificationCode = async (req, res) => {
             html: `${randomCode}` // html body
         };
 
+        let tempToken = jwt.sign({
+            email: user.email,
+            id: user.id,
+
+            first_name: user.first_name,
+            last_name: user.last_name,
+            company_id: user.company_id,
+            gender: user.gender,
+            field_type: user.field_type,
+            user_type: user.user_type
+        }, 'secretkey', {expiresIn: '1h'});
+
         // send mail with defined transport object
         transporter.sendMail(mailOptions, async (error, info) => {
             console.log(info)
@@ -144,14 +156,25 @@ exports.sendForgotPassEmail = async (req, res) => {
         console.log("CODE" + randomCode)
         // console.log(process.env)
 
+        let foundUser = await Users.findOne({where: {email: data.email}});
+
+        let tempToken = jwt.sign({
+            email: foundUser.email,
+            id: foundUser.id,
+            full_name: foundUser.full_name,
+            gender: foundUser.gender,
+        }, 'secretkey', {expiresIn: '1h'});
+
         // setup email data with unicode symbols
         let mailOptions = {
             from: '"Metl.tv " <info@metl.tv>', // sender address
             to: data.email, // list of receivers
             subject: 'Forgot Password e-mail', // Subject line
             text: 'You recently requested a password reset', // plain text body
-            html: `<p>You recently requested a password reset. Please click on this <a href="${process.env.FRONTEND_URL}auth/reset-password?email=${data.email}">link</a> to proceed</p>` // html body
+            html: `<p>You recently requested a password reset. Please click on this <a href="${process.env.FRONTEND_URL}auth/reset-password?email=${data.email}&token=${tempToken}">link</a> to proceed</p>` // html body
         };
+
+
 
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
