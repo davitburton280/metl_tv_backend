@@ -96,15 +96,7 @@ exports.sendVerificationCode = async (req, res) => {
         };
 
         let tempToken = jwt.sign({
-            email: user.email,
-            id: user.id,
-
-            first_name: user.first_name,
-            last_name: user.last_name,
-            company_id: user.company_id,
-            gender: user.gender,
-            field_type: user.field_type,
-            user_type: user.user_type
+            email: data.email,
         }, 'secretkey', {expiresIn: '1h'});
 
         // send mail with defined transport object
