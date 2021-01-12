@@ -122,7 +122,7 @@ exports.sendVerificationCode = async (req, res) => {
 
         });
     }
-}
+};
 
 
 exports.sendForgotPassEmail = async (req, res) => {
@@ -163,9 +163,11 @@ exports.sendForgotPassEmail = async (req, res) => {
             to: data.email, // list of receivers
             subject: 'Forgot Password e-mail', // Subject line
             text: 'You recently requested a password reset', // plain text body
-            html: `<p>You recently requested a password reset. Please click on this <a href="${process.env.FRONTEND_URL}auth/reset-password?email=${data.email}&token=${tempToken}">link</a> to proceed</p>` // html body
+            html: `<p>You recently requested a password reset. Please click on this 
+                    <a href="${process.env.FRONTEND_URL}auth/reset-password?email=${data.email}&token=${tempToken}">link</a>
+                     to proceed</p>
+                    <div><span>The link will be valid for the next 1 hour</span></div>` // html body
         };
-
 
 
         // send mail with defined transport object
