@@ -222,7 +222,7 @@ exports.getVideoById = async (req, res) => {
             },
             {model: Playlists, as: 'playlists', attributes: ['id']} //where: playlistWhere
         ],
-        attributes: ['id', 'likes', 'name', 'dislikes', 'views', 'filename', 'created_at']
+        attributes: ['id', 'likes', 'thumbnail', 'name', 'dislikes', 'views', 'filename', 'created_at']
     });
     res.json(v);
 };
@@ -262,7 +262,7 @@ exports.searchInAllVideos = async (req, res) => {
     let {search} = req.query;
     let v = await Videos.findAll({
         where: sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%'),
-        include: [{model: Channels, as: 'channel'}]
+        include: [{model: Channels, as: 'channel'}, {model: Playlists, as: 'playlists', attributes: ['id']}]
     });
     res.json(v);
 };
