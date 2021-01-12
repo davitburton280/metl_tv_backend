@@ -184,7 +184,7 @@ exports.getUserVideos = async (req, res) => {
 
 exports.getUserSavedVideos = async (req, res) => {
     console.log(req.query)
-    let userWhere = {id: req.query.user_id}
+    let userWhere = {id: req.query.user_id};
     let v = await Users.findOne({
         where: userWhere,
         include: [{
