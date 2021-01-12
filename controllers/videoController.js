@@ -26,7 +26,7 @@ exports.getVideos = async (req, res) => {
     let {withPlaylists, trending, limit} = req.query;
     let ret = {};
     let limitOption = limit ? {limit: +limit} : {};
-    let trendingOption = +trending ? [['views', 'DESC']] : [['created_at','DESC']];
+    let trendingOption = +trending ? [['views', 'DESC']] : [['created_at', 'DESC']];
     let v = await Videos.findAll({
         include: [
             {
@@ -173,7 +173,11 @@ exports.getUserVideos = async (req, res) => {
     // let v = await Videos.findAll({author_id: req.query.user_id});
     let v = await Users.findOne({
         where: {id: req.query.user_id},
-        include: [{model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}]}],
+        include: [
+            {
+                model: Videos, as: 'videos',
+                include: [{model: Channels, as: 'channel'}, {model: Playlists, as: 'playlists', attributes: ['id']}]
+            }],
     });
     res.json(v);
 };
