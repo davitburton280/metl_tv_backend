@@ -27,13 +27,19 @@ exports.getSubscriptions = async (req, res) => {
 // exports.getBy
 
 exports.searchChannelVideos = async (req, res) => {
-    let search = req.query.search;
+    let {search, user_id} = req.query;
+    console.log('search channel with videos!!!')
+    // let userWhere = user_id ? sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id) : {};
     if (search) {
 
 
         let channels = await Channels.findAll(
             {
-                include: [{model: Videos}, {model: Users, as: 'user'}],
+                include: [
+                    {model: Videos},
+                    {model: Users, as: 'user'},
+                    {model: Users, as: 'subscribers'}
+                ],
                 where: {
                     [Op.or]: [
                         {
@@ -47,8 +53,7 @@ exports.searchChannelVideos = async (req, res) => {
                         //         [Op.like]: '%' + search + '%'
                         //     }
                         // }
-                    ]
-
+                    ],
                 }
             });
         res.json(channels);
