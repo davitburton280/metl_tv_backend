@@ -109,7 +109,7 @@ app.get('*', (req, res, next) => {
 
 app.use((err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
-        res.status(423).json({msg: 'File size exceeds maximum size of 1Mb'})
+        res.status(423).json({msg: 'File size exceeds maximum size of 3Mb'})
     }
 
     // Handle any other errors
