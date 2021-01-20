@@ -10,19 +10,19 @@ module.exports = {
                 type: Sequelize.INTEGER
             },
             playlist_id: {
-                onDelete: 'CASCADE',
-                references: {
-                    model: 'playlists',
-                    key: 'id'
-                },
+                // onDelete: 'CASCADE',
+                // references: {
+                //     model: 'playlists',
+                //     key: 'id'
+                // },
                 type: Sequelize.INTEGER
             },
             video_id: {
                 type: Sequelize.INTEGER,
-                references: {
-                    model: 'videos',
-                    key: 'id'
-                },
+                // references: {
+                //     model: 'videos',
+                //     key: 'id'
+                // },
             },
             channel_id: {
                 type: Sequelize.INTEGER

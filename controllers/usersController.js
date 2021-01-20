@@ -128,9 +128,9 @@ exports.getSession = async (req, res) => {
                     });
             })
             .catch(error => {
-                console.log('session creation error')
+                console.log('session creation error!!!')
                 console.log(error)
-                res.status(500).json({msg: error})
+                res.status(500).json(error)
             });
     }
 
@@ -145,6 +145,7 @@ exports.leaveSession = (req, res) => {
         console.log(mapSessions)
     }
     console.log('Leaved session!!!!!')
+
     res.json('Leaved session');
 };
 

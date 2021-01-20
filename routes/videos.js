@@ -20,4 +20,5 @@ router.put('/update-likes', videoController.updateLikes);
 router.put('/update-views', videoController.updateViews);
 router.put('/save-video', videoController.saveVideo);
 router.delete('/remove', uploadVideoThumbFile, videoController.removeVideo);
+router.delete('/remove-by-token', uploadVideoThumbFile, videoController.removeVideo);
 module.exports = router;

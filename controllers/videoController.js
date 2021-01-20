@@ -359,7 +359,7 @@ exports.saveVideo = async (req, res) => {
 
 
 exports.removeVideo = async (req, res) => {
-    let {id, filename} = req.query;
+    let {id, token, filename} = req.query;
 
     let file = path.join(path.join(__dirname, '../public/uploads/videos/') + filename);
     let removeResult;
@@ -367,12 +367,19 @@ exports.removeVideo = async (req, res) => {
         removeResult = await to(fse.remove(file));
     }
     if (!removeResult) {
-        await PlaylistsVideos.destroy({where: {video_id: id}});
-        await Videos.destroy({where: {id: id}});
-        await usersController.getUserInfo(req, res);
+        if (id) {
+            await PlaylistsVideos.destroy({where: {video_id: id}});
+            await Videos.destroy({where: {id: id}});
+            await usersController.getUserInfo(req, res);
+            // removing live video by token
+        } else if (token) {
+            await to(Videos.destroy({where: {token: token, status: 'live'}}));
+            res.json('removed live video');
+        }
     }
 
 };
+
 
 exports.removeVideoThumbnail = async (req, res) => {
 
