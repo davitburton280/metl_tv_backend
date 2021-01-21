@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
             videos.belongsTo(models.users, {as:'user',foreignKey: 'author_id'});
             videos.belongsTo(models.channels, {foreignKey: 'channel_id', as: 'channel'});
             videos.hasMany(models.video_tags, {as: 'tags', foreignKey: 'video_id'});
+            videos.hasMany(models.chat_messages, {as: 'chat', foreignKey: 'video_id'});
             videos.belongsToMany(models.users, {
                 as: 'users_vids',
                 through: models.users_videos,

@@ -63,7 +63,10 @@ exports.saveVideoToken = async (req, res) => {
         let video = await Videos.create(data);
         data.tags.map(async (t) => {
             await VideoTags.create({name: t, video_id: video.id})
-        })
+        });
+        res.json(video);
+    } else {
+        res.json('OK');
     }
 
     // const videoStream = await VideoStreams.findOne({token: token});
@@ -78,7 +81,7 @@ exports.saveVideoToken = async (req, res) => {
     // }
 
     // const user = await Users.findOne({where: {username: username}});
-    res.json('OK');
+
 };
 
 
@@ -150,18 +153,18 @@ exports.saveVideoThumbnail = async (req, res) => {
 };
 
 
-exports.saveVideoMessage = async (req, res) => {
-    const {token, from, message} = req.body;
-    console.log(token)
-    const videoStream = await VideoStreams.findOne({token: token});
-    if (videoStream) {
-        videoStream.messages.push({from: from, message: message});
-        videoStream.save();
-    }
-    res.json('OK');
-    console.log(videoStream)
-
-};
+// exports.saveVideoMessage = async (req, res) => {
+//     const {token, from, message} = req.body;
+//     console.log(token)
+//     const videoStream = await VideoStreams.findOne({token: token});
+//     if (videoStream) {
+//         videoStream.messages.push({from: from, message: message});
+//         videoStream.save();
+//     }
+//     res.json('OK');
+//     console.log(videoStream)
+//
+// };
 
 exports.getCategories = async (req, res) => {
     let vc = await VideoCategories.findAll();

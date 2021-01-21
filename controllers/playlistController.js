@@ -5,6 +5,7 @@ const Users = db.users;
 const Channels = db.channels;
 const PlaylistsVideos = db.playlists_videos;
 const sequelize = require('sequelize');
+const to = require('../helpers/getPromiseResult');
 
 exports.add = async (req, res) => {
     const data = req.body;
