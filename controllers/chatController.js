@@ -19,7 +19,6 @@ exports.getVideoMessages = async (req, res) => {
 
 exports.saveMessage = async (req, res) => {
     let data = req.body;
-    data.to = data.to ? data.to : 0;
     data.to_id = data.to_id ? data.to_id : 0;
     console.log(data)
     await to(ChatMessages.create(data));
