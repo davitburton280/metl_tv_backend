@@ -1,6 +1,7 @@
 const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
+const ChatMessages = db.chat_messages;
 const VideoCategories = db.video_categories;
 const VideoTags = db.video_tags;
 const PrivacyTypes = db.privacy_types;
@@ -111,9 +112,11 @@ exports.saveVideoData = async (req, res) => {
             status: 'recorded'
         };
 
+
         let video = await Videos.findOne({where: {status: 'live', author_id: data.author_id}});
         console.log('video id')
         console.log(video)
+
 
         let userVideo = await UsersVideos.create({
             // where: {
@@ -371,11 +374,14 @@ exports.removeVideo = async (req, res) => {
     }
     if (!removeResult) {
         if (id) {
-            await PlaylistsVideos.destroy({where: {video_id: id}});
-            await Videos.destroy({where: {id: id}});
+            await to(PlaylistsVideos.destroy({where: {video_id: id}}));
+            await to(Videos.destroy({where: {id: id}}));
+            await to(ChatMessages.destroy({where: {video_id: id}}));
             await usersController.getUserInfo(req, res);
             // removing live video by token
         } else if (token) {
+            let v = await to(Videos.findOne({where: {token: token, status: 'live'}}));
+            await to(ChatMessages.destroy({where: {video_id: v.id}}));
             await to(Videos.destroy({where: {token: token, status: 'live'}}));
             res.json('removed live video');
         }
