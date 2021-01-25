@@ -228,7 +228,7 @@ exports.getVideoById = async (req, res) => {
             },
             {model: Playlists, as: 'playlists', attributes: ['id']} //where: playlistWhere
         ],
-        attributes: ['id', 'likes', 'thumbnail', 'name', 'dislikes', 'views', 'filename', 'created_at']
+        attributes: ['id', 'likes', 'thumbnail', 'name', 'dislikes', 'views', 'filename', 'status', 'created_at']
     });
     res.json(v);
 };
