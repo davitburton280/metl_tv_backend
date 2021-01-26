@@ -365,7 +365,10 @@ exports.saveVideo = async (req, res) => {
 
 
 exports.removeVideo = async (req, res) => {
-    let {id, token, filename} = req.query;
+    let data = req.query;
+    let {id, token, filename} = data;
+    console.log('remove video!!!')
+    console.log(req.query)
 
     let file = path.join(path.join(__dirname, '../public/uploads/videos/') + filename);
     let removeResult;
@@ -377,7 +380,11 @@ exports.removeVideo = async (req, res) => {
             await to(PlaylistsVideos.destroy({where: {video_id: id}}));
             await to(Videos.destroy({where: {id: id}}));
             await to(ChatMessages.destroy({where: {video_id: id}}));
-            await usersController.getUserInfo(req, res);
+            if (data.bigFileDetected) {
+                res.status(423).json({msg: 'File size exceeds maximum size of 3Mb'})
+            } else {
+                await usersController.getUserInfo(req, res);
+            }
             // removing live video by token
         } else if (token) {
             let v = await to(Videos.findOne({where: {token: token, status: 'live'}}));

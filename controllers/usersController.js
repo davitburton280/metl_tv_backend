@@ -197,8 +197,9 @@ let changeJwt = async (data, res) => {
 };
 
 exports.getUserInfo = async (req, res) => {
+    let data = req.query;
     let user = await Users.findOne({
-        where: {username: req.query.username},
+        where: {username: data.username},
         include: [{model: Channels, as: 'channel'}, {model: Videos, as: 'videos'}]
     });
     console.log('OK!!!' + req.query.username)

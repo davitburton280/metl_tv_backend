@@ -108,9 +108,13 @@ app.get('*', (req, res, next) => {
     }
 });
 
-app.use((err, req, res, next) => {
+const videoController = require('./controllers/videoController');
+app.use(async (err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
-        res.status(423).json({msg: 'File size exceeds maximum size of 3Mb'})
+        req.body.bigFileDetected = true;
+        req.query = req.body;
+        console.log(req.body)
+        await videoController.removeVideo(req, res);
     }
 
     // Handle any other errors
