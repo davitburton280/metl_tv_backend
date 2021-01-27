@@ -378,6 +378,7 @@ exports.removeVideo = async (req, res) => {
     if (!removeResult) {
         if (id) {
             await to(PlaylistsVideos.destroy({where: {video_id: id}}));
+            await to(UsersVideos.destroy({where: {video_id: id}}));
             await to(Videos.destroy({where: {id: id}}));
             await to(ChatMessages.destroy({where: {video_id: id}}));
             if (data.bigFileDetected) {
@@ -389,6 +390,7 @@ exports.removeVideo = async (req, res) => {
         } else if (token) {
             let v = await to(Videos.findOne({where: {token: token, status: 'live'}}));
             await to(ChatMessages.destroy({where: {video_id: v.id}}));
+            await to(UsersVideos.destroy({where: {video_id: v.id}}));
             await to(Videos.destroy({where: {token: token, status: 'live'}}));
             res.json('removed live video');
         }
