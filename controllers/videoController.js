@@ -109,7 +109,8 @@ exports.saveVideoData = async (req, res) => {
             author: data.full_name,
             avatar: data.avatar,
             filename: data.video_name,
-            status: 'recorded'
+            duration: data.video_duration,
+            status: 'recorded',
         };
 
 

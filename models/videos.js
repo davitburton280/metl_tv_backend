@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             // define association here
-            videos.belongsTo(models.users, {as:'user',foreignKey: 'author_id'});
+            videos.belongsTo(models.users, {as: 'user', foreignKey: 'author_id'});
             videos.belongsTo(models.channels, {foreignKey: 'channel_id', as: 'channel'});
             videos.hasMany(models.video_tags, {as: 'tags', foreignKey: 'video_id'});
             videos.hasMany(models.chat_messages, {as: 'chat', foreignKey: 'video_id'});
@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         likes: DataTypes.INTEGER,
         dislikes: DataTypes.INTEGER,
         views: DataTypes.INTEGER,
+        duration: DataTypes.STRING(4),
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
         session_name: DataTypes.STRING,
