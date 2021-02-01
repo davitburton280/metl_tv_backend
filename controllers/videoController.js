@@ -24,10 +24,16 @@ const fse = require('fs-extra');
 const path = require('path');
 
 exports.getVideos = async (req, res) => {
-    let {withPlaylists, trending, limit} = req.query;
+    let data = req.query;
+    let {withPlaylists, trending, limit} = data;
     let ret = {};
     let limitOption = limit ? {limit: +limit} : {};
     let trendingOption = +trending ? [['views', 'DESC']] : [['created_at', 'DESC']];
+    let filters = JSON.parse(data.filters);
+    console.log(filters)
+    let whereFilters = this.getVideoFiltersQuery(filters);
+
+    console.log(whereFilters)
     let v = await Videos.findAll({
         include: [
             {
@@ -44,14 +50,36 @@ exports.getVideos = async (req, res) => {
             }
         ],
         order: trendingOption,
+        where: whereFilters,
         limitOption
     });
     ret['videos'] = v;
     if (+withPlaylists) {
-        let p = await Playlists.findAll({include: [{model: Videos, as: 'videos'}]});
+        let p = await Playlists.findAll({include: [{model: Videos, as: 'videos', where: whereFilters}]});
         ret['playlists'] = p;
     }
     res.json(ret);
+};
+
+exports.getVideoFiltersQuery = (filters) => {
+    let whereFilters = {};
+    for (let group in filters) {
+        if (group === 'date') {
+            let filterValue = filters[group].value;
+            whereFilters['created_at'] = {
+                [Op.between]: [filterValue, Date.now()]
+            };
+        } else if (group === 'duration') {
+            let filterValue = filters[group].value;
+            let minDuration = '00:00';
+            let middleDuration = '00:30'
+            let maxDuration = '59:59';
+            whereFilters['duration'] = {
+                [Op.between]: (filterValue === 'short' ? [minDuration, middleDuration] : [middleDuration, maxDuration])
+            }
+        }
+    }
+    return whereFilters;
 };
 
 exports.saveVideoToken = async (req, res) => {
