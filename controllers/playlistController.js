@@ -6,6 +6,7 @@ const Channels = db.channels;
 const PlaylistsVideos = db.playlists_videos;
 const sequelize = require('sequelize');
 const to = require('../helpers/getPromiseResult');
+const videoController = require('../controllers/videoController');
 
 exports.add = async (req, res) => {
     const data = req.body;
@@ -51,14 +52,23 @@ exports.addVideosToOtherPlaylists = async (req, res) => {
 };
 
 exports.get = async (req, res) => {
-    console.log('playlist get!!!')
-    const {channel_id} = req.query;
+    // console.log('playlist get!!!')
+    const data = req.query;
+    const {channel_id} = data;
+    let filters = data.filters ? JSON.parse(data.filters) : {};
+    let wherePlaylistFilters = filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
+    let whereVideoFilters = filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
+
+    // console.log('PLAYLIST WHERE:  ', wherePlaylistFilters)
+    // console.log('VIDEO WHERE:  ', whereVideoFilters)
+
     const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
-        include: [{model: Videos, as: 'videos'}],
-        where: where
+        include: [{model: Videos, as: 'videos', where: whereVideoFilters, required: !!whereVideoFilters}],
+        where: [where, wherePlaylistFilters]
     });
-    // console.log(playlists)
+    // LEFT OUTER JOIN?!!
+    // console.log(playlists.length)
     res.json(playlists);
 };
 
@@ -139,5 +149,5 @@ exports.remove = async (req, res) => {
     const {id} = req.query;
     await Playlists.destroy({where: {id: id}});
     // await PlaylistsVideos.destroy({where:{playlist_id: id}});
-    this.get(req,res);
+    this.get(req, res);
 };

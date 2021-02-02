@@ -29,7 +29,7 @@ exports.getVideos = async (req, res) => {
     let ret = {};
     let limitOption = limit ? {limit: +limit} : {};
     let trendingOption = +trending ? [['views', 'DESC']] : [['created_at', 'DESC']];
-    let filters = JSON.parse(data.filters);
+    let filters = data.filters ? JSON.parse(data.filters) : {};
     console.log(filters)
     let whereFilters = this.getVideoFiltersQuery(filters);
 
@@ -258,7 +258,7 @@ exports.getVideoById = async (req, res) => {
             },
             {model: Playlists, as: 'playlists', attributes: ['id']} //where: playlistWhere
         ],
-        attributes: ['id', 'likes', 'thumbnail', 'name', 'dislikes', 'views', 'filename', 'status', 'created_at']
+        attributes: ['id', 'likes', 'thumbnail', 'duration', 'name', 'dislikes', 'views', 'filename', 'status', 'created_at']
     });
     res.json(v);
 };
