@@ -61,20 +61,21 @@ exports.getVideos = async (req, res) => {
     res.json(ret);
 };
 
+const moment = require('moment');
 exports.getVideoFiltersQuery = (filters) => {
     let whereFilters = {};
     for (let group in filters) {
         if (group === 'date') {
             let filterValue = filters[group].value;
-            whereFilters['created_at'] = {
-                [Op.between]: [filterValue, Date.now()]
+            whereFilters['`created_at`'] = {
+                [Op.between]: [filterValue, moment().format('YYYY-MM-DD HH:mm:ss')]
             };
         } else if (group === 'duration') {
             let filterValue = filters[group].value;
             let minDuration = '00:00';
             let middleDuration = '00:30'
             let maxDuration = '59:59';
-            whereFilters['duration'] = {
+            whereFilters['`duration`'] = {
                 [Op.between]: (filterValue === 'short' ? [minDuration, middleDuration] : [middleDuration, maxDuration])
             }
         }
@@ -263,7 +264,17 @@ exports.getVideoById = async (req, res) => {
 };
 
 exports.getVideosByAuthor = async (req, res) => {
-    let v = await Users.findAll({include: [{model: Videos, as: 'videos'}]});
+    let data = req.query;
+    let filters = data.filters ? JSON.parse(data.filters) : {};
+    let whereFilters = this.getVideoFiltersQuery(filters);
+    console.log(whereFilters)
+    let v = await Users.findAll(
+        {
+            include: [
+                {model: Videos, as: 'videos', where: whereFilters}
+            ],
+
+        });
     res.json(v);
 };
 
