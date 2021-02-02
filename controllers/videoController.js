@@ -290,12 +290,15 @@ exports.searchInVideosByAuthor = async (req, res) => {
 
 
 exports.searchInUserVideos = async (req, res) => {
-    let {user_id, search} = req.query;
+    let data = req.query;
+    let {user_id, search} = data;
     let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
+    let filters = data.filters ? JSON.parse(data.filters) : {};
+    let whereFilters = this.getVideoFiltersQuery(filters);
     let v = await Users.findOne({
         include: [{
             model: Videos, as: 'videos',
-            where: where
+            where: [where, whereFilters]
         }],
         where: {
             id: user_id
