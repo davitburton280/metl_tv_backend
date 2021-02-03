@@ -27,13 +27,11 @@ exports.addVideos = async (req, res) => {
             position: (lastPosition['MAX(`position_id`)'] + 1) || 1
         });
     });
-    console.log(videoIds)
     res.json('OK');
 };
 
 exports.addVideosToOtherPlaylists = async (req, res) => {
     const data = req.body;
-    console.log(data)
     data.playlists.map(async (p) => {
         await PlaylistsVideos.destroy({where: {video_id: data.video_id}});
         if (p.checked) {
@@ -59,24 +57,21 @@ exports.get = async (req, res) => {
     let wherePlaylistFilters = filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
     let whereVideoFilters = filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
 
-    // console.log('PLAYLIST WHERE:  ', wherePlaylistFilters)
-    // console.log('VIDEO WHERE:  ', whereVideoFilters)
-
     const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
         include: [{model: Videos, as: 'videos', where: whereVideoFilters, required: !!whereVideoFilters}],
         where: [where, wherePlaylistFilters]
     });
-    // LEFT OUTER JOIN?!!
-    // console.log(playlists.length)
+
     res.json(playlists);
 };
 
 exports.search = async (req, res) => {
     const {search} = req.query;
+    let whereSearch = search ? {name: search} : {};
     const playlists = await Playlists.findAll({
         include: [{model: Videos, as: 'videos'}],
-        where: {name: search},
+        where: whereSearch,
         order: [[sequelize.col(`created_at`), 'desc']]
     });
     res.json(playlists);
