@@ -2,6 +2,9 @@ require('dotenv').config()
 const express = require('express');
 global.app = express();
 
+const compression = require('compression');
+app.use(compression());
+
 const port = process.env.PORT || 3001;
 const server = require('http').createServer(app);
 const cors = require('cors');
