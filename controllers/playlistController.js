@@ -76,7 +76,8 @@ exports.search = async (req, res) => {
     const {search} = req.query;
     const playlists = await Playlists.findAll({
         include: [{model: Videos, as: 'videos'}],
-        where: {name: search}
+        where: {name: search},
+        order: [[sequelize.col(`created_at`), 'desc']]
     });
     res.json(playlists);
 };

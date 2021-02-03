@@ -22,6 +22,7 @@ const Op = sequelize.Op;
 
 const fse = require('fs-extra');
 const path = require('path');
+const moment = require('moment');
 
 exports.getVideos = async (req, res) => {
     let data = req.query;
@@ -61,7 +62,7 @@ exports.getVideos = async (req, res) => {
     res.json(ret);
 };
 
-const moment = require('moment');
+
 exports.getVideoFiltersQuery = (filters) => {
     let whereFilters = {};
     for (let group in filters) {
@@ -273,6 +274,7 @@ exports.getVideosByAuthor = async (req, res) => {
             include: [
                 {model: Videos, as: 'videos', where: whereFilters}
             ],
+            order: [[sequelize.col(`videos.created_at`), 'desc']]
 
         });
     res.json(v);
@@ -303,6 +305,7 @@ exports.searchInUserVideos = async (req, res) => {
         where: {
             id: user_id
         },
+        order: [[sequelize.col(`videos.created_at`), 'desc']]
     });
     res.json(v);
 };
