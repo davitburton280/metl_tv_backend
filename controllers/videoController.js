@@ -207,15 +207,27 @@ exports.getCategories = async (req, res) => {
 
 exports.getUserVideos = async (req, res) => {
     console.log(req.query)
+    let data = req.query;
+    let {user_id, search} = data;
     // let v = await Videos.findAll({author_id: req.query.user_id});
+    let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
+    let filters = data.filters ? JSON.parse(data.filters) : {};
+    let whereFilters = this.getVideoFiltersQuery(filters);
+
     let v = await Users.findOne({
-        where: {id: req.query.user_id},
-        include: [
-            {
-                model: Videos, as: 'videos',
-                include: [{model: Channels, as: 'channel'}, {model: Playlists, as: 'playlists', attributes: ['id']}]
-            }],
+        include: [{
+            model: Videos, as: 'videos',
+            where: [where, whereFilters],
+            include: [
+                {model: Channels, as: 'channel'}, {model: Playlists, as: 'playlists', attributes: ['id']}
+            ]
+        }],
+        where: {
+            id: user_id
+        },
+        order: [[sequelize.col(`videos.created_at`), 'desc']]
     });
+
     res.json(v);
 };
 
@@ -281,24 +293,24 @@ exports.getVideosByAuthor = async (req, res) => {
     res.json(v);
 };
 
-exports.searchInUserVideos = async (req, res) => {
-    let data = req.query;
-    let {user_id, search} = data;
-    let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
-    let filters = data.filters ? JSON.parse(data.filters) : {};
-    let whereFilters = this.getVideoFiltersQuery(filters);
-    let v = await Users.findOne({
-        include: [{
-            model: Videos, as: 'videos',
-            where: [where, whereFilters]
-        }],
-        where: {
-            id: user_id
-        },
-        order: [[sequelize.col(`videos.created_at`), 'desc']]
-    });
-    res.json(v);
-};
+// exports.searchInUserVideos = async (req, res) => {
+//     let data = req.query;
+//     let {user_id, search} = data;
+//     let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
+//     let filters = data.filters ? JSON.parse(data.filters) : {};
+//     let whereFilters = this.getVideoFiltersQuery(filters);
+//     let v = await Users.findOne({
+//         include: [{
+//             model: Videos, as: 'videos',
+//             where: [where, whereFilters]
+//         }],
+//         where: {
+//             id: user_id
+//         },
+//         order: [[sequelize.col(`videos.created_at`), 'desc']]
+//     });
+//     res.json(v);
+// };
 
 exports.searchInAllVideos = async (req, res) => {
     let {search} = req.query;

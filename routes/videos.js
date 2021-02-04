@@ -13,7 +13,7 @@ router.get('/get-categories', videoController.getCategories);
 router.get('/get-video-by-id', videoController.getVideoById);
 router.get('/get-videos-by-author', videoController.getVideosByAuthor);
 router.get('/search-in-videos-by-author', videoController.getVideosByAuthor);
-router.get('/search-in-user-videos', videoController.searchInUserVideos);
+router.get('/search-in-user-videos', videoController.getUserVideos);
 router.get('/search-in-all-videos', videoController.searchInAllVideos);
 router.get('/get', videoController.getVideos);
 router.get('/get-saved', videoController.getUserSavedVideos);
