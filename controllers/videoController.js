@@ -266,30 +266,20 @@ exports.getVideoById = async (req, res) => {
 
 exports.getVideosByAuthor = async (req, res) => {
     let data = req.query;
+    let search = data.search;
     let filters = data.filters ? JSON.parse(data.filters) : {};
     let whereFilters = this.getVideoFiltersQuery(filters);
-    console.log(whereFilters)
+    let whereSearch = search ? sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%') : {};
     let v = await Users.findAll(
         {
             include: [
                 {model: Videos, as: 'videos', where: whereFilters}
             ],
-            order: [[sequelize.col(`videos.created_at`), 'desc']]
-
+            order: [[sequelize.col(`videos.created_at`), 'desc']],
+            where: whereSearch
         });
     res.json(v);
 };
-
-exports.searchInVideosByAuthor = async (req, res) => {
-    let search = req.query.search;
-    let where = search ? sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%') : {};
-    let v = await Users.findAll({
-        include: [{model: Videos, as: 'videos'}],
-        where: where,
-    });
-    res.json(v);
-};
-
 
 exports.searchInUserVideos = async (req, res) => {
     let data = req.query;
