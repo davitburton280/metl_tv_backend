@@ -98590,18 +98590,21 @@ class CheckStreamingRequirementsComponent {
         this.getConnectedDevices(true);
     }
     getConnectedDevices(pageLoad = false) {
-        navigator.mediaDevices.enumerateDevices()
-            .then((devices) => {
-            var _a, _b;
-            console.log(devices);
-            this.userMediaDevices = devices;
-            this.defaultVideoDevice = devices.find(d => d.kind === 'videoinput');
-            this.deviceRecognitionForm.patchValue({ video_device: (_a = this.defaultVideoDevice) === null || _a === void 0 ? void 0 : _a.label });
-            this.defaultAudioDevice = devices.find(d => d.kind === 'audioinput');
-            this.deviceRecognitionForm.patchValue({ audio_device: (_b = this.defaultAudioDevice) === null || _b === void 0 ? void 0 : _b.label });
-        })
-            .catch((err) => {
-            console.log(err.name + ':' + err.message);
+        return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
+            yield navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            navigator.mediaDevices.enumerateDevices()
+                .then((devices) => {
+                var _a, _b;
+                console.log(devices);
+                this.userMediaDevices = devices;
+                this.defaultVideoDevice = devices.find(d => d.kind === 'videoinput');
+                this.deviceRecognitionForm.patchValue({ video_device: (_a = this.defaultVideoDevice) === null || _a === void 0 ? void 0 : _a.label });
+                this.defaultAudioDevice = devices.find(d => d.kind === 'audioinput');
+                this.deviceRecognitionForm.patchValue({ audio_device: (_b = this.defaultAudioDevice) === null || _b === void 0 ? void 0 : _b.label });
+            })
+                .catch((err) => {
+                console.log(err.name + ':' + err.message);
+            });
         });
     }
     get audioDevice() {
