@@ -14,6 +14,7 @@ const usersController = require('../controllers/usersController');
 
 const VideoStreams = require('../mongoose/video_streams');
 const to = require('../helpers/getPromiseResult');
+const showIfErrors = require('../helpers/showIfErrors');
 
 const Videos = db.videos;
 const Playlists = db.playlists;
@@ -380,6 +381,7 @@ exports.updateViews = async (req, res) => {
     this.getVideoById(req, res);
 };
 
+
 exports.saveVideo = async (req, res) => {
 
     let data = req.body;
@@ -413,15 +415,17 @@ exports.saveVideo = async (req, res) => {
 };
 
 exports.saveTags = async (req, res) => {
-    let data = req.body;
-    console.log(data)
-    await VideoTags.destroy({where: {video_id: data.video_id}});
-    let result = data.tags.map(async (t) => {
-        await VideoTags.create({name: t.name, video_id: data.video_id});
-    });
-    await Promise.all(result);
-    req.query.id = data.video_id;
-    this.getVideoById(req, res);
+    if (!showIfErrors(req, res)) {
+        let data = req.body;
+        console.log(data)
+        await VideoTags.destroy({where: {video_id: data.video_id}});
+        let result = data.tags.map(async (t) => {
+            await VideoTags.create({name: t.name, video_id: data.video_id});
+        });
+        await Promise.all(result);
+        req.query.id = data.video_id;
+        this.getVideoById(req, res);
+    }
 };
 
 
@@ -462,4 +466,39 @@ exports.removeVideo = async (req, res) => {
 
 exports.removeVideoThumbnail = async (req, res) => {
 
+};
+
+
+exports.updateUserTags = async (req, res) => {
+    let data = req.body;
+    console.log('increment!!!!')
+    let {user_id, video_id, tags} = data;
+    let results = tags.map(async (t) => {
+        let foundTag = await UsersTags.findOne({
+            where: {user_id: user_id, tag_id: t.id}
+        });
+        if (!foundTag) {
+            await UsersTags.create({user_id: user_id, tag_id: t.id});
+        } else {
+            console.log('increment!!!!')
+            await UsersTags.increment('popularity', {where: {user_id: user_id, tag_id: t.id}});
+        }
+    });
+
+    await Promise.all(results);
+
+    res.json('OK')
+};
+
+exports.getUserTags = async (req, res) => {
+    console.log('get user tags!!!')
+    let data = req.query;
+    let {user_id} = data;
+    console.log(data)
+    let userTags = await UsersTags.findAll({
+        where: {user_id: user_id},
+        order: [['popularity','desc']],
+        include: [{model: VideoTags, as: 'tag_details'}]
+    });
+    res.json(userTags);
 };

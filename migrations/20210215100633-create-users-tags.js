@@ -15,7 +15,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       popularity: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       created_at: {
         allowNull: false,
