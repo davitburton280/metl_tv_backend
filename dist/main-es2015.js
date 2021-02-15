@@ -5888,8 +5888,17 @@ class VideoService {
     updateViews(params) {
         return this.httpClient.put(`${_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"]}videos/update-views`, params);
     }
+    indexUserTags(params) {
+        return this.httpClient.put(`${_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"]}videos/index-user-tags`, params);
+    }
     saveVideo(params) {
         return this.httpClient.put(`${_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"]}videos/save-video`, params);
+    }
+    saveTags(params) {
+        return this.httpClient.put(`${_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"]}videos/save-tags`, params);
+    }
+    getUserTags(params) {
+        return this.httpClient.get(`${_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"]}videos/get-user-tags`, { params });
     }
 }
 VideoService.ɵfac = function VideoService_Factory(t) { return new (t || VideoService)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"])); };
@@ -5942,7 +5951,7 @@ CategoriesComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefi
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](10, "li");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](11, "a");
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](12, "Phil Ramerez");
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](12, "Phil Ramirez");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](13, "li");
@@ -6318,6 +6327,83 @@ ChatBoxComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineC
             type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"],
             args: ['videoRecordingState']
         }] }); })();
+
+
+/***/ }),
+
+/***/ "./src/app/shared/components/user-tags/user-tags.component.ts":
+/*!********************************************************************!*\
+  !*** ./src/app/shared/components/user-tags/user-tags.component.ts ***!
+  \********************************************************************/
+/*! exports provided: UserTagsComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UserTagsComponent", function() { return UserTagsComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _core_services_video_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @core/services/video.service */ "./src/app/core/services/video.service.ts");
+/* harmony import */ var _core_services_auth_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @core/services/auth.service */ "./src/app/core/services/auth.service.ts");
+/* harmony import */ var _shared_pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @shared/pipes/get-auth-user.pipe */ "./src/app/shared/pipes/get-auth-user.pipe.ts");
+/* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
+
+
+
+
+
+
+function UserTagsComponent_li_1_a_1_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "a");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const tag_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]().$implicit;
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](tag_r1.tag_details.name);
+} }
+function UserTagsComponent_li_1_Template(rf, ctx) { if (rf & 1) {
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, UserTagsComponent_li_1_a_1_Template, 2, 1, "a", 2);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+} if (rf & 2) {
+    const tag_r1 = ctx.$implicit;
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", tag_r1.tag_details);
+} }
+class UserTagsComponent {
+    constructor(videoService, auth, getAuthUser) {
+        this.videoService = videoService;
+        this.auth = auth;
+        this.getAuthUser = getAuthUser;
+        this.tags = [];
+    }
+    ngOnInit() {
+        this.authUser = this.getAuthUser.transform();
+        this.getUserTags();
+    }
+    getUserTags() {
+        this.videoService.getUserTags({ user_id: this.authUser.id }).subscribe((dt) => {
+            this.tags = dt;
+        });
+    }
+}
+UserTagsComponent.ɵfac = function UserTagsComponent_Factory(t) { return new (t || UserTagsComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_core_services_video_service__WEBPACK_IMPORTED_MODULE_1__["VideoService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_core_services_auth_service__WEBPACK_IMPORTED_MODULE_2__["AuthService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_3__["GetAuthUserPipe"])); };
+UserTagsComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: UserTagsComponent, selectors: [["app-user-tags"]], decls: 2, vars: 1, consts: [[1, "categories"], [4, "ngFor", "ngForOf"], [4, "ngIf"]], template: function UserTagsComponent_Template(rf, ctx) { if (rf & 1) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "ul", 0);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, UserTagsComponent_li_1_Template, 2, 1, "li", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
+    } if (rf & 2) {
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx.tags);
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_4__["NgForOf"], _angular_common__WEBPACK_IMPORTED_MODULE_4__["NgIf"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL3NoYXJlZC9jb21wb25lbnRzL3VzZXItdGFncy91c2VyLXRhZ3MuY29tcG9uZW50LnNjc3MifQ== */"] });
+/*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](UserTagsComponent, [{
+        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
+        args: [{
+                selector: 'app-user-tags',
+                templateUrl: './user-tags.component.html',
+                styleUrls: ['./user-tags.component.scss']
+            }]
+    }], function () { return [{ type: _core_services_video_service__WEBPACK_IMPORTED_MODULE_1__["VideoService"] }, { type: _core_services_auth_service__WEBPACK_IMPORTED_MODULE_2__["AuthService"] }, { type: _shared_pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_3__["GetAuthUserPipe"] }]; }, null); })();
 
 
 /***/ }),
@@ -7352,6 +7438,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./pipes/date-from-now.pipe */ "./src/app/shared/pipes/date-from-now.pipe.ts");
 /* harmony import */ var _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./pipes/filter-out-falsy-values-from-object.pipe */ "./src/app/shared/pipes/filter-out-falsy-values-from-object.pipe.ts");
 /* harmony import */ var _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./pipes/check-for-empty-object.pipe */ "./src/app/shared/pipes/check-for-empty-object.pipe.ts");
+/* harmony import */ var _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./components/user-tags/user-tags.component */ "./src/app/shared/components/user-tags/user-tags.component.ts");
+
 
 
 
@@ -7412,7 +7500,8 @@ SharedModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjec
         _pipes_get_selected_videos_to_be_added_to_playlist_pipe__WEBPACK_IMPORTED_MODULE_16__["GetSelectedVideosToBeAddedToPlaylistPipe"],
         _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"],
         _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__["FilterOutFalsyValuesFromObjectPipe"],
-        _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"]], imports: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"],
+        _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"],
+        _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"]], imports: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"],
         ngx_owl_carousel_o__WEBPACK_IMPORTED_MODULE_2__["CarouselModule"],
         _angular_forms__WEBPACK_IMPORTED_MODULE_5__["FormsModule"],
         _angular_forms__WEBPACK_IMPORTED_MODULE_5__["ReactiveFormsModule"],
@@ -7430,7 +7519,8 @@ SharedModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjec
         _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"],
         _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"],
         _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"],
-        _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"]] }); })();
+        _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"],
+        _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"]] }); })();
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](SharedModule, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
         args: [{
@@ -7450,6 +7540,7 @@ SharedModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjec
                     _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"],
                     _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__["FilterOutFalsyValuesFromObjectPipe"],
                     _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"],
+                    _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"],
                 ],
                 imports: [
                     _angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"],
@@ -7482,7 +7573,8 @@ SharedModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjec
                     _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"],
                     _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"],
                     _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"],
-                    _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"]
+                    _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"],
+                    _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"]
                 ]
             }]
     }], null, null); })();
