@@ -11438,26 +11438,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           return this.httpClient.put("".concat(_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"], "videos/update-views"), params);
         }
       }, {
-        key: "indexUserTags",
-        value: function indexUserTags(params) {
-          return this.httpClient.put("".concat(_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"], "videos/index-user-tags"), params);
-        }
-      }, {
         key: "saveVideo",
         value: function saveVideo(params) {
           return this.httpClient.put("".concat(_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"], "videos/save-video"), params);
-        }
-      }, {
-        key: "saveTags",
-        value: function saveTags(params) {
-          return this.httpClient.put("".concat(_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"], "videos/save-tags"), params);
-        }
-      }, {
-        key: "getUserTags",
-        value: function getUserTags(params) {
-          return this.httpClient.get("".concat(_core_constants_global__WEBPACK_IMPORTED_MODULE_1__["API_URL"], "videos/get-user-tags"), {
-            params: params
-          });
         }
       }]);
 
@@ -11578,7 +11561,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](11, "a");
 
-          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](12, "Phil Ramirez");
+          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](12, "Phil Ramerez");
 
           _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
 
@@ -12331,176 +12314,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   },
 
   /***/
-  "./src/app/shared/components/user-tags/user-tags.component.ts":
-  /*!********************************************************************!*\
-    !*** ./src/app/shared/components/user-tags/user-tags.component.ts ***!
-    \********************************************************************/
-
-  /*! exports provided: UserTagsComponent */
-
-  /***/
-  function srcAppSharedComponentsUserTagsUserTagsComponentTs(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-
-    __webpack_require__.r(__webpack_exports__);
-    /* harmony export (binding) */
-
-
-    __webpack_require__.d(__webpack_exports__, "UserTagsComponent", function () {
-      return UserTagsComponent;
-    });
-    /* harmony import */
-
-
-    var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(
-    /*! @angular/core */
-    "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
-    /* harmony import */
-
-
-    var _core_services_video_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(
-    /*! @core/services/video.service */
-    "./src/app/core/services/video.service.ts");
-    /* harmony import */
-
-
-    var _core_services_auth_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(
-    /*! @core/services/auth.service */
-    "./src/app/core/services/auth.service.ts");
-    /* harmony import */
-
-
-    var _shared_pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(
-    /*! @shared/pipes/get-auth-user.pipe */
-    "./src/app/shared/pipes/get-auth-user.pipe.ts");
-    /* harmony import */
-
-
-    var _angular_common__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
-    /*! @angular/common */
-    "./node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
-
-    function UserTagsComponent_li_1_a_1_Template(rf, ctx) {
-      if (rf & 1) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "a");
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](1);
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-      }
-
-      if (rf & 2) {
-        var tag_r1 = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵnextContext"]().$implicit;
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](tag_r1.tag_details.name);
-      }
-    }
-
-    function UserTagsComponent_li_1_Template(rf, ctx) {
-      if (rf & 1) {
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "li");
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, UserTagsComponent_li_1_a_1_Template, 2, 1, "a", 2);
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-      }
-
-      if (rf & 2) {
-        var tag_r1 = ctx.$implicit;
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", tag_r1.tag_details);
-      }
-    }
-
-    var UserTagsComponent = /*#__PURE__*/function () {
-      function UserTagsComponent(videoService, auth, getAuthUser) {
-        _classCallCheck(this, UserTagsComponent);
-
-        this.videoService = videoService;
-        this.auth = auth;
-        this.getAuthUser = getAuthUser;
-        this.tags = [];
-      }
-
-      _createClass(UserTagsComponent, [{
-        key: "ngOnInit",
-        value: function ngOnInit() {
-          this.authUser = this.getAuthUser.transform();
-          this.getUserTags();
-        }
-      }, {
-        key: "getUserTags",
-        value: function getUserTags() {
-          var _this17 = this;
-
-          this.videoService.getUserTags({
-            user_id: this.authUser.id
-          }).subscribe(function (dt) {
-            _this17.tags = dt;
-          });
-        }
-      }]);
-
-      return UserTagsComponent;
-    }();
-
-    UserTagsComponent.ɵfac = function UserTagsComponent_Factory(t) {
-      return new (t || UserTagsComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_core_services_video_service__WEBPACK_IMPORTED_MODULE_1__["VideoService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_core_services_auth_service__WEBPACK_IMPORTED_MODULE_2__["AuthService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_3__["GetAuthUserPipe"]));
-    };
-
-    UserTagsComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({
-      type: UserTagsComponent,
-      selectors: [["app-user-tags"]],
-      decls: 2,
-      vars: 1,
-      consts: [[1, "categories"], [4, "ngFor", "ngForOf"], [4, "ngIf"]],
-      template: function UserTagsComponent_Template(rf, ctx) {
-        if (rf & 1) {
-          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "ul", 0);
-
-          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](1, UserTagsComponent_li_1_Template, 2, 1, "li", 1);
-
-          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
-        }
-
-        if (rf & 2) {
-          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-
-          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngForOf", ctx.tags);
-        }
-      },
-      directives: [_angular_common__WEBPACK_IMPORTED_MODULE_4__["NgForOf"], _angular_common__WEBPACK_IMPORTED_MODULE_4__["NgIf"]],
-      styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL3NoYXJlZC9jb21wb25lbnRzL3VzZXItdGFncy91c2VyLXRhZ3MuY29tcG9uZW50LnNjc3MifQ== */"]
-    });
-    /*@__PURE__*/
-
-    (function () {
-      _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](UserTagsComponent, [{
-        type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
-        args: [{
-          selector: 'app-user-tags',
-          templateUrl: './user-tags.component.html',
-          styleUrls: ['./user-tags.component.scss']
-        }]
-      }], function () {
-        return [{
-          type: _core_services_video_service__WEBPACK_IMPORTED_MODULE_1__["VideoService"]
-        }, {
-          type: _core_services_auth_service__WEBPACK_IMPORTED_MODULE_2__["AuthService"]
-        }, {
-          type: _shared_pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_3__["GetAuthUserPipe"]
-        }];
-      }, null);
-    })();
-    /***/
-
-  },
-
-  /***/
   "./src/app/shared/components/video-carousel-holder/video-carousel-holder.component.ts":
   /*!********************************************************************************************!*\
     !*** ./src/app/shared/components/video-carousel-holder/video-carousel-holder.component.ts ***!
@@ -12897,16 +12710,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: "removeVideo",
         value: function removeVideo(video) {
-          var _this18 = this;
+          var _this17 = this;
 
           this.dialog.open(_core_components_modals_confirmation_dialog_confirmation_dialog_component__WEBPACK_IMPORTED_MODULE_2__["ConfirmationDialogComponent"]).afterClosed().subscribe(function (confirmed) {
             if (confirmed) {
-              _this18.videoService.removeVideo({
+              _this17.videoService.removeVideo({
                 id: video.id,
                 filename: video.filename,
-                username: _this18.authUser.username
+                username: _this17.authUser.username
               }).subscribe(function (dt) {
-                _this18.videos = dt.videos;
+                _this17.videos = dt.videos;
               });
             }
           });
@@ -13467,7 +13280,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }, {
         key: "ngAfterViewInit",
         value: function ngAfterViewInit() {
-          var _this19 = this;
+          var _this18 = this;
 
           // ID with which to access the template's video element
           var el = 'video_' + this.idx; // setup the player via the unique element ID
@@ -13481,41 +13294,41 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
           this.player.on('deviceReady', function (a) {
             // console.log(a)
-            _this19.shareScreen.emit(); // console.log('device is ready!');
+            _this18.shareScreen.emit(); // console.log('device is ready!');
 
           }); // user clicked the record button and started recording
 
           this.player.on('startRecord', function (aa) {
             // console.log(this.openViduToken)
-            _this19.recordingState = 'active';
+            _this18.recordingState = 'active';
 
-            _this19.subject.setVideoRecordingState({
+            _this18.subject.setVideoRecordingState({
               recording: true,
               viaSocket: false
             }); // console.log('start timestamp:' + this.player.currentTimestamp)
 
 
-            _this19.recordingStartTimeStamp = moment__WEBPACK_IMPORTED_MODULE_3__(_this19.player.currentTimestamp); // this.thumbnailFile = this.videoSettings.thumbnail;
+            _this18.recordingStartTimeStamp = moment__WEBPACK_IMPORTED_MODULE_3__(_this18.player.currentTimestamp); // this.thumbnailFile = this.videoSettings.thumbnail;
             // console.log(this.videoSettings.thumbnail)
 
-            _this19.videoService.saveVideoToken({
-              token: _this19.openViduToken,
-              author_id: _this19.authUser.id,
-              channel_id: _this19.authUser.channel.id,
-              category_id: _this19.videoSettings.category_id,
-              privacy: _this19.videoSettings.privacy,
+            _this18.videoService.saveVideoToken({
+              token: _this18.openViduToken,
+              author_id: _this18.authUser.id,
+              channel_id: _this18.authUser.channel.id,
+              category_id: _this18.videoSettings.category_id,
+              privacy: _this18.videoSettings.privacy,
               filename: '',
-              session_name: _this19.videoSettings.sessionName,
-              publisher: _this19.videoSettings.myUserName,
+              session_name: _this18.videoSettings.sessionName,
+              publisher: _this18.videoSettings.myUserName,
               status: 'live',
-              thumbnail: _this19.videoSettings.thumbnail,
-              name: _this19.videoSettings.name,
-              description: _this19.videoSettings.description,
-              tags: _this19.videoSettings.tags
+              thumbnail: _this18.videoSettings.thumbnail,
+              name: _this18.videoSettings.name,
+              description: _this18.videoSettings.description,
+              tags: _this18.videoSettings.tags
             }).subscribe(function (dt) {
-              _this19.videoId = dt === null || dt === void 0 ? void 0 : dt.id;
+              _this18.videoId = dt === null || dt === void 0 ? void 0 : dt.id;
 
-              _this19.recordingStarted.emit(_this19.videoId);
+              _this18.recordingStarted.emit(_this18.videoId);
             }); // console.log('started recording!');
 
           }); // user completed recording and stream is available
@@ -13526,32 +13339,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // console.log('finished recording: ', this.player);
             // console.log(document.getElementsByTagName('video')[0].duration)
             // console.log('end timestamp:' + this.player.currentTimestamp)
-            _this19.recordingEndTimeStamp = moment__WEBPACK_IMPORTED_MODULE_3__(_this19.player.currentTimestamp); // console.log('Duration timestamp:' + moment.utc((moment.duration(this.recordingEndTimeStamp - this.recordingStartTimeStamp, 'seconds').asMilliseconds()).format('HH:mm')))
+            _this18.recordingEndTimeStamp = moment__WEBPACK_IMPORTED_MODULE_3__(_this18.player.currentTimestamp); // console.log('Duration timestamp:' + moment.utc((moment.duration(this.recordingEndTimeStamp - this.recordingStartTimeStamp, 'seconds').asMilliseconds()).format('HH:mm')))
 
-            var recordingDuration = moment__WEBPACK_IMPORTED_MODULE_3__["utc"](_this19.recordingEndTimeStamp.diff(_this19.recordingStartTimeStamp)).format('mm:ss'); // console.log(this.videoSettings)
+            var recordingDuration = moment__WEBPACK_IMPORTED_MODULE_3__["utc"](_this18.recordingEndTimeStamp.diff(_this18.recordingStartTimeStamp)).format('mm:ss'); // console.log(this.videoSettings)
 
             var fd = new FormData();
-            fd.append('username', _this19.authUser.username); // fd.append('avatar', this.authUser.avatar);
+            fd.append('username', _this18.authUser.username); // fd.append('avatar', this.authUser.avatar);
 
-            fd.append('id', _this19.videoId);
-            fd.append('author_id', _this19.authUser.id); // fd.append('full_name', this.authUser.full_name);
+            fd.append('id', _this18.videoId);
+            fd.append('author_id', _this18.authUser.id); // fd.append('full_name', this.authUser.full_name);
             // fd.append('category_id', this.authUser._id);
 
-            fd.append('video_name', _this19.player.recordedData.name);
+            fd.append('video_name', _this18.player.recordedData.name);
             fd.append('video_duration', recordingDuration);
-            fd.append('video_stream_file', _this19.blobToFile.transform(_this19.player.recordedData)); // if (this.thumbnailFile) {
+            fd.append('video_stream_file', _this18.blobToFile.transform(_this18.player.recordedData)); // if (this.thumbnailFile) {
             //     fd.append('thumbnail', this.thumbnailFile.name);
             // }
 
-            fd.append('video_settings', JSON.stringify(_this19.videoSettings));
+            fd.append('video_settings', JSON.stringify(_this18.videoSettings));
 
-            _this19.subject.setVideoRecordingState({
+            _this18.subject.setVideoRecordingState({
               recording: false
             });
 
-            _this19.recordingState = 'finished';
+            _this18.recordingState = 'finished';
 
-            _this19.videoService.saveRecordedData(fd).subscribe(function () {
+            _this18.videoService.saveRecordedData(fd).subscribe(function () {
               localStorage.setItem('session', '');
               localStorage.setItem('video_settings', '');
             });
@@ -13560,14 +13373,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.player.on('finishConvert', function () {
             // the convertedData object contains the converted data that
             // can be downloaded by the user, stored on server etc.
-            console.log('finished converting: ', _this19.player.convertedData);
+            console.log('finished converting: ', _this18.player.convertedData);
           }); // error handling
 
           this.player.on('error', function (element, error) {
             console.warn(error);
           });
           this.player.on('deviceError', function () {
-            console.error('device error:', _this19.player.deviceErrorCode);
+            console.error('device error:', _this18.player.deviceErrorCode);
           });
         } // use ngOnDestroy to detach event handlers and remove the player
 
@@ -14654,12 +14467,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(
     /*! ./pipes/check-for-empty-object.pipe */
     "./src/app/shared/pipes/check-for-empty-object.pipe.ts");
-    /* harmony import */
-
-
-    var _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(
-    /*! ./components/user-tags/user-tags.component */
-    "./src/app/shared/components/user-tags/user-tags.component.ts");
 
     var SharedModule = function SharedModule() {
       _classCallCheck(this, SharedModule);
@@ -14678,9 +14485,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     (function () {
       (typeof ngJitMode === "undefined" || ngJitMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵsetNgModuleScope"](SharedModule, {
-        declarations: [_components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_7__["GetAuthUserPipe"], _pipes_blob_to_file_pipe__WEBPACK_IMPORTED_MODULE_8__["BlobToFilePipe"], _pipes_base64_to_file_pipe__WEBPACK_IMPORTED_MODULE_11__["Base64ToFilePipe"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _pipes_get_selected_videos_to_be_added_to_playlist_pipe__WEBPACK_IMPORTED_MODULE_16__["GetSelectedVideosToBeAddedToPlaylistPipe"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"], _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__["FilterOutFalsyValuesFromObjectPipe"], _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"], _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"]],
+        declarations: [_components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_7__["GetAuthUserPipe"], _pipes_blob_to_file_pipe__WEBPACK_IMPORTED_MODULE_8__["BlobToFilePipe"], _pipes_base64_to_file_pipe__WEBPACK_IMPORTED_MODULE_11__["Base64ToFilePipe"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _pipes_get_selected_videos_to_be_added_to_playlist_pipe__WEBPACK_IMPORTED_MODULE_16__["GetSelectedVideosToBeAddedToPlaylistPipe"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"], _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__["FilterOutFalsyValuesFromObjectPipe"], _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"]],
         imports: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"], ngx_owl_carousel_o__WEBPACK_IMPORTED_MODULE_2__["CarouselModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["FormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["ReactiveFormsModule"], _ctrl_ngx_emoji_mart__WEBPACK_IMPORTED_MODULE_9__["PickerModule"], _core_modules_material_module__WEBPACK_IMPORTED_MODULE_10__["MaterialModule"]],
-        exports: [_angular_forms__WEBPACK_IMPORTED_MODULE_5__["FormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["ReactiveFormsModule"], ngx_owl_carousel_o__WEBPACK_IMPORTED_MODULE_2__["CarouselModule"], _ctrl_ngx_emoji_mart__WEBPACK_IMPORTED_MODULE_9__["PickerModule"], _core_modules_material_module__WEBPACK_IMPORTED_MODULE_10__["MaterialModule"], _components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"], _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"]]
+        exports: [_angular_forms__WEBPACK_IMPORTED_MODULE_5__["FormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["ReactiveFormsModule"], ngx_owl_carousel_o__WEBPACK_IMPORTED_MODULE_2__["CarouselModule"], _ctrl_ngx_emoji_mart__WEBPACK_IMPORTED_MODULE_9__["PickerModule"], _core_modules_material_module__WEBPACK_IMPORTED_MODULE_10__["MaterialModule"], _components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"]]
       });
     })();
     /*@__PURE__*/
@@ -14690,10 +14497,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](SharedModule, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["NgModule"],
         args: [{
-          declarations: [_components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_7__["GetAuthUserPipe"], _pipes_blob_to_file_pipe__WEBPACK_IMPORTED_MODULE_8__["BlobToFilePipe"], _pipes_base64_to_file_pipe__WEBPACK_IMPORTED_MODULE_11__["Base64ToFilePipe"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _pipes_get_selected_videos_to_be_added_to_playlist_pipe__WEBPACK_IMPORTED_MODULE_16__["GetSelectedVideosToBeAddedToPlaylistPipe"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"], _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__["FilterOutFalsyValuesFromObjectPipe"], _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"], _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"]],
+          declarations: [_components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_7__["GetAuthUserPipe"], _pipes_blob_to_file_pipe__WEBPACK_IMPORTED_MODULE_8__["BlobToFilePipe"], _pipes_base64_to_file_pipe__WEBPACK_IMPORTED_MODULE_11__["Base64ToFilePipe"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _pipes_get_selected_videos_to_be_added_to_playlist_pipe__WEBPACK_IMPORTED_MODULE_16__["GetSelectedVideosToBeAddedToPlaylistPipe"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"], _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__["FilterOutFalsyValuesFromObjectPipe"], _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"]],
           imports: [_angular_common__WEBPACK_IMPORTED_MODULE_1__["CommonModule"], ngx_owl_carousel_o__WEBPACK_IMPORTED_MODULE_2__["CarouselModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["FormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["ReactiveFormsModule"], _ctrl_ngx_emoji_mart__WEBPACK_IMPORTED_MODULE_9__["PickerModule"], _core_modules_material_module__WEBPACK_IMPORTED_MODULE_10__["MaterialModule"]],
           providers: [_pipes_get_auth_user_pipe__WEBPACK_IMPORTED_MODULE_7__["GetAuthUserPipe"], _pipes_blob_to_file_pipe__WEBPACK_IMPORTED_MODULE_8__["BlobToFilePipe"], _pipes_base64_to_file_pipe__WEBPACK_IMPORTED_MODULE_11__["Base64ToFilePipe"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_selected_videos_to_be_added_to_playlist_pipe__WEBPACK_IMPORTED_MODULE_16__["GetSelectedVideosToBeAddedToPlaylistPipe"], _pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_19__["FilterOutFalsyValuesFromObjectPipe"], _pipes_check_for_empty_object_pipe__WEBPACK_IMPORTED_MODULE_20__["CheckForEmptyObjectPipe"]],
-          exports: [_angular_forms__WEBPACK_IMPORTED_MODULE_5__["FormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["ReactiveFormsModule"], ngx_owl_carousel_o__WEBPACK_IMPORTED_MODULE_2__["CarouselModule"], _ctrl_ngx_emoji_mart__WEBPACK_IMPORTED_MODULE_9__["PickerModule"], _core_modules_material_module__WEBPACK_IMPORTED_MODULE_10__["MaterialModule"], _components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"], _components_user_tags_user_tags_component__WEBPACK_IMPORTED_MODULE_21__["UserTagsComponent"]]
+          exports: [_angular_forms__WEBPACK_IMPORTED_MODULE_5__["FormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_5__["ReactiveFormsModule"], ngx_owl_carousel_o__WEBPACK_IMPORTED_MODULE_2__["CarouselModule"], _ctrl_ngx_emoji_mart__WEBPACK_IMPORTED_MODULE_9__["PickerModule"], _core_modules_material_module__WEBPACK_IMPORTED_MODULE_10__["MaterialModule"], _components_video_js_video_js_component__WEBPACK_IMPORTED_MODULE_3__["VideoJsComponent"], _components_video_js_record_video_js_record_component__WEBPACK_IMPORTED_MODULE_4__["VideoJsRecordComponent"], _components_chat_box_chat_box_component__WEBPACK_IMPORTED_MODULE_6__["ChatBoxComponent"], _shared_components_categories_categories_component__WEBPACK_IMPORTED_MODULE_12__["CategoriesComponent"], _pipes_filter_devices_pipe__WEBPACK_IMPORTED_MODULE_13__["FilterDevicesPipe"], _pipes_get_thumb_path_pipe__WEBPACK_IMPORTED_MODULE_14__["GetThumbPathPipe"], _components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_15__["VideoCarouselHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_17__["VideoFiltersComponent"], _pipes_date_from_now_pipe__WEBPACK_IMPORTED_MODULE_18__["DateFromNowPipe"]]
         }]
       }], null, null);
     })();
@@ -14895,10 +14702,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(HomeComponent, [{
         key: "ngOnInit",
         value: function ngOnInit() {
-          var _this20 = this;
+          var _this19 = this;
 
           this.videoService.get({}).subscribe(function (dt) {
-            _this20.videos = dt.videos;
+            _this19.videos = dt.videos;
           });
         }
       }]);

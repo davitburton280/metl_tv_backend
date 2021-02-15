@@ -98739,7 +98739,7 @@ function CollectStreamingDetailsFormComponent_mat_chip_9_Template(rf, ctx) { if 
 } if (rf & 2) {
     const tag_r11 = ctx.$implicit;
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
-    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"](" ", tag_r11, " ");
+    _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate1"](" ", tag_r11.name, " ");
 } }
 function CollectStreamingDetailsFormComponent_mat_error_14_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "mat-error");
@@ -98873,8 +98873,9 @@ class CollectStreamingDetailsFormComponent {
     add(event) {
         const input = event.input;
         const value = event.value;
+        // Add our fruit
         if ((value || '').trim()) {
-            this.tags.push({ name: value.trim() });
+            this.tags.push(value.trim());
             this.startStreamingForm.patchValue({ tags: this.tags });
         }
         // Reset the input value
