@@ -20,6 +20,7 @@ router.get('/get-saved', videoController.getUserSavedVideos);
 router.put('/update-likes', videoController.updateLikes);
 router.put('/update-views', videoController.updateViews);
 router.put('/save-video', videoController.saveVideo);
+router.put('/save-tags', videoController.saveTags);
 router.delete('/remove', uploadVideoThumbFile, videoController.removeVideo);
 router.delete('/remove-by-token', uploadVideoThumbFile, videoController.removeVideo);
 module.exports = router;

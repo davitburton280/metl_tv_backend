@@ -54,12 +54,17 @@ exports.get = async (req, res) => {
     const data = req.query;
     const {channel_id} = data;
     let filters = data.filters ? JSON.parse(data.filters) : {};
-    let wherePlaylistFilters = filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
-    let whereVideoFilters = filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
+    console.log(data.filters , filters)
+    let wherePlaylistFilters = filters && filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
+    let whereVideoFilters = filters && filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
+    let emptyFilters = Object.keys(whereVideoFilters).length === 0 && whereVideoFilters.constructor === Object;
+    console.log('where filters!!!')
+    console.log(emptyFilters)
 
+    console.log('where filters!!!')
     const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
-        include: [{model: Videos, as: 'videos', where: whereVideoFilters, required: !!whereVideoFilters}],
+        include: [{model: Videos, as: 'videos', where: whereVideoFilters, required: !emptyFilters}],
         where: [where, wherePlaylistFilters]
     });
 

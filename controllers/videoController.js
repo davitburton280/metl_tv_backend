@@ -7,6 +7,7 @@ const VideoTags = db.video_tags;
 const PrivacyTypes = db.privacy_types;
 const UsersVideos = db.users_videos;
 const PlaylistsVideos = db.playlists_videos;
+const UsersTags = db.users_tags;
 
 const usersController = require('../controllers/usersController');
 
@@ -93,7 +94,7 @@ exports.saveVideoToken = async (req, res) => {
     if (!v) {
         let video = await Videos.create(data);
         data.tags.map(async (t) => {
-            await VideoTags.create({name: t, video_id: video.id})
+            await VideoTags.create({name: t.name, video_id: video.id})
         });
         res.json(video);
     } else {
@@ -271,7 +272,7 @@ exports.getVideoById = async (req, res) => {
             },
             {model: Playlists, as: 'playlists', attributes: ['id']} //where: playlistWhere
         ],
-        attributes: ['id', 'likes', 'thumbnail', 'duration', 'name', 'dislikes', 'views', 'filename', 'status', 'created_at']
+        attributes: ['id', 'author_id', 'likes', 'thumbnail', 'duration', 'name', 'dislikes', 'views', 'filename', 'status', 'created_at']
     });
     res.json(v);
 };
@@ -409,6 +410,18 @@ exports.saveVideo = async (req, res) => {
         // });
     }
     res.json(ret);
+};
+
+exports.saveTags = async (req, res) => {
+    let data = req.body;
+    console.log(data)
+    await VideoTags.destroy({where: {video_id: data.video_id}});
+    let result = data.tags.map(async (t) => {
+        await VideoTags.create({name: t.name, video_id: data.video_id});
+    });
+    await Promise.all(result);
+    req.query.id = data.video_id;
+    this.getVideoById(req, res);
 };
 
 
