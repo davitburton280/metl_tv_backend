@@ -5,6 +5,7 @@ const Users = db.users;
 const Channels = db.channels;
 const PlaylistsVideos = db.playlists_videos;
 const sequelize = require('sequelize');
+const Op = sequelize.Op;
 const to = require('../helpers/getPromiseResult');
 const videoController = require('../controllers/videoController');
 
@@ -54,11 +55,11 @@ exports.get = async (req, res) => {
     const data = req.query;
     const {channel_id, search} = data;
     let filters = data.filters ? JSON.parse(data.filters) : {};
-    console.log(data.filters , filters)
+    console.log(data.filters, filters)
     let wherePlaylistFilters = filters && filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
     let whereVideoFilters = filters && filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
     let emptyFilters = Object.keys(whereVideoFilters).length === 0 && whereVideoFilters.constructor === Object;
-    let whereSearch = search ? {name: search} : {};
+    let whereSearch = search ? {name: {[Op.like]: '%' + search + '%'}} : {};
     console.log('where filters!!!')
     console.log(emptyFilters)
 
