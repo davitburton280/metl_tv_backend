@@ -23,16 +23,16 @@ require('./helpers/multer');
 app.set('trust proxy', 1);
 
 // Server configuration
-app.use(session({
-    name: 'sid',
-    saveUninitialized: true,
-    resave: false,
-    secret: 'MY_SECRET',
-    cookie: {
-        maxAge: ONE_DAY
-    },
-    secure: IN_PRODUCTION
-}));
+// app.use(session({
+//     name: 'sid',
+//     saveUninitialized: true,
+//     resave: false,
+//     secret: 'MY_SECRET',
+//     cookie: {
+//         maxAge: ONE_DAY
+//     },
+//     secure: IN_PRODUCTION
+// }));
 // var options = {
 //     key: fs.readFileSync('openvidukey.pem'),
 //     cert: fs.readFileSync('openviducert.pem')
