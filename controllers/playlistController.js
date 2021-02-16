@@ -52,12 +52,13 @@ exports.addVideosToOtherPlaylists = async (req, res) => {
 exports.get = async (req, res) => {
     // console.log('playlist get!!!')
     const data = req.query;
-    const {channel_id} = data;
+    const {channel_id, search} = data;
     let filters = data.filters ? JSON.parse(data.filters) : {};
     console.log(data.filters , filters)
     let wherePlaylistFilters = filters && filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
     let whereVideoFilters = filters && filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
     let emptyFilters = Object.keys(whereVideoFilters).length === 0 && whereVideoFilters.constructor === Object;
+    let whereSearch = search ? {name: search} : {};
     console.log('where filters!!!')
     console.log(emptyFilters)
 
@@ -65,7 +66,7 @@ exports.get = async (req, res) => {
     const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
         include: [{model: Videos, as: 'videos', where: whereVideoFilters, required: !emptyFilters}],
-        where: [where, wherePlaylistFilters]
+        where: [where, wherePlaylistFilters, whereSearch]
     });
 
     res.json(playlists);
