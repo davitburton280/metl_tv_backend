@@ -28,14 +28,15 @@ const moment = require('moment');
 
 exports.getVideos = async (req, res) => {
     let data = req.query;
-    let {withPlaylists, trending, limit} = data;
+    let {withPlaylists, trending, limit, tag} = data;
     let ret = {};
     let limitOption = limit ? {limit: +limit} : {};
     let trendingOption = +trending ? [['views', 'DESC']] : [['created_at', 'DESC']];
     let filters = data.filters ? JSON.parse(data.filters) : {};
     let whereFilters = this.getVideoFiltersQuery(filters);
+    let whereTag = tag ? {name: tag} : {};
 
-    console.log(whereFilters)
+    console.log(whereTag)
     let v = await Videos.findAll({
         include: [
             {
