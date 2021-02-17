@@ -68,7 +68,10 @@ exports.getVideoFiltersQuery = (filters) => {
     let whereFilters = {};
     for (let group in filters) {
         if (group === 'date') {
+
             let filterValue = filters[group].value;
+            console.log(filterValue)
+            console.log(moment(filterValue).utc().format('YYYY-MM-DD HH:mm:ss'))
             whereFilters['`created_at`'] = {
                 [Op.between]: [
                     moment(filterValue).utc().format('YYYY-MM-DD HH:mm:ss'),
