@@ -33,7 +33,6 @@ exports.getVideos = async (req, res) => {
     let limitOption = limit ? {limit: +limit} : {};
     let trendingOption = +trending ? [['views', 'DESC']] : [['created_at', 'DESC']];
     let filters = data.filters ? JSON.parse(data.filters) : {};
-    console.log(filters)
     let whereFilters = this.getVideoFiltersQuery(filters);
 
     console.log(whereFilters)
@@ -71,8 +70,12 @@ exports.getVideoFiltersQuery = (filters) => {
         if (group === 'date') {
             let filterValue = filters[group].value;
             whereFilters['`created_at`'] = {
-                [Op.between]: [filterValue, moment().format('YYYY-MM-DD HH:mm:ss')]
+                [Op.between]: [
+                    moment(filterValue).utc().format('YYYY-MM-DD HH:mm:ss'),
+                    moment().utc().format('YYYY-MM-DD HH:mm:ss')
+                ]
             };
+
         } else if (group === 'duration') {
             let filterValue = filters[group].value;
             let minDuration = '00:00';
@@ -497,7 +500,7 @@ exports.getUserTags = async (req, res) => {
     console.log(data)
     let userTags = await UsersTags.findAll({
         where: {user_id: user_id},
-        order: [['popularity','desc']],
+        order: [['popularity', 'desc']],
         include: [{model: VideoTags, as: 'tag_details'}]
     });
     res.json(userTags);

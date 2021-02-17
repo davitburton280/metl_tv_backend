@@ -41,8 +41,8 @@ exports.login = async (req, res) => {
                 // Cloning users object without password and saving user full name
                 let {password, ...details} = user.toJSON();
                 console.log("'" + user.full_name + "' has logged in");
-                req.session.full_name = user.full_name;
-                console.log(details)
+                // req.session.full_name = user.full_name;
+                // console.log(details)
                 res.status(200).json({
                     token: jwt.sign(details, 'secretkey', {expiresIn: '8h'}),
                     user_id: user.id,

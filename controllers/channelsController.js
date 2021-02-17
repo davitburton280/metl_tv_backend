@@ -5,6 +5,7 @@ const Videos = db.videos;
 const ChannelSubscribers = db.channel_subscribers;
 
 const usersController = require('./usersController');
+const videoController = require('./videoController');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
@@ -24,11 +25,11 @@ exports.getSubscriptions = async (req, res) => {
     res.json(channels);
 };
 
-// exports.getBy
-
 exports.searchChannelVideos = async (req, res) => {
-    let {search, user_id} = req.query;
+    let {search, user_id, filters} = req.query;
+    let whereFilters = videoController.getVideoFiltersQuery(JSON.parse(filters));
     console.log('search channel with videos!!!')
+    console.log(whereFilters)
     // let userWhere = user_id ? sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id) : {};
     if (search) {
 
@@ -36,11 +37,11 @@ exports.searchChannelVideos = async (req, res) => {
         let channels = await Channels.findAll(
             {
                 include: [
-                    {model: Videos},
+                    {model: Videos, where: whereFilters},
                     {model: Users, as: 'user'},
                     {model: Users, as: 'subscribers'}
                 ],
-                where: {
+                where:  {
                     [Op.or]: [
                         {
                             name: {
@@ -54,7 +55,7 @@ exports.searchChannelVideos = async (req, res) => {
                         //     }
                         // }
                     ],
-                }
+                },
             });
         res.json(channels);
     } else {
