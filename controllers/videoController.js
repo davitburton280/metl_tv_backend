@@ -55,7 +55,8 @@ exports.getVideos = async (req, res) => {
             {
                 model: Tags,
                 as: 'tags',
-                where: whereTag
+                where: whereTag,
+                required: false
             }
         ],
         order: trendingOption,
