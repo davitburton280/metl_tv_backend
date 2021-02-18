@@ -37,7 +37,7 @@ exports.getVideos = async (req, res) => {
     let whereFilters = this.getVideoFiltersQuery(filters);
     let whereTag = tag ? {name: tag} : {};
 
-    console.log(whereTag)
+    console.log('get videos!!!')
     let v = await Videos.findAll({
         include: [
             {
@@ -56,7 +56,7 @@ exports.getVideos = async (req, res) => {
                 model: Tags,
                 as: 'tags',
                 where: whereTag,
-                required: false
+                // required: false
             }
         ],
         order: trendingOption,
