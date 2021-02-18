@@ -57,9 +57,9 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     req.logout();
-    console.log(req.session)
-    console.log("'" + req.session.loggedUser + "' has logged out");
-    req.session.destroy();
+    // console.log(req.session)
+    // console.log("'" + req.session.loggedUser + "' has logged out");
+    // req.session.destroy();
     res.status(200).json({msg: 'OK'})
 };
 
