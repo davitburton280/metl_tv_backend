@@ -3,7 +3,8 @@ const Users = db.users;
 const Channels = db.channels;
 const ChatMessages = db.chat_messages;
 const VideoCategories = db.video_categories;
-const VideoTags = db.video_tags;
+const VideosTags = db.video_tags;
+const Tags = db.tags;
 const PrivacyTypes = db.privacy_types;
 const UsersVideos = db.users_videos;
 const PlaylistsVideos = db.playlists_videos;
@@ -50,6 +51,11 @@ exports.getVideos = async (req, res) => {
             },
             {
                 model: Users, as: 'users_vids', attributes: ['username']
+            },
+            {
+                model: Tags,
+                as: 'tags',
+                where: whereTag
             }
         ],
         order: trendingOption,
@@ -267,7 +273,7 @@ exports.getVideoById = async (req, res) => {
         // where: [idWhere, sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id)],
         include: [
             {model: Channels, as: 'channel', attributes: ['id', 'subscribers_count', 'name', 'avatar']}, {
-                model: VideoTags,
+                model: Tags,
                 as: 'tags'
             },
             {
@@ -425,9 +431,19 @@ exports.saveTags = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
         console.log(data)
-        await VideoTags.destroy({where: {video_id: data.video_id}});
+        await VideosTags.destroy({where: {video_id: data.video_id}});
         let result = data.tags.map(async (t) => {
-            await VideoTags.create({name: t.name, video_id: data.video_id});
+
+            let found = await Tags.findOne({where: {name: t.name}});
+            console.log(found)
+
+            if (!found) {
+                let tag = await Tags.create({name: t.name});
+                await VideosTags.create({tag_id: tag.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
+            } else {
+                await VideosTags.create({tag_id: found.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
+            }
+
         });
         await Promise.all(result);
         req.query.id = data.video_id;
@@ -505,7 +521,7 @@ exports.getUserTags = async (req, res) => {
     let userTags = await UsersTags.findAll({
         where: {user_id: user_id},
         order: [['popularity', 'desc']],
-        include: [{model: VideoTags, as: 'tag_details'}]
+        include: [{model: Tags, as: 'tag_details'}]
     });
     res.json(userTags);
 };

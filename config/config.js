@@ -7,9 +7,9 @@ module.exports = {
         host: "127.0.0.1",
         dialect: "mysql",
         operatorsAliases: 0,
-        dialectOptions: {
-            useUTC: false, // for reading from database
-        },
+        // dialectOptions: {
+        //     useUTC: false, // for reading from database
+        // },
         logging: true
     },
     "staging": {
