@@ -56,7 +56,7 @@ exports.getVideos = async (req, res) => {
                 model: Tags,
                 as: 'tags',
                 where: whereTag,
-                // required: false
+                required: false
             }
         ],
         order: trendingOption,
@@ -109,7 +109,14 @@ exports.saveVideoToken = async (req, res) => {
     if (!v) {
         let video = await Videos.create(data);
         data.tags.map(async (t) => {
-            await VideoTags.create({name: t.name, video_id: video.id})
+            let found = await Tags.findOne({where: {name: t.name}});
+
+            if (!found) {
+                let tag = await Tags.create({name: t.name});
+                await VideosTags.create({tag_id: tag.id, video_id: video.id}, {fields: ['tag_id', 'video_id']});
+            } else {
+                await VideosTags.create({tag_id: found.id, video_id: video.id}, {fields: ['tag_id', 'video_id']});
+            }
         });
         res.json(video);
     } else {
