@@ -76,7 +76,7 @@ exports.sendVerificationCode = async (req, res) => {
             // port: 465,
             // secure: false, // true for 465, false for other ports
             auth: {
-                user: 'davitburton280@gmail.com', // generated ethereal user
+                user: 'sofiabruno3003@gmail.com', // generated ethereal user
                 pass: 'davmark11' // generated ethereal password
             }
         });
