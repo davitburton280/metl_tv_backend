@@ -56,7 +56,7 @@ exports.getVideos = async (req, res) => {
                 model: Tags,
                 as: 'tags',
                 where: whereTag,
-                required: false
+                required: !!tag
             }
         ],
         order: trendingOption,
@@ -280,9 +280,12 @@ exports.getVideoById = async (req, res) => {
         where: [idWhere],
         // where: [idWhere, sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id)],
         include: [
-            {model: Channels, as: 'channel', attributes: ['id', 'subscribers_count', 'name', 'avatar']}, {
+            {
+                model: Channels, as: 'channel', attributes: ['id', 'subscribers_count', 'name', 'avatar']},
+            {
                 model: Tags,
-                as: 'tags'
+                as: 'tags',
+                // required: false
             },
             {
                 model: Users,
@@ -435,30 +438,6 @@ exports.saveVideo = async (req, res) => {
     res.json(ret);
 };
 
-exports.saveTags = async (req, res) => {
-    if (!showIfErrors(req, res)) {
-        let data = req.body;
-        console.log(data)
-        await VideosTags.destroy({where: {video_id: data.video_id}});
-        let result = data.tags.map(async (t) => {
-
-            let found = await Tags.findOne({where: {name: t.name}});
-            console.log(found)
-
-            if (!found) {
-                let tag = await Tags.create({name: t.name});
-                await VideosTags.create({tag_id: tag.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
-            } else {
-                await VideosTags.create({tag_id: found.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
-            }
-
-        });
-        await Promise.all(result);
-        req.query.id = data.video_id;
-        this.getVideoById(req, res);
-    }
-};
-
 
 exports.removeVideo = async (req, res) => {
     let data = req.query;
@@ -499,6 +478,30 @@ exports.removeVideoThumbnail = async (req, res) => {
 
 };
 
+exports.saveTags = async (req, res) => {
+    if (!showIfErrors(req, res)) {
+        let data = req.body;
+        console.log(data)
+        await VideosTags.destroy({where: {video_id: data.video_id}});
+        let result = data.tags.map(async (t) => {
+
+            let found = await Tags.findOne({where: {name: t.name}});
+            console.log(!found)
+
+            if (!found) {
+                let tag = await Tags.create({name: t.name});
+                await VideosTags.create({tag_id: tag.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
+            } else {
+                await VideosTags.create({tag_id: found.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
+            }
+
+        });
+        await Promise.all(result);
+        req.query.id = data.video_id;
+        this.getVideoById(req, res);
+    }
+};
+
 
 exports.updateUserTags = async (req, res) => {
     let data = req.body;
@@ -529,7 +532,10 @@ exports.getUserTags = async (req, res) => {
     let userTags = await UsersTags.findAll({
         where: {user_id: user_id},
         order: [['popularity', 'desc']],
-        include: [{model: Tags, as: 'tag_details'}]
-    });
+        include: [{
+            model: Tags, as: 'tag_details',
+            include: [{model: Videos, as: 'tags_videos', attributes: ['id']}]
+        }]
+    }).filter(ut => ut.tag_details.tags_videos.length !== 0);
     res.json(userTags);
 };
