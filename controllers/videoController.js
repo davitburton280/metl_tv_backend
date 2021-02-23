@@ -90,7 +90,7 @@ exports.getVideoFiltersQuery = (filters) => {
         } else if (group === 'duration') {
             let filterValue = filters[group].value;
             let minDuration = '00:00';
-            let middleDuration = '00:30'
+            let middleDuration = '00:30';
             let maxDuration = '59:59';
             whereFilters['`duration`'] = {
                 [Op.between]: (filterValue === 'short' ? [minDuration, middleDuration] : [middleDuration, maxDuration])
