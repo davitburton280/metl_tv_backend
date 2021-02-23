@@ -37,11 +37,11 @@ exports.searchChannelVideos = async (req, res) => {
         let channels = await Channels.findAll(
             {
                 include: [
-                    {model: Videos, where: whereFilters},
+                    {model: Videos, where: whereFilters, required: false},
                     {model: Users, as: 'user'},
                     {model: Users, as: 'subscribers'}
                 ],
-                where:  {
+                where: {
                     [Op.or]: [
                         {
                             name: {
