@@ -38,6 +38,9 @@ const url = require('url');
 
 const jwt = require('jsonwebtoken');
 
+const sequelize = require('sequelize');
+const Op = sequelize.Op;
+
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
     console.log('OK')
@@ -155,11 +158,10 @@ exports.changeAvatar = async (req, res) => {
 
     uploadAvatar(req, res, async (err) => {
 
-        console.log('aaaaa')
         await Users.update({avatar: avatar}, {where: {id: id}});
         await Channels.update({avatar: avatar}, {where: {id: id}});
 
-        await changeJwt(data, res);
+        await this.changeJwt(data, res);
 
     });
 
@@ -173,11 +175,11 @@ exports.changeCover = async (req, res) => {
     uploadCover(req, res, async (err) => {
         await Users.update({cover: cover}, {where: {id: id}});
         await Channels.update({cover: cover}, {where: {id: id}});
-        await changeJwt(data, res);
+        await this.changeJwt(data, res);
     });
 };
 
-let changeJwt = async (data, res) => {
+exports.changeJwt = async (data, res) => {
 
     let user = await Users.findOne({where: {id: data.id}, include: [{model: Channels, as: 'channel'}]});
 
@@ -197,10 +199,18 @@ let changeJwt = async (data, res) => {
 };
 
 exports.getUserInfo = async (req, res) => {
+    console.log('get user info!!!!')
     let data = req.query;
     let user = await Users.findOne({
         where: {username: data.username},
-        include: [{model: Channels, as: 'channel'}, {model: Videos, as: 'videos'}]
+        include: [
+            {model: Channels, as: 'channel'},
+            {
+                model: Videos,
+                as: 'videos',
+
+            }],
+        order: [[{model: Videos},sequelize.col(`created_at`), 'desc']]
     });
     console.log('OK!!!' + req.query.username)
     res.json(user);

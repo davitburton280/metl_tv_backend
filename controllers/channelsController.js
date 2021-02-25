@@ -220,3 +220,14 @@ exports.saveDescription = async (req, res) => {
     let userInfo = await usersController.getUserInfo(req, res);
     res.json(userInfo);
 };
+
+
+exports.saveChannelDetails = async (req, res) => {
+    let data = req.body
+    const {id, ...rest} = data;
+    req.query = req.body;
+    await Channels.update(rest, {where: {id: id}});
+    await usersController.changeJwt(data, res);
+    // let userInfo = await usersController.getUserInfo(req, res);
+    // res.json(userInfo);
+}

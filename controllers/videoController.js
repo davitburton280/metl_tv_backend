@@ -244,7 +244,7 @@ exports.getUserVideos = async (req, res) => {
             include: [
                 {model: Channels, as: 'channel'}, {model: Playlists, as: 'playlists', attributes: ['id']}
             ]
-        }],
+        }, {model: Channels, as: 'channel'}],
         where: {
             id: user_id
         },
@@ -281,7 +281,8 @@ exports.getVideoById = async (req, res) => {
         // where: [idWhere, sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id)],
         include: [
             {
-                model: Channels, as: 'channel', attributes: ['id', 'subscribers_count', 'name', 'avatar']},
+                model: Channels, as: 'channel', attributes: ['id', 'subscribers_count', 'name', 'avatar']
+            },
             {
                 model: Tags,
                 as: 'tags',
@@ -311,7 +312,8 @@ exports.getVideosByAuthor = async (req, res) => {
     let v = await Users.findAll(
         {
             include: [
-                {model: Videos, as: 'videos', where: whereFilters}
+                {model: Videos, as: 'videos', where: whereFilters},
+                {model: Channels, as: 'channel', attributes: ['id', 'avatar','name']}
             ],
             order: [[sequelize.col(`videos.created_at`), 'desc']],
             where: whereSearch
