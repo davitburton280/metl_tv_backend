@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 
 
 const rules = [
-    // body('user_id').not().isEmpty().withMessage('User id is required'),
+    body('name').not().isEmpty().withMessage('The video name is required'),
     body().custom(async (req) => {
         let tags = req.tags;
 
