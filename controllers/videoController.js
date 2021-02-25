@@ -224,7 +224,18 @@ exports.saveVideoThumbnail = async (req, res) => {
 // };
 
 exports.getCategories = async (req, res) => {
-    let vc = await VideoCategories.findAll();
+    let data = req.query;
+    console.log('get categories!!!')
+    let whereAll = data.all ? {} : {
+        where: {
+            [Op.not]:
+                {
+                    name: 'All'
+                }
+        }
+    };
+
+    let vc = await VideoCategories.findAll(whereAll);
     res.json(vc);
 };
 
@@ -313,7 +324,7 @@ exports.getVideosByAuthor = async (req, res) => {
         {
             include: [
                 {model: Videos, as: 'videos', where: whereFilters},
-                {model: Channels, as: 'channel', attributes: ['id', 'avatar','name']}
+                {model: Channels, as: 'channel', attributes: ['id', 'avatar', 'name']}
             ],
             order: [[sequelize.col(`videos.created_at`), 'desc']],
             where: whereSearch
@@ -480,10 +491,11 @@ exports.removeVideoThumbnail = async (req, res) => {
 
 };
 
-exports.saveTags = async (req, res) => {
+exports.saveVideoDetails = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
         console.log(data)
+        await Videos.update({name: data.name}, {where: {id: data.video_id}});
         await VideosTags.destroy({where: {video_id: data.video_id}});
         let result = data.tags.map(async (t) => {
 

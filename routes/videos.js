@@ -23,7 +23,7 @@ router.put('/update-likes', videoController.updateLikes);
 router.put('/update-views', videoController.updateViews);
 router.put('/index-user-tags', videoController.updateUserTags);
 router.put('/save-video', videoController.saveVideo);
-router.put('/save-tags', validateVideoTags.rules, videoController.saveTags);
+router.put('/save-video-details', validateVideoTags.rules, videoController.saveVideoDetails);
 router.delete('/remove', uploadVideoThumbFile, videoController.removeVideo);
 router.delete('/remove-by-token', uploadVideoThumbFile, videoController.removeVideo);
 module.exports = router;
