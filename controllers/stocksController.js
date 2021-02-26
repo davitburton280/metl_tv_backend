@@ -88,6 +88,6 @@ exports.getDailyStocks = async (req, res) => {
             } ]
         } ]
     };
-    console.log(stocks)
+    // console.log(stocks)
     res.json(stocks.historicalStockList);
 };

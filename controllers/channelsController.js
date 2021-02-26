@@ -17,11 +17,16 @@ exports.get = async (req, res) => {
 };
 
 exports.getSubscriptions = async (req, res) => {
-    console.log(req.query)
+    console.log('get subscriptions!!!')
     let channels = await Users.findOne({
         where: {id: req.query.user_id},
-        include: [{model: Channels, as: 'subscriptions'}]
+        include: [{
+            model: Channels,
+            as: 'subscriptions',
+            include: [{model: Videos, as: 'videos', attributes: ['id']}]
+        }]
     });
+    console.log(channels.subscriptions)
     res.json(channels);
 };
 
