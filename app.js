@@ -86,6 +86,7 @@ app.use('/users', require('./routes/users'));
 app.use('/videos', require('./routes/videos'));
 app.use('/playlists', require('./routes/playlists'));
 app.use('/channels', require('./routes/channels'));
+app.use('/stocks', require('./routes/stocks'));
 app.use('/chat', require('./routes/chat'));
 
 let dist = path.join(__dirname, 'dist/');
