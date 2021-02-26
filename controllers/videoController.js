@@ -363,7 +363,7 @@ exports.searchInAllVideos = async (req, res) => {
 
 exports.updateLikes = async (req, res) => {
     let data = req.body;
-    const {user_id, video_id, likes, dislikes, likeStatus} = data;
+    const {user_id, video_id, likes, dislikes, liked, disliked, likeStatus} = data;
 
 
     let found = await UsersVideos.findOne({
@@ -373,13 +373,17 @@ exports.updateLikes = async (req, res) => {
         }
     });
 
-    console.log(found)
+    console.log({disliked: likeStatus === 'disliked' ? 1 : 0, liked: likeStatus === 'liked' ? 1 : 0})
 
     if (!found) {
-        await UsersVideos.create({...data, disliked: likeStatus === 'disliked', liked: likeStatus === 'liked'});
+        await UsersVideos.create({
+            ...data,
+            disliked: liked,
+            liked: disliked
+        });
 
     } else {
-        await UsersVideos.update({disliked: likeStatus === 'disliked', liked: likeStatus === 'liked'}, {
+        await UsersVideos.update({disliked: disliked, liked: liked}, {
             where: {
                 user_id: user_id,
                 video_id: video_id
