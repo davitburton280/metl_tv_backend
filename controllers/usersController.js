@@ -215,3 +215,7 @@ exports.getUserInfo = async (req, res) => {
     console.log('OK!!!' + req.query.username)
     res.json(user);
 };
+
+exports.saveProfileChanges = async (req, res) => {
+    res.json('OK');
+};
