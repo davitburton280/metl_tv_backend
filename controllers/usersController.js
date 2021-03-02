@@ -41,6 +41,8 @@ const jwt = require('jsonwebtoken');
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
+const bcrypt = require('bcryptjs');
+
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
     console.log('OK')
@@ -210,12 +212,21 @@ exports.getUserInfo = async (req, res) => {
                 as: 'videos',
 
             }],
-        order: [[{model: Videos},sequelize.col(`created_at`), 'desc']]
+        order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });
     console.log('OK!!!' + req.query.username)
     res.json(user);
 };
 
 exports.saveProfileChanges = async (req, res) => {
-    res.json('OK');
+    const {id, ...data} = req.body;
+
+    uploadUserAvatar(req, res, async (err) => {
+
+        let newPassword = data.password;
+        data.password = bcrypt.hashSync(newPassword, 10);
+        await Users.update(data, {where: {id: id}});
+        await this.changeJwt({id: id, ...data}, res);
+
+    });
 };
