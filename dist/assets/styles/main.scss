@@ -22,6 +22,7 @@ html, body, p, h1, h2, h3, h4, ul {
     padding: 0;
 }
 
+
 input, button {
     outline: none;
     border: none;
@@ -320,7 +321,7 @@ nav.home-header {
 .body-content.full-width {
     width: 100%;
     padding: 0 !important;
-    margin-top: 0!important;
+    margin-top: 0 !important;
 }
 
 .body-content-right {
@@ -382,6 +383,14 @@ nav.home-header {
     width: 100%;
     padding-right: 32px;
     position: relative;
+
+    .main-item-block {
+        justify-content: left;
+    }
+
+    @media screen and (max-width: 767px) {
+        padding-right: 0;
+    }
 }
 
 .live-now {
@@ -522,8 +531,12 @@ nav.home-header {
 .left-menu p {
     color: #545454;
     font-size: 16px;
+    line-height: 24px;
     font-family: "Muli-Regular";
     margin-left: 12px;
+    @media screen and (max-width: 767px) {
+        font-size: 14px;
+    }
 }
 
 .left-menu-top i, .left-menu-top p {
@@ -758,8 +771,12 @@ nav.home-header {
 
 }
 
+.chat-container {
+
+}
 
 .chat-content {
+    max-width: 500px;
     //margin-bottom: 40px;
     box-shadow: 0 0 6px #0000001A;
 }
@@ -1163,6 +1180,53 @@ ngb-modal-window {
     border: 1px solid #e0e0e0 !important;
 }
 
+// Drop zone styles
+#dropzone.single {
+    height: 410px !important;
+
+
+    .dz-wrapper {
+        height: 100% !important;
+        //max-width: 400px;
+        overflow: hidden !important;
+        width: 100%;
+
+        .dz-message {
+            height: 400px !important;
+            border: none !important;
+        }
+
+
+        .dz-image img {
+            height: 400px !important;
+            object-fit: cover;
+        }
+
+        .dz-progress {
+            display: none;
+        }
+
+        .dz-remove {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-color: $red;
+            border-radius: 20px;
+            transform: translate(-50%, -50%);
+            text-decoration: none !important;
+            color: $white;
+            z-index: 44444;
+            font-weight: bold;
+            padding: 5px;
+        }
+    }
+}
+
+// Material side nav styles
+.mat-drawer-container {
+    background-color: $white !important;
+}
+
 @media (max-width: 1700px) {
     nav.home-header {
         padding: 0 100px;
@@ -1300,7 +1364,7 @@ ngb-modal-window {
     }
     .home-search {
         width: 300px;
-        margin-bottom: 20px;
+        margin-bottom: 0;
         margin-right: 0;
     }
     nav.home-header {
@@ -1323,16 +1387,20 @@ ngb-modal-window {
         justify-content: space-between;
     }
 
-
+    .body-content {
+        min-height: 100vh;
+    }
 }
 
 @media (max-width: 767px) {
+
     .home-black-item {
         margin-bottom: 5px;
         margin-top: 5px;
     }
     .home-search {
         width: 100%;
+        margin:  0;
     }
 
     .left-list {
@@ -1340,7 +1408,7 @@ ngb-modal-window {
     }
     .body-content-right {
         width: 100%;
-        margin-top: 40px;
+        //margin-top: 40px;
     }
     .left-menu {
         width: 80%;
@@ -1348,7 +1416,7 @@ ngb-modal-window {
     }
     .left-list {
         width: 80%;
-        margin-top: 40px;
+        margin: 40px 0 0;
     }
     .main-carousel .owl-nav button.owl-next {
         display: none;
@@ -1377,10 +1445,22 @@ ngb-modal-window {
         width: 100% !important;
         height: auto !important;
     }
+    .sub-block {
+        flex-wrap: wrap;
+    }
+    .profile-list .watchlist-search {
+        max-width: 290px;
+        width: 100%;
+    }
+    app-search-videos-form.flex-1 {
+        flex: 1;
+        max-width: 200px;
+        margin: 0 8px;
+    }
 }
 
 @media (max-width: 480px) {
-    .left-menu, .left-list, .categories, .watchlist {
+    .left-list, .categories, .watchlist {
         width: 100%;
     }
     .watchlist .tab-pane, .ads-block-right {
@@ -1427,7 +1507,7 @@ input, textarea {
 }
 
 .owl-item {
-    width: 400px !important;
+    //width: 400px !important;
 
     .thumbnail {
         object-fit: cover !important;
