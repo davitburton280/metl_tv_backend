@@ -106,7 +106,7 @@ exports.getById = async (req, res) => {
 exports.updatePlaylistInfo = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
-        const {id, name, description} = data
+        const {id, name, description} = data;
         await Playlists.update({name: name, description: description}, {where: {id: id}});
         req.query.playlist_id = req.body.id;
         console.log(req.query)
