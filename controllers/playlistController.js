@@ -56,11 +56,12 @@ exports.addVideosToOtherPlaylists = async (req, res) => {
 exports.get = async (req, res) => {
     // console.log('playlist get!!!')
     const data = req.query;
-    const {channel_id, search} = data;
+    const {channel_id, user_id, search} = data;
     let filters = data.filters ? JSON.parse(data.filters) : {};
     console.log(data.filters, filters)
     let wherePlaylistFilters = filters && filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
     let whereVideoFilters = filters && filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
+    let wherePrivacy = {};
     let emptyFilters = Object.keys(whereVideoFilters).length === 0 && whereVideoFilters.constructor === Object;
     let whereSearch = search ? {name: {[Op.like]: '%' + search + '%'}} : {};
     console.log('where filters!!!')
@@ -69,9 +70,12 @@ exports.get = async (req, res) => {
     console.log('where filters!!!')
     const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
-        include: [{model: Videos, as: 'videos', where: whereVideoFilters, required: !emptyFilters}],
+        include: [
+            {model: Videos, as: 'videos', where: whereVideoFilters, required: !emptyFilters},
+            {model: Channels, as: 'channel'}],
         where: [where, wherePlaylistFilters, whereSearch]
-    });
+    })
+        .filter(p => p.channel.user_id !== +user_id ? p.privacy === 0 : p); // Filtering out private playlists for other users
 
     res.json(playlists);
 };
@@ -131,7 +135,6 @@ exports.changeThumbnail = async (req, res) => {
     req.query = req.body;
     this.getById(req, res);
 };
-
 
 
 exports.updateVideoPosition = async (req, res) => {
