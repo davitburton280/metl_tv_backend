@@ -3,6 +3,7 @@ const router = express.Router();
 const stocksController = require('../controllers/stocksController');
 
 router.get('/get-daily', stocksController.getDailyStocks);
+router.get('/get-indices', stocksController.getMajorIndexes);
 // router.get('/session/leave', usersController.leaveSession);
 // router.get('/get-user-info', usersController.getUserInfo);
 // router.post('/change-profile-image', uploadAvatar, usersController.changeAvatar);
