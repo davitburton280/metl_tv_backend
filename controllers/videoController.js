@@ -274,7 +274,7 @@ exports.getUserSavedVideos = async (req, res) => {
             model: Videos,
             as: 'users_vids',
             where: [sequelize.where(sequelize.col('`users_vids->users_videos`.`saved`'), 1)],
-            include: [{model: Channels, as: 'channel'}]
+            include: [{model: Channels, as: 'channel'}, {model: Tags, as: 'tags'}]
         }],
 
     });

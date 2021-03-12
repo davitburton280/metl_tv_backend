@@ -32,6 +32,7 @@ var mapSessionNamesTokens = {};
 const db = require('../models');
 const Users = db.users;
 const Videos = db.videos;
+const Tags = db.tags;
 const Channels = db.channels;
 
 const url = require('url');
@@ -210,7 +211,7 @@ exports.getUserInfo = async (req, res) => {
             {
                 model: Videos,
                 as: 'videos',
-
+                include: [{model:Tags, as: 'tags'}]
             }],
         order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });
