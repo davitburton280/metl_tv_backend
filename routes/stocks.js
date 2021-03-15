@@ -3,6 +3,7 @@ const router = express.Router();
 const stocksController = require('../controllers/stocksController');
 
 router.get('/get-daily', stocksController.getDailyStocks);
+router.get('/get-by-type', stocksController.getStocksByType);
 router.get('/get-indices', stocksController.getMajorIndexes);
 // router.get('/session/leave', usersController.leaveSession);
 // router.get('/get-user-info', usersController.getUserInfo);
