@@ -5,6 +5,7 @@ const stocksController = require('../controllers/stocksController');
 router.get('/get-daily', stocksController.getDailyStocks);
 router.get('/get-by-type', stocksController.getStocksByType);
 router.get('/get-indices', stocksController.getMajorIndexes);
+router.get('/get-historical', stocksController.getHistoricalPrices);
 // router.get('/session/leave', usersController.leaveSession);
 // router.get('/get-user-info', usersController.getUserInfo);
 // router.post('/change-profile-image', uploadAvatar, usersController.changeAvatar);
