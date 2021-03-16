@@ -253,7 +253,9 @@ exports.getUserVideos = async (req, res) => {
             model: Videos, as: 'videos',
             where: [where, whereFilters],
             include: [
-                {model: Channels, as: 'channel'}, {model: Playlists, as: 'playlists', attributes: ['id']}
+                {model: Channels, as: 'channel'},
+                {model: Playlists, as: 'playlists', attributes: ['id']},
+                {model: Tags, as: 'tags'}
             ]
         }, {model: Channels, as: 'channel'}],
         where: {
@@ -355,7 +357,11 @@ exports.searchInAllVideos = async (req, res) => {
     let {search} = req.query;
     let v = await Videos.findAll({
         where: sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%'),
-        include: [{model: Channels, as: 'channel'}, {model: Playlists, as: 'playlists', attributes: ['id']}]
+        include: [
+            {model: Channels, as: 'channel'},
+            {model: Playlists, as: 'playlists', attributes: ['id']},
+            {model: Tags, as: 'tags'}
+        ]
     });
     res.json(v);
 };

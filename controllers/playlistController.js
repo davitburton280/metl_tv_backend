@@ -2,6 +2,7 @@ const db = require('../models');
 const Playlists = db.playlists;
 const Videos = db.videos;
 const Users = db.users;
+const Tags = db.tags;
 const Channels = db.channels;
 const PlaylistsVideos = db.playlists_videos;
 const sequelize = require('sequelize');
@@ -71,7 +72,13 @@ exports.get = async (req, res) => {
     const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
         include: [
-            {model: Videos, as: 'videos', where: whereVideoFilters, required: !emptyFilters},
+            {
+                model: Videos,
+                as: 'videos',
+                where: whereVideoFilters,
+                required: !emptyFilters,
+                include: [{model: Tags, as: 'tags'}]
+            },
             {model: Channels, as: 'channel'}],
         where: [where, wherePlaylistFilters, whereSearch]
     })
@@ -96,7 +103,10 @@ exports.getById = async (req, res) => {
         where: {id: req.query.playlist_id},
         include: [
             {
-                model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}] //{model: Users, as: 'user'}
+                model: Videos, as: 'videos', include: [
+                    {model: Channels, as: 'channel'},
+                    {model: Tags, as: 'tags'}
+                ] //{model: Users, as: 'user'}
             },
             {model: Channels, as: 'channel'},
 
