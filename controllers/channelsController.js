@@ -221,6 +221,15 @@ exports.saveDescription = async (req, res) => {
     req.query = req.body;
     console.log('save description')
     console.log(rest)
+
+    function nl2br (str, is_xhtml) {
+        var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br ' + '/>' : '<br>';
+        return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+    }
+
+    rest.description = nl2br(rest.description, false)
+
+
     await Channels.update(rest, {where: {id: id}});
     let userInfo = await usersController.getUserInfo(req, res);
     res.json(userInfo);
