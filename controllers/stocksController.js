@@ -20,14 +20,22 @@ exports.getMajorIndexes = async (req, res) => {
 exports.getStocksByType = async (req, res) => {
     let data = req.query;
     let {type} = data;
-    let url;
-    if (type !== 'stocks' && type !== 'all') {
-        url = `https://financialmodelingprep.com/api/v3/quotes/${type}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+
+    let url = `https://financialmodelingprep.com/api/v3/quotes/${type}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    if (type === 'stocks') {
+        url = `https://financialmodelingprep.com/api/v3/private/quotes?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     }
+    console.log(url)
     const response = await axios.get(url);
+    let ret = [];
+    response.data.map((d, index) => {
+        if (index < 50) {
+            ret.push(d)
+        }
+    });
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
-    } else res.json(response.data);
+    } else res.json(ret);
 
 };
 
