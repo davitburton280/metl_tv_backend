@@ -88,7 +88,18 @@ exports.getStockQuote = async (req, res) => {
 exports.getStockHistoricalPrices = async (req, res) => {
     let {stock} = req.query;
     let url = `https://financialmodelingprep.com/api/v3/historical-price-full/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    console.log(url)
+    const response = await axios.get(url);
+    if (response.data['Error Message']) {
+        res.status(400).send({msg: response.data['Error Message']})
+    } else {
+
+        res.json(response.data);
+    }
+};
+
+exports.searchStocksBySymbol = async (req, res) => {
+    let {search} = req.query;
+    let url = `https://financialmodelingprep.com/web/v2/tickers/summary?count=7&symbol=${search}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
