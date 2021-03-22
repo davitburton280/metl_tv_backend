@@ -9,6 +9,8 @@ const videoController = require('./videoController');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
+const nl2br = require('../helpers/nl2br');
+const showIfErrors = require('../helpers/showIfErrors');
 
 exports.get = async (req, res) => {
     console.log('here!!!!!!!!!!!!!')
@@ -23,7 +25,7 @@ exports.getSubscriptions = async (req, res) => {
         include: [{
             model: Channels,
             as: 'subscriptions',
-            include: [{model: Videos, as: 'videos', attributes: ['id']}, {model:Users, as: 'user'}]
+            include: [{model: Videos, as: 'videos', attributes: ['id']}, {model: Users, as: 'user'}]
         }]
     });
     console.log(channels.subscriptions)
@@ -217,22 +219,20 @@ exports.changeSubscriptionPriority = async (req, res) => {
 };
 
 exports.saveDescription = async (req, res) => {
-    const {id, ...rest} = req.body;
-    req.query = req.body;
-    console.log('save description')
-    console.log(rest)
 
-    function nl2br (str, is_xhtml) {
-        var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br ' + '/>' : '<br>';
-        return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+    if (!showIfErrors(req, res)) {
+
+
+        const {id, ...rest} = req.body;
+        rest.description = nl2br(rest.description, false)
+        req.query = req.body;
+
+
+        await Channels.update(rest, {where: {id: id}});
+        let userInfo = await usersController.getUserInfo(req, res);
+        await usersController.changeJwt({id: id, ...rest}, res);
+        // res.json(userInfo);
     }
-
-    rest.description = nl2br(rest.description, false)
-
-
-    await Channels.update(rest, {where: {id: id}});
-    let userInfo = await usersController.getUserInfo(req, res);
-    res.json(userInfo);
 };
 
 
