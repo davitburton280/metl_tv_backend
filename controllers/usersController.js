@@ -57,7 +57,7 @@ exports.getSession = async (req, res) => {
     const tokenOptions = {
         data: JSON.stringify({serverData: {username: user.username}}),
     };
-
+    console.log(tokenOptions)
     console.log(mapSessions)
 
 
@@ -110,7 +110,7 @@ exports.getSession = async (req, res) => {
 
                 tokenOptions.role = 'PUBLISHER';
 
-                console.log(tokenOptions)
+
 
 
                 // Generate a new token asynchronously with the recently created tokenOptions
