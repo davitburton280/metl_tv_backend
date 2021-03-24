@@ -1,5 +1,13 @@
 const axios = require('axios');
 const moment = require('moment');
+const db = require('../models');
+const Users = db.users;
+const UsersStocks = db.users_stocks;
+const Stocks = db.stocks;
+
+
+const showIfErrors = require('../helpers/showIfErrors');
+
 exports.getDailyStocks = async (req, res) => {
     let url = `https://financialmodelingprep.com/api/v3/ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const response = await axios.get(url);
@@ -25,13 +33,13 @@ exports.getStocksByType = async (req, res) => {
     if (type === 'stocks') {
         url = `https://financialmodelingprep.com/api/v3/private/quotes?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     }
-    console.log(url)
+    // console.log(url)
     const response = await axios.get(url);
     let ret = [];
     response.data.map((d, index) => {
-        if (index < 50) {
+        // if (index < 50) {
             ret.push(d)
-        }
+        // }
     });
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
@@ -52,6 +60,7 @@ exports.getHistoricalPrices = async (req, res) => {
 exports.getStockChartData = async (req, res) => {
     let {stock} = req.query;
     let chartUrl = `https://financialmodelingprep.com/api/v3/historical-chart/1min/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}&limit=600`;
+    console.log(chartUrl)
     const chartData = await axios.get(chartUrl);
 
     let tableDataUrl = `https://financialmodelingprep.com/api/v3/quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
@@ -88,6 +97,7 @@ exports.getStockQuote = async (req, res) => {
 exports.getStockHistoricalPrices = async (req, res) => {
     let {stock} = req.query;
     let url = `https://financialmodelingprep.com/api/v3/historical-price-full/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
@@ -106,5 +116,46 @@ exports.searchStocksBySymbol = async (req, res) => {
     } else {
 
         res.json(response.data);
+    }
+};
+
+exports.getUserStocks = async (req, res) => {
+    let {stocks, user_id} = req.query;
+    let user_stocks = await Users.findOne({
+            where: {id: user_id},
+            include: [{model: Stocks, as: 'user_stocks'}], attributes: ['id']
+        })
+    ;
+    res.json(user_stocks);
+};
+
+exports.updateUserStocks = async (req, res) => {
+    if (!showIfErrors(req, res)) {
+
+        let {stocks, user_id} = req.body;
+        await UsersStocks.destroy({where: {user_id: user_id}});
+        let all = stocks.map(async (st) => {
+
+            let found = await Stocks.findOne({where: {name: st.name}});
+            if (!found) {
+                let justCreated = await Stocks.create(st);
+                await this.checkIfUserStockExist(justCreated, user_id)
+            } else {
+                await this.checkIfUserStockExist(found, user_id)
+            }
+
+            // console.log(stocks)
+        });
+        await Promise.all(all);
+        req.query.user_id = req.body.user_id;
+        this.getUserStocks(req, res);
+    }
+};
+
+exports.checkIfUserStockExist = async (stock, user_id) => {
+    console.log({user_id: user_id, stock_id: stock.id})
+    let userStocksFind = await UsersStocks.findOne({where: {user_id: user_id, stock_id: stock.id}});
+    if (!userStocksFind) {
+        await UsersStocks.create({user_id: user_id, stock_id: stock.id});
     }
 };

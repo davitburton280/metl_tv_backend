@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const stocksController = require('../controllers/stocksController');
+const validateStock = require('../validators/validateStock');
 
 router.get('/get-daily', stocksController.getDailyStocks);
 router.get('/get-by-type', stocksController.getStocksByType);
@@ -8,6 +9,8 @@ router.get('/get-indices', stocksController.getMajorIndexes);
 router.get('/get-historical', stocksController.getHistoricalPrices);
 router.get('/get-stock-historical', stocksController.getStockHistoricalPrices);
 router.get('/get-stock-chart-data', stocksController.getStockChartData);
+router.get('/get-user-stocks', stocksController.getUserStocks);
+router.put('/update-user-stocks', validateStock.rules, stocksController.updateUserStocks);
 router.get('/search', stocksController.searchStocksBySymbol);
 // router.get('/session/leave', usersController.leaveSession);
 // router.get('/get-user-info', usersController.getUserInfo);
