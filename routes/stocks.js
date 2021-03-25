@@ -12,6 +12,7 @@ router.get('/get-stock-chart-data', stocksController.getStockChartData);
 router.get('/get-user-stocks', stocksController.getUserStocks);
 router.put('/update-user-stocks', validateStock.rules, stocksController.updateUserStocks);
 router.get('/search', stocksController.searchStocksBySymbol);
+router.get('/search-in-stock-type-data', stocksController.searchInStockTypeData);
 // router.get('/session/leave', usersController.leaveSession);
 // router.get('/get-user-info', usersController.getUserInfo);
 // router.post('/change-profile-image', uploadAvatar, usersController.changeAvatar);
