@@ -169,6 +169,7 @@ class AboutTabComponent {
         this.authUser = this.getAuthUser.transform();
     }
     ngOnInit() {
+        var _a;
         this.aboutForm = this.fb.group({
             description: ['', [_angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required, _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].maxLength(_core_constants_global__WEBPACK_IMPORTED_MODULE_2__["DESCRIPTION_CHARACTERS_LIMIT"])]],
             id: ['', _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required],
@@ -177,7 +178,7 @@ class AboutTabComponent {
         this.aboutForm.patchValue({
             username: this.channelUser.username,
             id: this.channelUser.channel.id,
-            description: this.channelUser.channel.description.replace(/<br\s*[\/]?>/gi, '\n')
+            description: (_a = this.channelUser.channel.description) === null || _a === void 0 ? void 0 : _a.replace(/<br\s*[\/]?>/gi, '\n')
             // ...this.channelUser.channel
         });
     }
@@ -1374,7 +1375,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core_services_subject_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @core/services/subject.service */ "./src/app/core/services/subject.service.ts");
 /* harmony import */ var _shared_pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @shared/pipes/filter-out-falsy-values-from-object.pipe */ "./src/app/shared/pipes/filter-out-falsy-values-from-object.pipe.ts");
 /* harmony import */ var _angular_common__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/common */ "./node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
-/* harmony import */ var _shared_components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../shared/components/video-carousel-holder/video-carousel-holder.component */ "./src/app/shared/components/video-carousel-holder/video-carousel-holder.component.ts");
+/* harmony import */ var _shared_components_videos_list_holder_videos_list_holder_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../shared/components/videos-list-holder/videos-list-holder.component */ "./src/app/shared/components/videos-list-holder/videos-list-holder.component.ts");
 /* harmony import */ var _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @shared/components/video-filters/video-filters.component */ "./src/app/shared/components/video-filters/video-filters.component.ts");
 
 
@@ -1431,12 +1432,12 @@ class VideosTabComponent {
 VideosTabComponent.ɵfac = function VideosTabComponent_Factory(t) { return new (t || VideosTabComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_core_services_video_service__WEBPACK_IMPORTED_MODULE_3__["VideoService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_core_services_subject_service__WEBPACK_IMPORTED_MODULE_4__["SubjectService"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_shared_pipes_filter_out_falsy_values_from_object_pipe__WEBPACK_IMPORTED_MODULE_5__["FilterOutFalsyValuesFromObjectPipe"])); };
 VideosTabComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: VideosTabComponent, selectors: [["app-videos-tab"]], inputs: { channelUser: "channelUser", authUser: "authUser" }, decls: 2, vars: 5, consts: [[3, "filter", 4, "ngIf"], [3, "videos", "title", "detailsSource", "removable"], [3, "filter"]], template: function VideosTabComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](0, VideosTabComponent_app_video_filters_0_Template, 1, 0, "app-video-filters", 0);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "app-video-carousel-holder", 1);
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "app-videos-list-holder", 1);
     } if (rf & 2) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("ngIf", ctx.showFilters);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵadvance"](1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("videos", ctx.channelUser.videos)("title", "Recent videos")("detailsSource", ctx.channelUser)("removable", ctx.authUser.username === ctx.channelUser.username);
-    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_6__["NgIf"], _shared_components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_7__["VideoCarouselHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_8__["VideoFiltersComponent"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NoYW5uZWxzL3Nob3ctY2hhbm5lbC92aWRlb3MtdGFiL3ZpZGVvcy10YWIuY29tcG9uZW50LnNjc3MifQ== */"] });
+    } }, directives: [_angular_common__WEBPACK_IMPORTED_MODULE_6__["NgIf"], _shared_components_videos_list_holder_videos_list_holder_component__WEBPACK_IMPORTED_MODULE_7__["VideosListHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_8__["VideoFiltersComponent"]], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NoYW5uZWxzL3Nob3ctY2hhbm5lbC92aWRlb3MtdGFiL3ZpZGVvcy10YWIuY29tcG9uZW50LnNjc3MifQ== */"] });
 /*@__PURE__*/ (function () { _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](VideosTabComponent, [{
         type: _angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"],
         args: [{

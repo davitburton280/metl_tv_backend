@@ -343,6 +343,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       _createClass(AboutTabComponent, [{
         key: "ngOnInit",
         value: function ngOnInit() {
+          var _a;
+
           this.aboutForm = this.fb.group({
             description: ['', [_angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required, _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].maxLength(_core_constants_global__WEBPACK_IMPORTED_MODULE_2__["DESCRIPTION_CHARACTERS_LIMIT"])]],
             id: ['', _angular_forms__WEBPACK_IMPORTED_MODULE_1__["Validators"].required],
@@ -351,7 +353,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.aboutForm.patchValue({
             username: this.channelUser.username,
             id: this.channelUser.channel.id,
-            description: this.channelUser.channel.description.replace(/<br\s*[\/]?>/gi, '\n') // ...this.channelUser.channel
+            description: (_a = this.channelUser.channel.description) === null || _a === void 0 ? void 0 : _a.replace(/<br\s*[\/]?>/gi, '\n') // ...this.channelUser.channel
 
           });
         }
@@ -2963,9 +2965,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     /* harmony import */
 
 
-    var _shared_components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(
-    /*! ../../../shared/components/video-carousel-holder/video-carousel-holder.component */
-    "./src/app/shared/components/video-carousel-holder/video-carousel-holder.component.ts");
+    var _shared_components_videos_list_holder_videos_list_holder_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(
+    /*! ../../../shared/components/videos-list-holder/videos-list-holder.component */
+    "./src/app/shared/components/videos-list-holder/videos-list-holder.component.ts");
     /* harmony import */
 
 
@@ -3070,7 +3072,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (rf & 1) {
           _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtemplate"](0, VideosTabComponent_app_video_filters_0_Template, 1, 0, "app-video-filters", 0);
 
-          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "app-video-carousel-holder", 1);
+          _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "app-videos-list-holder", 1);
         }
 
         if (rf & 2) {
@@ -3081,7 +3083,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵproperty"]("videos", ctx.channelUser.videos)("title", "Recent videos")("detailsSource", ctx.channelUser)("removable", ctx.authUser.username === ctx.channelUser.username);
         }
       },
-      directives: [_angular_common__WEBPACK_IMPORTED_MODULE_6__["NgIf"], _shared_components_video_carousel_holder_video_carousel_holder_component__WEBPACK_IMPORTED_MODULE_7__["VideoCarouselHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_8__["VideoFiltersComponent"]],
+      directives: [_angular_common__WEBPACK_IMPORTED_MODULE_6__["NgIf"], _shared_components_videos_list_holder_videos_list_holder_component__WEBPACK_IMPORTED_MODULE_7__["VideosListHolderComponent"], _shared_components_video_filters_video_filters_component__WEBPACK_IMPORTED_MODULE_8__["VideoFiltersComponent"]],
       styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NoYW5uZWxzL3Nob3ctY2hhbm5lbC92aWRlb3MtdGFiL3ZpZGVvcy10YWIuY29tcG9uZW50LnNjc3MifQ== */"]
     });
     /*@__PURE__*/
