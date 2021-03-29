@@ -60,8 +60,9 @@ exports.getHistoricalPrices = async (req, res) => {
 exports.getStockChartData = async (req, res) => {
     let {stock} = req.query;
     let chartUrl = `https://financialmodelingprep.com/api/v3/historical-chart/1min/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}&limit=600`;
-    console.log(chartUrl)
+    // console.log(chartUrl)
     const chartData = await axios.get(chartUrl);
+    // console.log(chartData.data.length)
 
     let tableDataUrl = `https://financialmodelingprep.com/api/v3/quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const tableData = await axios.get(tableDataUrl);
@@ -75,7 +76,7 @@ exports.getStockChartData = async (req, res) => {
         delete d.date;
         delete d.close;
     });
-    ret.chart[0].series = chartData.data;
+    ret.chart[0].series = chartData.data.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
     res.json(ret);
 
 };
