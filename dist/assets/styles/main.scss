@@ -13,9 +13,12 @@
 @import '~@videojs/themes/dist/forest/index.css';
 // Sea
 @import '~@videojs/themes/dist/sea/index.css';
+
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import '~@ctrl/ngx-emoji-mart/picker';
 @import "~plyr/src/sass/plyr";
+
+@import "~placeholder-loading/src/scss/placeholder-loading";
 
 html, body, p, h1, h2, h3, h4, ul {
     margin: 0;
@@ -189,18 +192,9 @@ nav.home-header {
 
     .marquee-content {
         display: flex;
-        animation: marquee 10s linear infinite;
     }
 }
 
-@keyframes marquee {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50%);
-    }
-}
 
 
 .header-right {
@@ -362,10 +356,13 @@ nav.home-header {
 }
 
 .body-content {
-    margin-top: 112px;
+    //margin-top: 112px;
     display: flex;
     justify-content: space-between;
-    padding: 0 200px;
+    //padding: 0 200px;
+    padding: 0 15px !important;
+    width: 90%;
+    margin: 112px auto 0;
 }
 
 .categories {
@@ -1502,7 +1499,7 @@ select {
     }
     .main-item-block {
         justify-content: left;
-        max-width: 200px;
+        //max-width: 200px;
         margin: 10px auto;
     }
     .main-item-block.channel-block {
