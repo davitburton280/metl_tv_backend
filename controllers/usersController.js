@@ -231,7 +231,7 @@ exports.saveProfileChanges = async (req, res) => {
     uploadUserAvatar(req, res, async (err) => {
 
         let newPassword = data.password;
-        data.password = bcrypt.hashSync(newPassword, 10);
+        // data.password = bcrypt.hashSync(newPassword, 10);
         await Users.update(data, {where: {id: id}});
         await this.changeJwt({id: id, ...data}, res);
 
