@@ -64,7 +64,7 @@
 /******/
 /******/ 	// script path function
 /******/ 	function jsonpScriptSrc(chunkId) {
-/******/ 		return __webpack_require__.p + "" + ({"auth-auth-module":"auth-auth-module","channels-channels-module":"channels-channels-module","chat-chat-module":"chat-chat-module","playlists-playlists-module":"playlists-playlists-module","stocks-stocks-module":"stocks-stocks-module","videos-videos-module":"videos-videos-module"}[chunkId]||chunkId) + "-es2015.js"
+/******/ 		return __webpack_require__.p + "" + ({"auth-auth-module":"auth-auth-module","chat-chat-module":"chat-chat-module","default~channels-channels-module~user-user-module":"default~channels-channels-module~user-user-module","channels-channels-module":"channels-channels-module","user-user-module":"user-user-module","playlists-playlists-module":"playlists-playlists-module","videos-videos-module":"videos-videos-module"}[chunkId]||chunkId) + "-es2015.js"
 /******/ 	}
 /******/
 /******/ 	// The require function
