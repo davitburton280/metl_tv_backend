@@ -23,7 +23,7 @@ else if(process.env.NODE_ENV === 'production') {
 // Environment variable: secret shared with our OpenVidu server
 var OPENVIDU_SECRET = 'MY_SECRET';
 
-console.log(OPENVIDU_URL, OPENVIDU_SECRET);
+// console.log(OPENVIDU_URL, OPENVIDU_SECRET);
 
 // Entrypoint to OpenVidu Node Client SDK
 var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
