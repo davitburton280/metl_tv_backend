@@ -13,12 +13,9 @@
 @import '~@videojs/themes/dist/forest/index.css';
 // Sea
 @import '~@videojs/themes/dist/sea/index.css';
-
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import '~@ctrl/ngx-emoji-mart/picker';
 @import "~plyr/src/sass/plyr";
-
-@import "~placeholder-loading/src/scss/placeholder-loading";
 
 html, body, p, h1, h2, h3, h4, ul {
     margin: 0;
@@ -185,18 +182,6 @@ nav.home-header {
     }
 }
 
-
-.marquee {
-    display: flex;
-    align-items: center;
-
-    .marquee-content {
-        display: flex;
-    }
-}
-
-
-
 .header-right {
     display: flex;
     justify-content: space-between;
@@ -224,10 +209,6 @@ nav.home-header {
     background: #EFEFEF;
     color: #545454;
     font-size: 16px;
-
-    &.white {
-        color: $white;
-    }
 }
 
 .home-search i {
@@ -244,6 +225,7 @@ nav.home-header {
 }
 
 .home-black-block {
+    //width: 625px;
     height: 36px;
     background: #393939;
     padding: 11px 12px;
@@ -251,11 +233,6 @@ nav.home-header {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    max-width: 450px;
-    overflow: hidden;
-    //@media screen and (min-width: 992px) and  (max-width: 1200px) {
-    //    max-width: 290px;
-    //}
 }
 
 .black-text {
@@ -356,13 +333,10 @@ nav.home-header {
 }
 
 .body-content {
-    //margin-top: 112px;
+    margin-top: 112px;
     display: flex;
     justify-content: space-between;
-    //padding: 0 200px;
-    padding: 0 15px !important;
-    width: 90%;
-    margin: 112px auto 0;
+    padding: 0 200px;
 }
 
 .categories {
@@ -968,7 +942,6 @@ nav.home-header {
     align-items: flex-start;
 
 }
-
 .main-tags-text {
     display: flex;
     flex-wrap: wrap;
@@ -1275,7 +1248,6 @@ select {
         }
     }
 }
-
 .tags {
     ul {
         overflow: hidden;
@@ -1499,7 +1471,7 @@ select {
     }
     .main-item-block {
         justify-content: left;
-        //max-width: 200px;
+        max-width: 200px;
         margin: 10px auto;
     }
     .main-item-block.channel-block {
@@ -1602,7 +1574,6 @@ input, textarea {
 
     #privacy {
         margin-bottom: 24px;
-
         mat-radio-button {
             margin-right: 40px;
 

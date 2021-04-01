@@ -106,7 +106,7 @@
 
         .details {
             flex: 1;
-            margin-left: 2px;
+            margin-left: 32px;
 
             .title {
                 display: flex;
@@ -164,7 +164,7 @@
                 display: -webkit-box;
                 -webkit-line-clamp: 4;
                 -webkit-box-orient: vertical;
-                max-width: 370px;
+                max-width: 250px;
             }
 
             .channel-details {
@@ -270,17 +270,6 @@
 
                     .name {
                         font-weight: bold;
-                    }
-                }
-
-                img {
-                    width: 432px;
-                    height: 249px;
-                    object-fit: cover;
-                    cursor: pointer;
-                    @media screen and (max-width: 991px) {
-                        max-width: 432px !important;
-                        width: 100% !important;
                     }
                 }
             }
