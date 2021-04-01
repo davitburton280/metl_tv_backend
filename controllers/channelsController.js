@@ -5,9 +5,12 @@ const Videos = db.videos;
 const ChannelSubscribers = db.channel_subscribers;
 
 const usersController = require('./usersController');
+const videoController = require('./videoController');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
+const nl2br = require('../helpers/nl2br');
+const showIfErrors = require('../helpers/showIfErrors');
 
 exports.get = async (req, res) => {
     console.log('here!!!!!!!!!!!!!')
@@ -16,19 +19,24 @@ exports.get = async (req, res) => {
 };
 
 exports.getSubscriptions = async (req, res) => {
-    console.log(req.query)
+    console.log('get subscriptions!!!')
     let channels = await Users.findOne({
         where: {id: req.query.user_id},
-        include: [{model: Channels, as: 'subscriptions'}]
+        include: [{
+            model: Channels,
+            as: 'subscriptions',
+            include: [{model: Videos, as: 'videos', attributes: ['id']}, {model: Users, as: 'user'}]
+        }]
     });
+    console.log(channels.subscriptions)
     res.json(channels);
 };
 
-// exports.getBy
-
 exports.searchChannelVideos = async (req, res) => {
-    let {search, user_id} = req.query;
+    let {search, user_id, filters} = req.query;
+    let whereFilters = videoController.getVideoFiltersQuery(JSON.parse(filters));
     console.log('search channel with videos!!!')
+    console.log(whereFilters)
     // let userWhere = user_id ? sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id) : {};
     if (search) {
 
@@ -36,7 +44,7 @@ exports.searchChannelVideos = async (req, res) => {
         let channels = await Channels.findAll(
             {
                 include: [
-                    {model: Videos},
+                    {model: Videos, where: whereFilters, required: false},
                     {model: Users, as: 'user'},
                     {model: Users, as: 'subscribers'}
                 ],
@@ -54,7 +62,7 @@ exports.searchChannelVideos = async (req, res) => {
                         //     }
                         // }
                     ],
-                }
+                },
             });
         res.json(channels);
     } else {
@@ -211,11 +219,29 @@ exports.changeSubscriptionPriority = async (req, res) => {
 };
 
 exports.saveDescription = async (req, res) => {
-    const {id, ...rest} = req.body;
-    req.query = req.body;
-    console.log('save description')
-    console.log(rest)
-    await Channels.update(rest, {where: {id: id}});
-    let userInfo = await usersController.getUserInfo(req, res);
-    res.json(userInfo);
+
+    if (!showIfErrors(req, res)) {
+
+
+        const {id, ...rest} = req.body;
+        rest.description = nl2br(rest.description, false)
+        req.query = req.body;
+
+
+        await Channels.update(rest, {where: {id: id}});
+        let userInfo = await usersController.getUserInfo(req, res);
+        await usersController.changeJwt({id: id, ...rest}, res);
+        // res.json(userInfo);
+    }
 };
+
+
+exports.saveChannelDetails = async (req, res) => {
+    let data = req.body
+    const {id, ...rest} = data;
+    req.query = req.body;
+    await Channels.update(rest, {where: {id: id}});
+    await usersController.changeJwt(data, res);
+    // let userInfo = await usersController.getUserInfo(req, res);
+    // res.json(userInfo);
+}

@@ -11,8 +11,8 @@ module.exports = {
             video_id: {
                 type: Sequelize.INTEGER
             },
-            name: {
-                type: Sequelize.STRING
+            tag_id: {
+                type: Sequelize.INTEGER
             }
         });
     },

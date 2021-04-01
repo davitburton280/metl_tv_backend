@@ -2,16 +2,21 @@ const db = require('../models');
 const Playlists = db.playlists;
 const Videos = db.videos;
 const Users = db.users;
+const Tags = db.tags;
 const Channels = db.channels;
 const PlaylistsVideos = db.playlists_videos;
 const sequelize = require('sequelize');
+const Op = sequelize.Op;
 const to = require('../helpers/getPromiseResult');
 const videoController = require('../controllers/videoController');
+const showIfErrors = require('../helpers/showIfErrors');
 
 exports.add = async (req, res) => {
-    const data = req.body;
-    let p = await Playlists.create(data);
-    res.json(p);
+    if (!showIfErrors(req, res)) {
+        const data = req.body;
+        let p = await Playlists.create(data);
+        res.json(p);
+    }
 };
 exports.addVideos = async (req, res) => {
     const data = req.body;
@@ -52,16 +57,32 @@ exports.addVideosToOtherPlaylists = async (req, res) => {
 exports.get = async (req, res) => {
     // console.log('playlist get!!!')
     const data = req.query;
-    const {channel_id} = data;
+    const {channel_id, user_id, search} = data;
     let filters = data.filters ? JSON.parse(data.filters) : {};
-    let wherePlaylistFilters = filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
-    let whereVideoFilters = filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
+    console.log(data.filters, filters)
+    let wherePlaylistFilters = filters && filters.date ? videoController.getVideoFiltersQuery({date: filters.date}) : {};
+    let whereVideoFilters = filters && filters.duration ? videoController.getVideoFiltersQuery({duration: filters.duration}) : {};
+    let wherePrivacy = {};
+    let emptyFilters = Object.keys(whereVideoFilters).length === 0 && whereVideoFilters.constructor === Object;
+    let whereSearch = search ? {name: {[Op.like]: '%' + search + '%'}} : {};
+    console.log('where filters!!!')
+    console.log(emptyFilters)
 
+    console.log('where filters!!!')
     const where = channel_id ? {channel_id: channel_id} : {};
     const playlists = await Playlists.findAll({
-        include: [{model: Videos, as: 'videos', where: whereVideoFilters, required: !!whereVideoFilters}],
-        where: [where, wherePlaylistFilters]
-    });
+        include: [
+            {
+                model: Videos,
+                as: 'videos',
+                where: whereVideoFilters,
+                required: !emptyFilters,
+                include: [{model: Tags, as: 'tags'}]
+            },
+            {model: Channels, as: 'channel'}],
+        where: [where, wherePlaylistFilters, whereSearch]
+    })
+        .filter(p => p.channel.user_id !== +user_id ? p.privacy === 0 : p); // Filtering out private playlists for other users
 
     res.json(playlists);
 };
@@ -82,7 +103,10 @@ exports.getById = async (req, res) => {
         where: {id: req.query.playlist_id},
         include: [
             {
-                model: Videos, as: 'videos', include: [{model: Channels, as: 'channel'}] //{model: Users, as: 'user'}
+                model: Videos, as: 'videos', include: [
+                    {model: Channels, as: 'channel'},
+                    {model: Tags, as: 'tags'}
+                ] //{model: Users, as: 'user'}
             },
             {model: Channels, as: 'channel'},
 
@@ -91,6 +115,17 @@ exports.getById = async (req, res) => {
     });
 
     res.json(playlists);
+};
+
+exports.updatePlaylistInfo = async (req, res) => {
+    if (!showIfErrors(req, res)) {
+        let data = req.body;
+        const {id, name, description} = data;
+        await Playlists.update({name: name, description: description}, {where: {id: id}});
+        req.query.playlist_id = req.body.id;
+        console.log(req.query)
+        this.getById(req, res);
+    }
 };
 
 
@@ -111,14 +146,6 @@ exports.changeThumbnail = async (req, res) => {
     this.getById(req, res);
 };
 
-exports.updatePlaylistInfo = async (req, res) => {
-    let data = req.body;
-    const {id, name, description} = data
-    await Playlists.update({name: name, description: description}, {where: {id: id}});
-    req.query.playlist_id = req.body.id;
-    console.log(req.query)
-    this.getById(req, res);
-};
 
 exports.updateVideoPosition = async (req, res) => {
     let {playlist_id, rows} = req.body;

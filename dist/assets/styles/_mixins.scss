@@ -25,16 +25,18 @@
 
     &.added {
 
-        .img{
+        .img {
             position: relative;
             overflow: hidden;
-            span{
+
+            span.added-placeholder {
                 position: absolute;
                 right: -24px;
                 top: 8px;
                 font-size: 13px;
                 transform: rotate(45deg);
-                &::before{
+
+                &::before {
                     content: "Added";
                     background: #f53c6f;
                     color: #ffffff;
@@ -42,13 +44,18 @@
                 }
             }
         }
+        .shortened-description {
+            -webkit-line-clamp: 1!important;
+        }
     }
 
 
     .video-container {
         display: flex;
+        align-items: flex-start;
 
         .img {
+            position: relative;
             flex: 0 0 200px;
 
             img {
@@ -56,13 +63,50 @@
                 height: 115px;
                 object-fit: cover;
                 cursor: pointer;
+                margin-bottom: 0;
             }
+
+            .duration {
+                position: absolute;
+                bottom: 9px;
+                right: 10px;
+                color: white;
+                background-color: #000;
+                padding: 0 2px;
+            }
+        }
+
+        .thumbnail {
+            position: relative;
+            margin-bottom: 24px;
+
+            img {
+                width: 432px;
+                height: 249px;
+                object-fit: cover;
+                cursor: pointer;
+                @media screen and (max-width: 991px) {
+                    max-width: 432px !important;
+                    width: 100% !important;
+                }
+            }
+
+            .duration {
+                position: absolute;
+                bottom: 9px;
+                right: 10px;
+                color: white;
+                background-color: #000;
+                padding: 0 2px;
+            }
+
+
         }
 
 
         .details {
             flex: 1;
-            margin-left: 32px;
+            margin-left: 2px;
 
             .title {
                 display: flex;
@@ -115,11 +159,46 @@
                 margin-top: 16px;
                 margin-bottom: 0;
                 color: #545454;
+                white-space: pre-wrap;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                max-width: 370px;
+            }
+
+            .channel-details {
+                margin-top: 4px;
+
+                .channel-name {
+                    font-weight: bold;
+                    color: #818181;
+                    font-size: 14px;
+                    cursor: pointer;
+                }
+
+
+                .videos-count {
+                    font-size: 14px;
+                    color: #818181;
+                }
             }
 
         }
     }
 
+    .tags {
+        margin-top: 10px;
+
+        li {
+            display: inline-block;
+            margin-right: 5px;
+
+            span {
+                @include tagItem;
+            }
+        }
+    }
 
 }
 
@@ -158,3 +237,62 @@
         }
     }
 }
+
+@mixin tagItem{
+    height: 22px;
+    border-radius: 11px;
+    padding: 2px 11px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #EEEEEE;
+    transition: 0.3s ease-in-out;
+    color: #545454 !important;
+    font-size: 14px;
+    font-family: "Muli-Regular";
+    cursor: pointer;
+}
+
+@mixin playlistItem{
+    .playlist-container {
+        .thumbnail-container {
+            position: relative;
+            cursor: pointer;
+
+            .thumbnail {
+                position: relative;
+
+                .short-details {
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    color: white;
+
+                    .name {
+                        font-weight: bold;
+                    }
+                }
+
+                img {
+                    width: 432px;
+                    height: 249px;
+                    object-fit: cover;
+                    cursor: pointer;
+                    @media screen and (max-width: 991px) {
+                        max-width: 432px !important;
+                        width: 100% !important;
+                    }
+                }
+            }
+
+            .fake-bg {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                background: rgba(1, 1, 1, 0.2);
+            }
+        }
+    }
+}
+

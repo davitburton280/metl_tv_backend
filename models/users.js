@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
             through: models.users_videos,
             foreignKey: 'user_id'
         });
+        users.belongsToMany(models.stocks, {
+            as: 'user_stocks',
+            through: models.users_stocks,
+            foreignKey: 'user_id'
+        });
         // associations can be defined here
     };
     return users;

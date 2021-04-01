@@ -4,16 +4,19 @@ module.exports = {
     up: async (queryInterface, Sequelize) => {
         return queryInterface.bulkInsert('video_categories', [
             {
-                'name': 'Stock',
+                name: 'All'
             },
             {
-                'name': 'ETF',
+                name: 'Stock',
             },
             {
-                'name': 'Forex',
+                name: 'ETF',
             },
             {
-                'name': 'Cryptocurrency',
+                name: 'Forex',
+            },
+            {
+                name: 'Cryptocurrency',
             },
 
         ])

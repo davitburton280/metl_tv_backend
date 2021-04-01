@@ -13,11 +13,17 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 
 // Environment variable: URL where our OpenVidu server is listening
-var OPENVIDU_URL = process.env.NODE_ENV === 'production' ? 'https://metl.tv/' : 'https://localhost:4443';
+let OPENVIDU_URL = 'https://localhost:4443';
+if(process.env.NODE_ENV === 'staging'){
+    OPENVIDU_URL  = 'https://staging.metl.tv/';
+}
+else if(process.env.NODE_ENV === 'production') {
+    OPENVIDU_URL = 'https://metl.tv/'
+}
 // Environment variable: secret shared with our OpenVidu server
 var OPENVIDU_SECRET = 'MY_SECRET';
 
-console.log(OPENVIDU_URL, OPENVIDU_SECRET);
+// console.log(OPENVIDU_URL, OPENVIDU_SECRET);
 
 // Entrypoint to OpenVidu Node Client SDK
 var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
@@ -32,11 +38,17 @@ var mapSessionNamesTokens = {};
 const db = require('../models');
 const Users = db.users;
 const Videos = db.videos;
+const Tags = db.tags;
 const Channels = db.channels;
 
 const url = require('url');
 
 const jwt = require('jsonwebtoken');
+
+const sequelize = require('sequelize');
+const Op = sequelize.Op;
+
+const bcrypt = require('bcryptjs');
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
@@ -51,7 +63,7 @@ exports.getSession = async (req, res) => {
     const tokenOptions = {
         data: JSON.stringify({serverData: {username: user.username}}),
     };
-
+    console.log(tokenOptions)
     console.log(mapSessions)
 
 
@@ -104,7 +116,7 @@ exports.getSession = async (req, res) => {
 
                 tokenOptions.role = 'PUBLISHER';
 
-                console.log(tokenOptions)
+
 
 
                 // Generate a new token asynchronously with the recently created tokenOptions
@@ -155,11 +167,10 @@ exports.changeAvatar = async (req, res) => {
 
     uploadAvatar(req, res, async (err) => {
 
-        console.log('aaaaa')
-        await Users.update({avatar: avatar}, {where: {id: id}});
+        // await Users.update({avatar: avatar}, {where: {id: id}});
         await Channels.update({avatar: avatar}, {where: {id: id}});
 
-        await changeJwt(data, res);
+        await this.changeJwt(data, res);
 
     });
 
@@ -171,13 +182,13 @@ exports.changeCover = async (req, res) => {
 
 
     uploadCover(req, res, async (err) => {
-        await Users.update({cover: cover}, {where: {id: id}});
+        // await Users.update({cover: cover}, {where: {id: id}});
         await Channels.update({cover: cover}, {where: {id: id}});
-        await changeJwt(data, res);
+        await this.changeJwt(data, res);
     });
 };
 
-let changeJwt = async (data, res) => {
+exports.changeJwt = async (data, res) => {
 
     let user = await Users.findOne({where: {id: data.id}, include: [{model: Channels, as: 'channel'}]});
 
@@ -197,11 +208,32 @@ let changeJwt = async (data, res) => {
 };
 
 exports.getUserInfo = async (req, res) => {
+    console.log('get user info!!!!')
     let data = req.query;
     let user = await Users.findOne({
         where: {username: data.username},
-        include: [{model: Channels, as: 'channel'}, {model: Videos, as: 'videos'}]
+        include: [
+            {model: Channels, as: 'channel'},
+            {
+                model: Videos,
+                as: 'videos',
+                include: [{model:Tags, as: 'tags'}]
+            }],
+        order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });
     console.log('OK!!!' + req.query.username)
     res.json(user);
+};
+
+exports.saveProfileChanges = async (req, res) => {
+    const {id, ...data} = req.body;
+
+    uploadUserAvatar(req, res, async (err) => {
+
+        let newPassword = data.password;
+        // data.password = bcrypt.hashSync(newPassword, 10);
+        await Users.update(data, {where: {id: id}});
+        await this.changeJwt({id: id, ...data}, res);
+
+    });
 };

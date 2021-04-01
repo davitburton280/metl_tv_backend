@@ -14,7 +14,7 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 const IN_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Listen
-const session = require('express-session');
+// const session = require('express-session');
 const https = require('https');
 
 // Multer
@@ -23,16 +23,16 @@ require('./helpers/multer');
 app.set('trust proxy', 1);
 
 // Server configuration
-app.use(session({
-    name: 'sid',
-    saveUninitialized: true,
-    resave: false,
-    secret: 'MY_SECRET',
-    cookie: {
-        maxAge: ONE_DAY
-    },
-    secure: IN_PRODUCTION
-}));
+// app.use(session({
+//     name: 'sid',
+//     saveUninitialized: true,
+//     resave: false,
+//     secret: 'MY_SECRET',
+//     cookie: {
+//         maxAge: ONE_DAY
+//     },
+//     secure: IN_PRODUCTION
+// }));
 // var options = {
 //     key: fs.readFileSync('openvidukey.pem'),
 //     cert: fs.readFileSync('openviducert.pem')
@@ -86,6 +86,7 @@ app.use('/users', require('./routes/users'));
 app.use('/videos', require('./routes/videos'));
 app.use('/playlists', require('./routes/playlists'));
 app.use('/channels', require('./routes/channels'));
+app.use('/stocks', require('./routes/stocks'));
 app.use('/chat', require('./routes/chat'));
 
 let dist = path.join(__dirname, 'dist/');
@@ -99,12 +100,13 @@ app.use('/uploads/', express.static(path.join(__dirname, './public/uploads')));
 // Separating Angular routes
 app.get('*', (req, res, next) => {
 
-    console.log(/dashboard|sessions|openvidu|recordings|api/.test(req.url))
+    // console.log(/dashboard|sessions|openvidu|recordings|api/.test(req.url))
     if (/dashboard|sessions|openvidu|recordings|api/.test(req.url)) {
         // console.log('aaaa')
         next();
         // res.json('Openvidu route')
     } else if (!req.url.includes('phpmyadmin')) {
+        console.log('Angular route!')
         res.sendFile(dist + 'index.html');
     } else {
         res.status(404).send('Not found');

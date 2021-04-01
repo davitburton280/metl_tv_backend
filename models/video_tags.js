@@ -14,12 +14,13 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     video_tags.init({
-        name: DataTypes.STRING,
-        video_id: DataTypes.INTEGER
+        video_id: DataTypes.INTEGER,
+        tag_id: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'video_tags',
-        timestamps: false
+        timestamps: false,
+        underscored: true
     });
     return video_tags;
 };

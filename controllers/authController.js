@@ -17,7 +17,7 @@ exports.login = async (req, res) => {
         // Getting request data and setting user fields to return
         let {email} = req.body;
 
-        let attributes = [`full_name`, 'email', 'username', 'avatar', 'cover', 'password', 'id', 'status_id'];
+        let attributes = [`full_name`, 'email', 'username', 'birthday', 'avatar', 'cover', 'password', 'id', 'status_id'];
 
         // Active status selecting
         let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
@@ -41,8 +41,8 @@ exports.login = async (req, res) => {
                 // Cloning users object without password and saving user full name
                 let {password, ...details} = user.toJSON();
                 console.log("'" + user.full_name + "' has logged in");
-                req.session.full_name = user.full_name;
-                console.log(details)
+                // req.session.full_name = user.full_name;
+                // console.log(details)
                 res.status(200).json({
                     token: jwt.sign(details, 'secretkey', {expiresIn: '8h'}),
                     user_id: user.id,
@@ -57,9 +57,9 @@ exports.login = async (req, res) => {
 
 exports.logout = (req, res) => {
     req.logout();
-    console.log(req.session)
-    console.log("'" + req.session.loggedUser + "' has logged out");
-    req.session.destroy();
+    // console.log(req.session)
+    // console.log("'" + req.session.loggedUser + "' has logged out");
+    // req.session.destroy();
     res.status(200).json({msg: 'OK'})
 };
 
@@ -76,7 +76,8 @@ exports.sendVerificationCode = async (req, res) => {
             // port: 465,
             // secure: false, // true for 465, false for other ports
             auth: {
-                user: 'sofiabruno3003@gmail.com', // generated ethereal user
+                // user: 'sofiabruno3003@gmail.com', // generated ethereal user
+                user: 'davitburton280@gmail.com', // generated ethereal user
                 pass: 'davmark11' // generated ethereal password
             }
         });
@@ -235,3 +236,5 @@ exports.resetPassword = async (req, res) => {
 
 
 };
+
+

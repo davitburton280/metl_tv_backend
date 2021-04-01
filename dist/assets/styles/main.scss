@@ -13,13 +13,18 @@
 @import '~@videojs/themes/dist/forest/index.css';
 // Sea
 @import '~@videojs/themes/dist/sea/index.css';
+
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import '~@ctrl/ngx-emoji-mart/picker';
+@import "~plyr/src/sass/plyr";
+
+@import "~placeholder-loading/src/scss/placeholder-loading";
 
 html, body, p, h1, h2, h3, h4, ul {
     margin: 0;
     padding: 0;
 }
+
 
 input, button {
     outline: none;
@@ -180,6 +185,18 @@ nav.home-header {
     }
 }
 
+
+.marquee {
+    display: flex;
+    align-items: center;
+
+    .marquee-content {
+        display: flex;
+    }
+}
+
+
+
 .header-right {
     display: flex;
     justify-content: space-between;
@@ -195,8 +212,10 @@ nav.home-header {
     margin-right: 24px;
 
     input {
+        position: relative;
+        z-index: 1;
         width: 100%;
-        padding-left: 15px;
+        padding: 8px 32px 8px 16px;
     }
 }
 
@@ -205,6 +224,10 @@ nav.home-header {
     background: #EFEFEF;
     color: #545454;
     font-size: 16px;
+
+    &.white {
+        color: $white;
+    }
 }
 
 .home-search i {
@@ -212,6 +235,8 @@ nav.home-header {
     color: #6A6A6A;
     right: 11px;
     top: 10px;
+    z-index: 333;
+    cursor: pointer;
 }
 
 .header-left-logo {
@@ -219,7 +244,6 @@ nav.home-header {
 }
 
 .home-black-block {
-    //width: 625px;
     height: 36px;
     background: #393939;
     padding: 11px 12px;
@@ -227,6 +251,11 @@ nav.home-header {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    max-width: 450px;
+    overflow: hidden;
+    //@media screen and (min-width: 992px) and  (max-width: 1200px) {
+    //    max-width: 290px;
+    //}
 }
 
 .black-text {
@@ -312,6 +341,12 @@ nav.home-header {
     width: 200px;
 }
 
+.body-content.full-width {
+    width: 100%;
+    padding: 0 !important;
+    margin-top: 0 !important;
+}
+
 .body-content-right {
     width: calc(100% - 232px);
 
@@ -321,10 +356,13 @@ nav.home-header {
 }
 
 .body-content {
-    margin-top: 40px;
+    //margin-top: 112px;
     display: flex;
     justify-content: space-between;
-    padding: 0 200px;
+    //padding: 0 200px;
+    padding: 0 15px !important;
+    width: 90%;
+    margin: 112px auto 0;
 }
 
 .categories {
@@ -336,23 +374,13 @@ nav.home-header {
 }
 
 .categories li {
-    margin-right: 8px;
+    margin-right: 2px;
     margin-bottom: 8px;
     width: max-content;
 }
 
 .categories li a {
-    height: 22px;
-    border-radius: 11px;
-    padding: 2px 11px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #EEEEEE;
-    transition: 0.3s ease-in-out;
-    color: #545454 !important;
-    font-size: 14px;
-    font-family: "Muli-Regular";
+    @include tagItem;
 }
 
 .categories li a.active,
@@ -369,8 +397,16 @@ nav.home-header {
 
 .main-carousel-item {
     width: 100%;
-    padding-right: 32px;
+    //padding-right: 32px;
     position: relative;
+
+    .main-item-block {
+        justify-content: left;
+    }
+
+    @media screen and (max-width: 767px) {
+        padding-right: 0;
+    }
 }
 
 .live-now {
@@ -462,10 +498,10 @@ nav.home-header {
     display: flex;
     align-items: center;
     transition: 0.3s ease-in-out;
-    margin-bottom: 5px;
+    margin-bottom: 12px;
     border-bottom: 1px solid transparent;
 
-    &.st-left-metu {
+    &.st-left-menu {
         .material-icons, * {
             color: #ffffff;
         }
@@ -511,8 +547,12 @@ nav.home-header {
 .left-menu p {
     color: #545454;
     font-size: 16px;
+    line-height: 24px;
     font-family: "Muli-Regular";
     margin-left: 12px;
+    @media screen and (max-width: 767px) {
+        font-size: 14px;
+    }
 }
 
 .left-menu-top i, .left-menu-top p {
@@ -563,7 +603,7 @@ nav.home-header {
     font-size: 12px;
     box-shadow: 0 0 6px #0000000F;
     font-family: "Muli-Bold";
-    width: 66px;
+    width: 90px;
     margin-bottom: 16px;
 }
 
@@ -573,7 +613,7 @@ nav.home-header {
 
 .watchlist .nav-link {
     padding: 5px;
-    width: 67px;
+    width: 90px;
     height: 31px;
     border-right: 1px solid silver;
     background: #fff;
@@ -588,7 +628,7 @@ nav.home-header {
 }
 
 .watchlist .nav-link:last-child {
-    border-right: 0;
+    //border-right: 0;
 }
 
 .watchlist .nav-link.active {
@@ -627,7 +667,7 @@ nav.home-header {
 }
 
 .analytics-item-1 {
-    width: 38px;
+    width: 76px;
     overflow: hidden;
 }
 
@@ -639,7 +679,7 @@ nav.home-header {
 
 .analytics-text-2 {
     color: #777777;
-    font-size: 14px;
+    font-size: 12px;
     font-family: "Muli-Light";
 }
 
@@ -747,8 +787,12 @@ nav.home-header {
 
 }
 
+.chat-container {
+
+}
 
 .chat-content {
+    max-width: 500px;
     //margin-bottom: 40px;
     box-shadow: 0 0 6px #0000001A;
 }
@@ -761,6 +805,7 @@ nav.home-header {
 
 .chat-block {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
@@ -797,16 +842,19 @@ nav.home-header {
 }
 
 .chat-block-1 {
-    width: 45px;
+    margin: 0;
     color: #9B9B9B;
-    font-size: 10px;
+    font-size: 14px;
     font-family: "Muli-Light";
+    width: 76px !important;
 }
 
 .chat-block-2 {
-    width: 204px;
+    margin-bottom: 0;
+    margin-left: 16px;
+    flex: 1;
     color: #545454;
-    font-size: 10px;
+    font-size: 14px;
     font-family: "Muli-Light";
 }
 
@@ -819,9 +867,9 @@ nav.home-header {
 
 .chat-input {
     color: #C9C9C9;
-    font-size: 10px;
+    font-size: 14px;
     font-family: "Muli-Light";
-    padding-bottom: 8px;
+    padding: 8px 0;
     width: 100%;
     background: transparent;
     border-bottom: 1px solid silver;
@@ -895,6 +943,21 @@ nav.home-header {
 .ads-block-left {
     width: calc(100% - 350px);
     margin-bottom: 20px;
+
+    .videoWrap {
+        position: relative;
+        //padding: 30% 0;
+    }
+
+    video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        outline: none;
+    }
 }
 
 .main-tags {
@@ -902,11 +965,15 @@ nav.home-header {
     margin-bottom: 16px;
     margin-top: 24px;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+
 }
 
 .main-tags-text {
     display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    margin-right: 24px;
     align-items: center;
 }
 
@@ -915,7 +982,7 @@ nav.home-header {
     font-size: 16px;
     font-family: "Muli-Bold";
     margin-right: 16px;
-
+    margin-bottom: 8px;
 }
 
 .main-tags-like {
@@ -985,7 +1052,6 @@ nav.home-header {
 .down-white {
     color: white;
     font-size: 12px;
-    font-family: "Muli-Bold";
 }
 
 .chat-by-bits {
@@ -1125,6 +1191,105 @@ ngb-modal-window {
     }
 }
 
+.mat-chip.mat-standard-chip {
+    background-color: unset !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+// Drop zone styles
+#dropzone.single {
+    height: 410px !important;
+
+
+    .dz-wrapper {
+        height: 100% !important;
+        //max-width: 400px;
+        overflow: hidden !important;
+        width: 100%;
+
+        .dz-message {
+            height: 400px !important;
+            border: none !important;
+        }
+
+
+        .dz-image img {
+            height: 400px !important;
+            object-fit: cover;
+        }
+
+        .dz-progress {
+            display: none;
+        }
+
+        .dz-remove {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-color: $red;
+            border-radius: 20px;
+            transform: translate(-50%, -50%);
+            text-decoration: none !important;
+            color: $white;
+            z-index: 44444;
+            font-weight: bold;
+            padding: 5px;
+        }
+    }
+}
+
+// Material side nav styles
+.mat-drawer-container {
+    background-color: $white !important;
+}
+
+.stream-errors {
+    p {
+        &.top {
+            margin-top: -200px;
+        }
+
+        b {
+
+            text-align: center;
+            font-size: 24px;
+            line-height: 30px;
+            font-family: "Muli-Bold", sans-serif;
+            color: #545454;
+        }
+    }
+}
+
+.owl-stage {
+    display: flex;
+}
+
+select {
+    option {
+        &:focus,
+        &:active,
+        &:checked,
+        &:hover {
+            background: #18B587 !important;
+            color: #fff !important;
+        }
+    }
+}
+
+.tags {
+    ul {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+}
+
+.mat-paginator-range-label {
+    margin: 0 32px 0 24px;
+    white-space: nowrap;
+}
+
 
 @media (max-width: 1700px) {
     nav.home-header {
@@ -1200,7 +1365,7 @@ ngb-modal-window {
     // }
 
     .black-text {
-        font-size: 8px;
+        font-size: 10px;
     }
     .ads-block-right {
         width: 230px;
@@ -1263,7 +1428,7 @@ ngb-modal-window {
     }
     .home-search {
         width: 300px;
-        margin-bottom: 20px;
+        margin-bottom: 0;
         margin-right: 0;
     }
     nav.home-header {
@@ -1286,16 +1451,20 @@ ngb-modal-window {
         justify-content: space-between;
     }
 
-
+    .body-content {
+        min-height: 100vh;
+    }
 }
 
 @media (max-width: 767px) {
+
     .home-black-item {
         margin-bottom: 5px;
         margin-top: 5px;
     }
     .home-search {
         width: 100%;
+        margin: 0;
     }
 
     .left-list {
@@ -1303,7 +1472,7 @@ ngb-modal-window {
     }
     .body-content-right {
         width: 100%;
-        margin-top: 40px;
+        //margin-top: 40px;
     }
     .left-menu {
         width: 80%;
@@ -1311,17 +1480,35 @@ ngb-modal-window {
     }
     .left-list {
         width: 80%;
-        margin-top: 40px;
+        margin: 30px auto 10px;
+        text-align: left;
     }
     .main-carousel .owl-nav button.owl-next {
         display: none;
     }
 
-    .trending-text, .subscriptions-text {
-        text-align: center;
+    .trending-text {
+        text-align: left;
+        max-width: 200px;
+    }
+
+    .subscriptions-text {
+        text-align: left;
+        max-width: 200px;
+        margin: 0 auto;
     }
     .main-item-block {
-        justify-content: center;
+        justify-content: left;
+        //max-width: 200px;
+        margin: 10px auto;
+    }
+    .main-item-block.channel-block {
+        max-width: 100%;
+    }
+    .owl-item .main-item-block {
+        justify-content: left;
+        max-width: 100%;
+        margin: 10px 0;
     }
     .categories {
         width: 80%;
@@ -1340,10 +1527,26 @@ ngb-modal-window {
         width: 100% !important;
         height: auto !important;
     }
+    .sub-block {
+        flex-wrap: wrap;
+    }
+    .profile-list .watchlist-search {
+        max-width: 290px;
+        width: 100%;
+    }
+    app-search-videos-form.flex-1 {
+        flex: 1;
+        max-width: 200px;
+        margin: 0 8px;
+    }
+    #tags-form .right-group #video-tags {
+        max-width: 250px;
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
-    .left-menu, .left-list, .categories, .watchlist {
+    .left-list, .categories, .watchlist {
         width: 100%;
     }
     .watchlist .tab-pane, .ads-block-right {
@@ -1354,18 +1557,6 @@ ngb-modal-window {
     }
     .analytics-item {
         justify-content: space-between;
-    }
-
-    .main-item-block {
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        margin-bottom: 15px;
-    }
-
-    .list-img, .main-item-block img {
-        margin-right: 0 !important;
     }
 }
 
@@ -1390,13 +1581,16 @@ input, textarea {
 }
 
 .owl-item {
-    width: 400px !important;
+    // @todo look here tomorrow
+    //max-width: 400px !important;
+    //width: 100% !important;
 
     .thumbnail {
         object-fit: cover !important;
         height: 182px !important;
         cursor: pointer;
     }
+
 }
 
 .avatar {
@@ -1438,4 +1632,26 @@ input, textarea {
 
         }
     }
+}
+
+// Plyr custom styles
+.plyr {
+    height: 400px;
+    width: 100%;
+
+    .plyr__control--overlaid {
+        background-color: #18B587 !important;
+    }
+
+    .plyr__controls button:hover, .plyr__controls button:focus, .plyr--video .plyr__control[aria-expanded=true] {
+        background: #18B587 !important;
+    }
+}
+
+.plyr--full-ui input[type=range] {
+    color: #18B587 !important;
+}
+
+.mat-dialog-container {
+    padding: 0 !important;
 }

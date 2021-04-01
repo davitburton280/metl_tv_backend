@@ -14,6 +14,8 @@ let storage = multer.diskStorage({
             dir = path.join(__dirname, '../public/uploads/avatars');
         } else if (file.fieldname === 'cover_file') {
             dir = path.join(__dirname, '../public/uploads/covers');
+        } else if (file.fieldname === 'user_avatar_file') {
+            dir = path.join(__dirname, '../public/uploads/user_avatars');
         } else {
             dir = path.join(__dirname, '../public/uploads/videos');
 
@@ -56,4 +58,5 @@ let upload = multer({
 global.uploadVideoStreamFile = upload.single('video_stream_file');
 global.uploadVideoThumbFile = upload.single('video_thumbnail_file');
 global.uploadAvatar = upload.single('avatar_file');
+global.uploadUserAvatar = upload.single('user_avatar_file');
 global.uploadCover = upload.single('cover_file');
