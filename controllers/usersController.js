@@ -40,6 +40,9 @@ const Users = db.users;
 const Videos = db.videos;
 const Tags = db.tags;
 const Channels = db.channels;
+const PrivacyTypes = db.privacy_types;
+
+
 
 const url = require('url');
 
@@ -217,7 +220,7 @@ exports.getUserInfo = async (req, res) => {
             {
                 model: Videos,
                 as: 'videos',
-                include: [{model:Tags, as: 'tags'}]
+                include: [{model:Tags, as: 'tags'}, {model: PrivacyTypes, as: 'privacy'}]
             }],
         order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });

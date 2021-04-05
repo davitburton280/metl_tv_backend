@@ -1,5 +1,6 @@
 const db = require('../models');
 const Playlists = db.playlists;
+const PrivacyTypes = db.privacy_types;
 const Videos = db.videos;
 const Users = db.users;
 const Tags = db.tags;
@@ -99,13 +100,18 @@ exports.search = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
+    let data = req.query;
+    let {user_id, playlist_id} = data;
+    console.log('get playlists by id!!!');
+    let wherePrivacy = user_id ? {}:  {name: 'Public'};
     const playlists = await Playlists.findOne({
-        where: {id: req.query.playlist_id},
+        where: {id: playlist_id},
         include: [
             {
                 model: Videos, as: 'videos', include: [
                     {model: Channels, as: 'channel'},
-                    {model: Tags, as: 'tags'}
+                    {model: Tags, as: 'tags'},
+                    {model: PrivacyTypes, as: 'privacy', where: wherePrivacy}
                 ] //{model: Users, as: 'user'}
             },
             {model: Channels, as: 'channel'},

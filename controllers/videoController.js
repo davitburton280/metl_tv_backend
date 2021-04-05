@@ -29,14 +29,14 @@ const moment = require('moment');
 
 exports.getVideos = async (req, res) => {
     let data = req.query;
-    let {withPlaylists, trending, limit, tag} = data;
+    let {withPlaylists, trending, limit, tag, user_id} = data;
     let ret = {};
     let limitOption = limit ? {limit: +limit} : {};
     let trendingOption = +trending ? [['views', 'DESC']] : [['created_at', 'DESC']];
     let filters = data.filters ? JSON.parse(data.filters) : {};
     let whereFilters = this.getVideoFiltersQuery(filters);
     let whereTag = tag ? {name: tag} : {};
-
+    let wherePrivacy = user_id ? {}:  {name: 'Public'};
     console.log('get videos!!!')
     let v = await Videos.findAll({
         include: [
@@ -57,7 +57,8 @@ exports.getVideos = async (req, res) => {
                 as: 'tags',
                 where: whereTag,
                 required: !!tag
-            }
+            },
+            {model: PrivacyTypes, as: 'privacy', where: wherePrivacy}
         ],
         order: trendingOption,
         where: whereFilters,
@@ -247,6 +248,7 @@ exports.getUserVideos = async (req, res) => {
     let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
     let filters = data.filters ? JSON.parse(data.filters) : {};
     let whereFilters = this.getVideoFiltersQuery(filters);
+    // let wherePrivacy = user_id ? {}:  {name: 'Public'};
 
     let v = await Users.findOne({
         include: [{
@@ -255,7 +257,8 @@ exports.getUserVideos = async (req, res) => {
             include: [
                 {model: Channels, as: 'channel'},
                 {model: Playlists, as: 'playlists', attributes: ['id']},
-                {model: Tags, as: 'tags'}
+                {model: Tags, as: 'tags'},
+                // {model: PrivacyTypes, as: 'privacy'}
             ]
         }, {model: Channels, as: 'channel'}],
         where: {

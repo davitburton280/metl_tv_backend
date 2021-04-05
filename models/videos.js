@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
             // define association here
             videos.belongsTo(models.users, {as: 'user', foreignKey: 'author_id'});
             videos.belongsTo(models.channels, {foreignKey: 'channel_id', as: 'channel'});
-
+            videos.belongsTo(models.privacy_types, {foreignKey: 'privacy_id', as: 'privacy'})
             videos.hasMany(models.chat_messages, {as: 'chat', foreignKey: 'video_id'});
             videos.belongsToMany(models.users, {
                 as: 'users_vids',
