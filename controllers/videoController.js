@@ -36,7 +36,7 @@ exports.getVideos = async (req, res) => {
     let filters = data.filters ? JSON.parse(data.filters) : {};
     let whereFilters = this.getVideoFiltersQuery(filters);
     let whereTag = tag ? {name: tag} : {};
-    let wherePrivacy = user_id ? {}:  {name: 'Public'};
+    let wherePrivacy = user_id ? {} : {name: 'Public'};
     console.log('get videos!!!')
     let v = await Videos.findAll({
         include: [
@@ -565,4 +565,12 @@ exports.getUserTags = async (req, res) => {
         }]
     }).filter(ut => ut.tag_details.tags_videos.length !== 0);
     res.json(userTags);
+};
+
+exports.updatePrivacy = async (req, res) => {
+    let data = req.body;
+    let {privacy, video_id} = data;
+    let foundPrivacy = await PrivacyTypes.findOne({where: {name: privacy}});
+    let v = await Videos.update({privacy_id: foundPrivacy.id}, {where: {id: data.video_id}});
+    res.json(foundPrivacy);
 };

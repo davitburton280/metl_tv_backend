@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const videoController = require('../controllers/videoController');
 const validateVideo = require('../validators/validateVideo');
-const validateVideoDetails= require('../validators/validateVideoDetails');
+const validateVideoDetails = require('../validators/validateVideoDetails');
 
 router.post('/save-video-token', videoController.saveVideoToken);
 router.post('/save-video-data', uploadVideoStreamFile, videoController.saveVideoData);
@@ -20,6 +20,7 @@ router.get('/search-in-all-videos', videoController.searchInAllVideos);
 router.get('/get', videoController.getVideos);
 router.get('/get-saved', videoController.getUserSavedVideos);
 router.put('/update-likes', videoController.updateLikes);
+router.put('/update-privacy', videoController.updatePrivacy);
 router.put('/update-views', videoController.updateViews);
 router.put('/index-user-tags', videoController.updateUserTags);
 router.put('/save-video', videoController.saveVideo);
