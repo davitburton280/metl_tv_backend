@@ -2,6 +2,7 @@ const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
 const Videos = db.videos;
+const Tags = db.tags;
 const ChannelSubscribers = db.channel_subscribers;
 
 const usersController = require('./usersController');
@@ -44,7 +45,7 @@ exports.searchChannelVideos = async (req, res) => {
         let channels = await Channels.findAll(
             {
                 include: [
-                    {model: Videos, where: whereFilters, required: false},
+                    {model: Videos, where: whereFilters, required: false, include: [{model: Tags, as: 'tags'}]},
                     {model: Users, as: 'user'},
                     {model: Users, as: 'subscribers'}
                 ],
