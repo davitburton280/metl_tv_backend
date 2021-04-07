@@ -136,11 +136,12 @@ exports.searchInStockTypeData = async (req, res) => {
 
 exports.getUserStocks = async (req, res) => {
     let {stocks, user_id} = req.query;
+    console.log('get user stocks!!!!')
     let user_stocks = await Users.findOne({
-            where: {id: user_id},
-            include: [{model: Stocks, as: 'user_stocks'}], attributes: ['id']
-        })
-    ;
+        where: {id: user_id},
+        include: [{model: Stocks, as: 'user_stocks'}], attributes: ['id']
+    });
+    console.log(user_stocks)
     res.json(user_stocks);
 };
 
