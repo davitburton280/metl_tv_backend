@@ -122,26 +122,32 @@ exports.searchStocksBySymbol = async (req, res) => {
 };
 
 exports.searchInStockTypeData = async (req, res) => {
-    let {search, stockType} = req.query;
-    let url = `https://financialmodelingprep.com/api/v3/search?query=${search}&exchange=ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let {search, stockType, autocomplete} = req.query;
+    let exchanges = autocomplete ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : stockType;
+    let url = `https://financialmodelingprep.com/api/v3/search?query=${search}&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
     } else {
         let ret = [];
 
-         response.data.map((item, index) => {
-            if (['NYSE', 'AMEX', 'NASDAQ'].indexOf(item.exchangeShortName) !== -1) {
-                item.exchangeShortName = 'STOCKS'
-            }
-            let indexOfFoundInRet = ret.indexOf(ret.find(d => d.name === item.exchangeShortName));
-            let firstOccurrence = response.data.indexOf(response.data.find(d => d.exchangeShortName === item.exchangeShortName));
-            if (firstOccurrence === index) {
-                ret.push({name: item.exchangeShortName, stocks: [item]});
-            } else if (indexOfFoundInRet !== -1) {
-                ret[indexOfFoundInRet].stocks.push(item)
-            }
-        });
+        if (autocomplete) {
+            response.data.map((item, index) => {
+                if (['NYSE', 'AMEX', 'NASDAQ'].indexOf(item.exchangeShortName) !== -1) {
+                    item.exchangeShortName = 'STOCKS'
+                }
+                let indexOfFoundInRet = ret.indexOf(ret.find(d => d.name === item.exchangeShortName));
+                let firstOccurrence = response.data.indexOf(response.data.find(d => d.exchangeShortName === item.exchangeShortName));
+                if (firstOccurrence === index) {
+                    ret.push({name: item.exchangeShortName, stocks: [item]});
+                } else if (indexOfFoundInRet !== -1) {
+                    ret[indexOfFoundInRet].stocks.push(item)
+                }
+            });
+        } else {
+            ret = response.data;
+        }
 
         res.json(ret);
     }

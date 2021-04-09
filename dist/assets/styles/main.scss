@@ -1307,7 +1307,13 @@ select {
         }
     }
 }
-
+.add-video-playlist-modal {
+    .video-container {
+        .thumbnail {
+            margin-bottom: 0;
+        }
+    }
+}
 // Subscribe-to-channel button
 .subscribe-to-channel-btn {
     padding: 12px 28px;
@@ -1323,7 +1329,22 @@ select {
         color: $white;
     }
 }
-
+.stocks-top-actions {
+    .watchlist-search {
+        position: relative;
+        .watchlist-input {
+            padding: 8px;
+        }
+        .fa-search {
+            position: absolute;
+            right: 8px;
+            top: 16px;
+        }
+    }
+    //.mat-icon {
+    //    margin-top: 12px;
+    //}
+}
 
 @media (max-width: 1700px) {
     nav.home-header {
@@ -1697,4 +1718,25 @@ input, textarea {
 
 .green {
     color: $green;
+}
+
+mat-optgroup {
+    .mat-option-text {
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+}
+
+#stocks-lists-modal{
+    .mat-progress-spinner circle, .mat-spinner circle {
+        stroke: $white;
+    }
+}
+
+.see-more {
+    color: #18B587;
+    font-size: 16px;
+    font-family: 'Muli-Regular';
+    margin-top: 32px;
+    cursor: pointer;
 }
