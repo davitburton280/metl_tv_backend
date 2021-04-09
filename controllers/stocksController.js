@@ -123,14 +123,27 @@ exports.searchStocksBySymbol = async (req, res) => {
 
 exports.searchInStockTypeData = async (req, res) => {
     let {search, stockType} = req.query;
-    let url = `https://financialmodelingprep.com/api/v3/search?query=${search}${stockType === 'stocks' ? '' : '&exchange=' + stockType}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    console.log(url)
+    let url = `https://financialmodelingprep.com/api/v3/search?query=${search}&exchange=ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
     } else {
-        console.log(response.data)
-        res.json(response.data);
+        let ret = [];
+
+         response.data.map((item, index) => {
+            if (['NYSE', 'AMEX', 'NASDAQ'].indexOf(item.exchangeShortName) !== -1) {
+                item.exchangeShortName = 'STOCKS'
+            }
+            let indexOfFoundInRet = ret.indexOf(ret.find(d => d.name === item.exchangeShortName));
+            let firstOccurrence = response.data.indexOf(response.data.find(d => d.exchangeShortName === item.exchangeShortName));
+            if (firstOccurrence === index) {
+                ret.push({name: item.exchangeShortName, stocks: [item]});
+            } else if (indexOfFoundInRet !== -1) {
+                ret[indexOfFoundInRet].stocks.push(item)
+            }
+        });
+
+        res.json(ret);
     }
 };
 
@@ -141,7 +154,7 @@ exports.getUserStocks = async (req, res) => {
         where: {id: user_id},
         include: [{model: Stocks, as: 'user_stocks'}], attributes: ['id']
     });
-    console.log(user_stocks)
+    // console.log(user_stocks)
     res.json(user_stocks);
 };
 
