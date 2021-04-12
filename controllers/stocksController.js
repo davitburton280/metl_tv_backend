@@ -4,6 +4,7 @@ const db = require('../models');
 const Users = db.users;
 const UsersStocks = db.users_stocks;
 const Stocks = db.stocks;
+const StockTypes = db.stock_types;
 
 
 const showIfErrors = require('../helpers/showIfErrors');
@@ -14,6 +15,11 @@ exports.getDailyStocks = async (req, res) => {
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
     } else res.json(response.data);
+};
+
+exports.getStockTypes = async (req, res) => {
+    let stockTypes = await StockTypes.findAll({});
+    res.json(stockTypes);
 };
 
 
@@ -123,7 +129,7 @@ exports.searchStocksBySymbol = async (req, res) => {
 
 exports.searchInStockTypeData = async (req, res) => {
     let {search, stockType, autocomplete} = req.query;
-    let exchanges = autocomplete ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : stockType;
+    let exchanges = autocomplete ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : (stockType === 'stocks' ? 'AMEX,NASDAQ,NYSE' : stockType);
     let url = `https://financialmodelingprep.com/api/v3/search?query=${search}&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     console.log(url)
     const response = await axios.get(url);
@@ -154,11 +160,13 @@ exports.searchInStockTypeData = async (req, res) => {
 };
 
 exports.getUserStocks = async (req, res) => {
-    let {stocks, user_id} = req.query;
+    let {stocks, user_id, type_id} = req.query;
+    let whereType = type_id ? {type_id: +type_id} : {};
     console.log('get user stocks!!!!')
+    console.log(whereType)
     let user_stocks = await Users.findOne({
         where: {id: user_id},
-        include: [{model: Stocks, as: 'user_stocks'}], attributes: ['id']
+        include: [{model: Stocks, as: 'user_stocks', where: whereType}], attributes: ['id']
     });
     // console.log(user_stocks)
     res.json(user_stocks);
@@ -167,11 +175,12 @@ exports.getUserStocks = async (req, res) => {
 exports.updateUserStocks = async (req, res) => {
     if (!showIfErrors(req, res)) {
 
-        let {stocks, user_id} = req.body;
-        await UsersStocks.destroy({where: {user_id: user_id}});
+        let {stocks, user_id, type_id} = req.body; //send type_id!!!!!!!!
+        await UsersStocks.destroy({where: {user_id: user_id, type_id: type_id}});
         let all = stocks.map(async (st) => {
 
             let found = await Stocks.findOne({where: {name: st.name}});
+            // let stockType = await StockTypes.findOne({name: type});
             if (!found) {
                 let justCreated = await Stocks.create(st);
                 await this.checkIfUserStockExist(justCreated, user_id)
@@ -183,6 +192,7 @@ exports.updateUserStocks = async (req, res) => {
         });
         await Promise.all(all);
         req.query.user_id = req.body.user_id;
+        req.query.type_id = req.body.type_id;
         this.getUserStocks(req, res);
     }
 };

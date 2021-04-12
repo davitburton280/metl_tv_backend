@@ -16,11 +16,14 @@ module.exports = (sequelize, DataTypes) => {
                 through: models.users_stocks,
                 foreignKey: 'stock_id'
             });
+
+            stocks.belongsTo(models.stock_types, {as: 'types', foreignKey: 'type_id'});
         }
     }
 
     stocks.init({
         symbol: DataTypes.STRING,
+        type_id: DataTypes.INTEGER,
         name: DataTypes.STRING,
         change: DataTypes.FLOAT,
         price: DataTypes.FLOAT,

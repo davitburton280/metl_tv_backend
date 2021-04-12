@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   users_stocks.init({
     user_id: DataTypes.INTEGER,
-    stock_id: DataTypes.INTEGER
+    stock_id: DataTypes.INTEGER,
+    type_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'users_stocks',

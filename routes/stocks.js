@@ -5,6 +5,7 @@ const validateStock = require('../validators/validateStock');
 
 router.get('/get-daily', stocksController.getDailyStocks);
 router.get('/get-by-type', stocksController.getStocksByType);
+router.get('/get-types', stocksController.getStockTypes);
 router.get('/get-indices', stocksController.getMajorIndexes);
 router.get('/get-historical', stocksController.getHistoricalPrices);
 router.get('/get-stock-historical', stocksController.getStockHistoricalPrices);
