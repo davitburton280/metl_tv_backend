@@ -176,9 +176,12 @@ exports.updateUserStocks = async (req, res) => {
     if (!showIfErrors(req, res)) {
 
         let {stocks, user_id, type_id} = req.body; //send type_id!!!!!!!!
-        await UsersStocks.destroy({where: {user_id: user_id, type_id: type_id}});
+        let where = {user_id: user_id};
+        if (type_id) {
+            where.type_id = type_id
+        }
+        await UsersStocks.destroy({where: where});
         let all = stocks.map(async (st) => {
-
             let found = await Stocks.findOne({where: {name: st.name}});
             // let stockType = await StockTypes.findOne({name: type});
             if (!found) {
@@ -201,6 +204,6 @@ exports.checkIfUserStockExist = async (stock, user_id) => {
     console.log({user_id: user_id, stock_id: stock.id})
     let userStocksFind = await UsersStocks.findOne({where: {user_id: user_id, stock_id: stock.id}});
     if (!userStocksFind) {
-        await UsersStocks.create({user_id: user_id, stock_id: stock.id});
+        await UsersStocks.create({user_id: user_id, stock_id: stock.id, type_id: stock.type_id});
     }
 };
