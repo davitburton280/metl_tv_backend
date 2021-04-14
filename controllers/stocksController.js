@@ -1,11 +1,11 @@
 const axios = require('axios');
 const moment = require('moment');
 const db = require('../models');
+const sequelize = require('sequelize');
 const Users = db.users;
 const UsersStocks = db.users_stocks;
 const Stocks = db.stocks;
 const StockTypes = db.stock_types;
-
 
 const showIfErrors = require('../helpers/showIfErrors');
 
@@ -52,6 +52,8 @@ exports.getStocksByType = async (req, res) => {
     } else res.json(ret);
 
 };
+
+
 
 exports.getHistoricalPrices = async (req, res) => {
     let url = `https://financialmodelingprep.com/api/v3/historical-price-full/MSFT,GOOG,AAPL,SPCE,DIS?apikey=${process.env.FMP_CLOUD_API_KEY}&timeseries=1`;
@@ -160,17 +162,27 @@ exports.searchInStockTypeData = async (req, res) => {
 };
 
 exports.getUserStocks = async (req, res) => {
-    let {stocks, user_id, type_id} = req.query;
+    let {stocks, user_id, type_id, sort_type} = req.query;
     let whereType = type_id ? {type_id: +type_id} : {};
     console.log('get user stocks!!!!')
     console.log(whereType)
+
+    let order = [[sequelize.col(`user_stocks->users_stocks.position_id`), 'asc']];
+
+    if (sort_type === 'A-Z') {
+        order = [[sequelize.col(`user_stocks.name`), 'asc']];
+    }
+
+
     let user_stocks = await Users.findOne({
         where: {id: user_id},
-        include: [{model: Stocks, as: 'user_stocks', where: whereType}], attributes: ['id']
+        include: [{model: Stocks, as: 'user_stocks', where: whereType}], attributes: ['id'],
+        order: order
     });
     // console.log(user_stocks)
     res.json(user_stocks);
 };
+
 
 exports.updateUserStocks = async (req, res) => {
     if (!showIfErrors(req, res)) {
@@ -180,30 +192,63 @@ exports.updateUserStocks = async (req, res) => {
         if (type_id) {
             where.type_id = type_id
         }
+
+
         await UsersStocks.destroy({where: where});
-        let all = stocks.map(async (st) => {
+        let all = stocks.map(async (st, index) => {
             let found = await Stocks.findOne({where: {name: st.name}});
             // let stockType = await StockTypes.findOne({name: type});
             if (!found) {
-                let justCreated = await Stocks.create(st);
-                await this.checkIfUserStockExist(justCreated, user_id)
-            } else {
-                await this.checkIfUserStockExist(found, user_id)
+                found = await Stocks.create(st);
             }
 
-            // console.log(stocks)
+            // // Getting maximum position id of the user's stocks
+            // let userStocks = await UsersStocks.findOne({
+            //     where: {user_id: user_id},
+            //     attributes: [sequelize.fn('MAX', sequelize.col('position_id'))],
+            //     raw: true
+            // });
+            // console.log(userStocks);
+
+            // console.log("position: " + position)
+            await UsersStocks.create({
+                user_id: user_id,
+                stock_id: found.id,
+                type_id: found.type_id,
+                position_id: index + 1
+            });
         });
         await Promise.all(all);
+
+
         req.query.user_id = req.body.user_id;
         req.query.type_id = req.body.type_id;
         this.getUserStocks(req, res);
     }
 };
 
-exports.checkIfUserStockExist = async (stock, user_id) => {
+exports.updateUserStocksPriority = async (req, res) => {
+    let {user_id, rows} = req.body;
+    rows = JSON.parse(rows);
+
+    rows.map(async (r) => {
+        await UsersStocks.update({position_id: rows.indexOf(r) + 1}, {
+            where: {
+                user_id: user_id,
+                stock_id: r.id
+            }
+        });
+    });
+
+    res.json('OK');
+};
+
+exports.refreshUserStocks = async (stock, user_id) => {
     console.log({user_id: user_id, stock_id: stock.id})
-    let userStocksFind = await UsersStocks.findOne({where: {user_id: user_id, stock_id: stock.id}});
-    if (!userStocksFind) {
-        await UsersStocks.create({user_id: user_id, stock_id: stock.id, type_id: stock.type_id});
-    }
+    // let userStocksFind = await UsersStocks.findOne({where: {user_id: user_id, stock_id: stock.id}});
+
+    // if (!userStocksFind) {
+
+
+    // }
 };

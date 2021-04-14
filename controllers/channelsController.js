@@ -175,33 +175,8 @@ exports.changeSubscriptionPriority = async (req, res) => {
     let {user_id, rows} = req.body;
     rows = JSON.parse(rows);
 
-    // let {user_id} = req.body;
     console.log(rows)
     console.log('change subscription priority!!!!!')
-    // let userSubscriptions = await Users.findAll({
-    //     include: [
-    //         {
-    //             model: Channels, as: 'subscriptions',
-    //             attributes: {exclude: ['avatar', 'role_id', 'status_id', 'cover', 'subscribers_count', 'createdAt', 'updatedAt']},
-    //             where:
-    //                 sequelize.where(sequelize.col('subscriptions->channel_subscribers.subscriber_id'), user_id),
-    //         }
-    //     ],
-    //     attributes: {exclude: ['avatar', 'cover', 'role_id', 'status_id', 'phone', 'birthday', 'gender', 'password', 'createdAt', 'updatedAt']},
-    // });
-
-    // let userSubscriptions = await Channels.findAll({
-    //     // where: {user_id: user_id},
-    //     where: sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
-    //     include: [
-    //         {
-    //             model: Users, as: 'subscribers',
-    //             through: {attributes: ['position_id']},
-    //             attributes: ['full_name', 'id'],
-    //         }
-    //     ],
-    //     attributes: {exclude: ['createdAt', 'updatedAt']},
-    // });
 
     rows.map(async (r) => {
         await ChannelSubscribers.update({position_id: rows.indexOf(r) + 1}, {
@@ -212,10 +187,6 @@ exports.changeSubscriptionPriority = async (req, res) => {
         });
     });
 
-    // console.log(userSubscriptions[0])
-
-
-    // userSubscriptions[0].updateAttributes()
     res.json('updated')
 };
 

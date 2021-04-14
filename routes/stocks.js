@@ -5,6 +5,7 @@ const validateStock = require('../validators/validateStock');
 
 router.get('/get-daily', stocksController.getDailyStocks);
 router.get('/get-by-type', stocksController.getStocksByType);
+router.get('/get-by-sort-type', stocksController.getUserStocks);
 router.get('/get-types', stocksController.getStockTypes);
 router.get('/get-indices', stocksController.getMajorIndexes);
 router.get('/get-historical', stocksController.getHistoricalPrices);
@@ -12,6 +13,7 @@ router.get('/get-stock-historical', stocksController.getStockHistoricalPrices);
 router.get('/get-stock-chart-data', stocksController.getStockChartData);
 router.get('/get-user-stocks', stocksController.getUserStocks);
 router.put('/update-user-stocks', validateStock.rules, stocksController.updateUserStocks);
+router.put('/update-user-stocks-priority', validateStock.rules, stocksController.updateUserStocksPriority);
 router.get('/search', stocksController.searchInStockTypeData);
 router.get('/search-in-stock-type-data', stocksController.searchInStockTypeData);
 // router.get('/session/leave', usersController.leaveSession);
