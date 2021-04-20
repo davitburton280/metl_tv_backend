@@ -14,6 +14,9 @@ module.exports = {
             status_id: {
                 type: Sequelize.INTEGER
             },
+            stocks_order_type_id: {
+                type: Sequelize.INTEGER
+            },
             full_name: {
                 type: Sequelize.STRING
             },

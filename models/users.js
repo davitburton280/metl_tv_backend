@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     const users = sequelize.define('users', {
         role_id: DataTypes.INTEGER,
         status_id: DataTypes.INTEGER,
+        stocks_order_type_id: DataTypes.INTEGER,
         full_name: DataTypes.STRING,
         username: DataTypes.STRING,
         // last_name: DataTypes.STRING,
@@ -20,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
         users.hasMany(models.videos, {as: 'videos', foreignKey: 'author_id'});
         users.hasMany(models.chat_messages, {as: 'from_messages', foreignKey: 'from_id'});
         users.hasMany(models.chat_messages, {as: 'to_messages', foreignKey: 'to_id'});
-        users.hasOne(models.channels, {foreignKey: 'user_id', as: 'channel'})
+        users.hasOne(models.channels, {foreignKey: 'user_id', as: 'channel'});
+        users.belongsTo(models.stocks_ordering_types, {foreignKey: 'stocks_order_type_id', as: 'stocks_order_type'});
+
         users.belongsToMany(models.channels, {
             as: 'subscriptions',
             through: models.channel_subscribers,

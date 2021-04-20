@@ -5,6 +5,7 @@ const sequelize = require('sequelize');
 const Users = db.users;
 const UsersStocks = db.users_stocks;
 const Stocks = db.stocks;
+const StocksOrderType = db.stocks_ordering_types;
 const StockTypes = db.stock_types;
 
 const showIfErrors = require('../helpers/showIfErrors');
@@ -52,7 +53,6 @@ exports.getStocksByType = async (req, res) => {
     } else res.json(ret);
 
 };
-
 
 
 exports.getHistoricalPrices = async (req, res) => {
@@ -176,7 +176,10 @@ exports.getUserStocks = async (req, res) => {
 
     let user_stocks = await Users.findOne({
         where: {id: user_id},
-        include: [{model: Stocks, as: 'user_stocks', where: whereType}], attributes: ['id'],
+        include: [
+            {model: Stocks, as: 'user_stocks', where: whereType},
+            {model: StocksOrderType, as: 'stocks_order_type'}
+        ], attributes: ['id'],
         order: order
     });
     // console.log(user_stocks)
@@ -195,6 +198,7 @@ exports.updateUserStocks = async (req, res) => {
 
 
         await UsersStocks.destroy({where: where});
+
         let all = stocks.map(async (st, index) => {
             let found = await Stocks.findOne({where: {name: st.name}});
             // let stockType = await StockTypes.findOne({name: type});
@@ -228,9 +232,14 @@ exports.updateUserStocks = async (req, res) => {
 };
 
 exports.updateUserStocksPriority = async (req, res) => {
-    let {user_id, rows} = req.body;
+    let {user_id, rows, order_type} = req.body;
     rows = JSON.parse(rows);
-
+    console.log('priority update!!!')
+    let stocks_order = await StocksOrderType.findOne({where: {value: order_type}, raw: true, attributes: ['id']});
+    console.log(stocks_order)
+    if (stocks_order) {
+        await Users.update({stocks_order_type_id: stocks_order.id}, {where: {id: user_id}});
+    }
     rows.map(async (r) => {
         await UsersStocks.update({position_id: rows.indexOf(r) + 1}, {
             where: {
