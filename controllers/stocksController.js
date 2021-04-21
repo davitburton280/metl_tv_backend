@@ -26,10 +26,27 @@ exports.getStockTypes = async (req, res) => {
 
 exports.getMajorIndexes = async (req, res) => {
     let url = `https://financialmodelingprep.com/api/v3/quote-order/%5EDJI,%5EGSPC,%5EIXIC,OVX,BTCUSD,EURUSD?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    const response = await axios.get(url);
-    if (response.data['Error Message']) {
-        res.status(400).send({msg: response.data['Error Message']})
-    } else res.json(response.data);
+    const indices = await axios.get(url);
+
+    let graphDataUrl = `https://financialmodelingprep.com/api/v3/historical-chart-menu?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    const graphDataResponse = await axios.get(graphDataUrl);
+
+    let ret = {};
+    indices.data.map(i => {
+        graphDataResponse.data[i.symbol].map(d => {
+            d.name = d.date;
+            d.value = d.close;
+        })
+        // graphDataResponse.data[i.symbol]['name'] = i.symbol;
+        // graphDataResponse.data[i.symbol]['value'] = i.price;
+        i.series = graphDataResponse.data[i.symbol];
+    });
+
+    console.log(indices.data[0]);
+
+    if (graphDataResponse.data['Error Message']) {
+        res.status(400).send({msg: graphDataResponse.data['Error Message']})
+    } else res.json(indices.data);
 };
 
 exports.getStocksByType = async (req, res) => {
