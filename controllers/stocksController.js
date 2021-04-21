@@ -36,13 +36,11 @@ exports.getMajorIndexes = async (req, res) => {
         graphDataResponse.data[i.symbol].map(d => {
             d.name = d.date;
             d.value = d.close;
-        })
-        // graphDataResponse.data[i.symbol]['name'] = i.symbol;
-        // graphDataResponse.data[i.symbol]['value'] = i.price;
+        });
         i.series = graphDataResponse.data[i.symbol];
     });
 
-    console.log(indices.data[0]);
+    // console.log(indices.data[0]);
 
     if (graphDataResponse.data['Error Message']) {
         res.status(400).send({msg: graphDataResponse.data['Error Message']})
