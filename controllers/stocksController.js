@@ -89,7 +89,7 @@ exports.getStockChartData = async (req, res) => {
 
     let tableDataUrl = `https://financialmodelingprep.com/api/v3/quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const tableData = await axios.get(tableDataUrl);
-
+console.log(tableData.data)
 
     let ret = {chart: [{series: [], name: stock}], table: tableData.data};
 
