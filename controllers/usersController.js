@@ -14,10 +14,9 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 // Environment variable: URL where our OpenVidu server is listening
 let OPENVIDU_URL = 'https://localhost:4443';
-if(process.env.NODE_ENV === 'staging'){
-    OPENVIDU_URL  = 'https://staging.metl.tv/';
-}
-else if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'staging') {
+    OPENVIDU_URL = 'https://staging.metl.tv/';
+} else if (process.env.NODE_ENV === 'production') {
     OPENVIDU_URL = 'https://metl.tv/'
 }
 // Environment variable: secret shared with our OpenVidu server
@@ -41,8 +40,7 @@ const Videos = db.videos;
 const Tags = db.tags;
 const Channels = db.channels;
 const PrivacyTypes = db.privacy_types;
-
-
+const StocksOrderType = db.stocks_ordering_types;
 
 const url = require('url');
 
@@ -120,8 +118,6 @@ exports.getSession = async (req, res) => {
                 tokenOptions.role = 'PUBLISHER';
 
 
-
-
                 // Generate a new token asynchronously with the recently created tokenOptions
                 session.generateToken(tokenOptions)
                     .then(token => {
@@ -193,7 +189,12 @@ exports.changeCover = async (req, res) => {
 
 exports.changeJwt = async (data, res) => {
 
-    let user = await Users.findOne({where: {id: data.id}, include: [{model: Channels, as: 'channel'}]});
+    let user = await Users.findOne({
+        where: {id: data.id}, include: [
+            {model: Channels, as: 'channel'},
+            {model: StocksOrderType, as: 'stocks_order_type'}
+        ]
+    });
 
 
     let full_name = user[`full_name`];
@@ -220,7 +221,7 @@ exports.getUserInfo = async (req, res) => {
             {
                 model: Videos,
                 as: 'videos',
-                include: [{model:Tags, as: 'tags'}, {model: PrivacyTypes, as: 'privacy'}]
+                include: [{model: Tags, as: 'tags'}, {model: PrivacyTypes, as: 'privacy'}]
             }],
         order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });

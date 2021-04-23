@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
+const StocksOrderType = db.stocks_ordering_types;
 
 const bcrypt = require('bcryptjs');
 
@@ -17,7 +18,7 @@ exports.login = async (req, res) => {
         // Getting request data and setting user fields to return
         let {email} = req.body;
 
-        let attributes = [`full_name`, 'email', 'username', 'birthday', 'avatar', 'cover', 'password', 'id', 'status_id'];
+        let attributes = [`full_name`, 'email', 'username', 'birthday', 'avatar', 'cover', 'password', 'stocks_order_type_id','id', 'status_id'];
 
         // Active status selecting
         let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
@@ -25,7 +26,7 @@ exports.login = async (req, res) => {
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
             attributes: attributes,
-            include: [{model: Channels, as: 'channel'}],
+            include: [{model: Channels, as: 'channel'},  {model: StocksOrderType, as: 'stocks_order_type'}],
             where: {email: email} //userTypeWhere
 
         }, res);

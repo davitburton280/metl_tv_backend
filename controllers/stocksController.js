@@ -9,6 +9,7 @@ const StocksOrderType = db.stocks_ordering_types;
 const StockTypes = db.stock_types;
 
 const showIfErrors = require('../helpers/showIfErrors');
+const usersController = require('./usersController');
 
 exports.getDailyStocks = async (req, res) => {
     let url = `https://financialmodelingprep.com/api/v3/ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
@@ -89,7 +90,6 @@ exports.getStockChartData = async (req, res) => {
 
     let tableDataUrl = `https://financialmodelingprep.com/api/v3/quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const tableData = await axios.get(tableDataUrl);
-console.log(tableData.data)
 
     let ret = {chart: [{series: [], name: stock}], table: tableData.data};
 
@@ -117,11 +117,10 @@ exports.getStockQuote = async (req, res) => {
 
 };
 
-
 exports.getStockHistoricalPrices = async (req, res) => {
     let {stock} = req.query;
     let url = `https://financialmodelingprep.com/api/v3/historical-price-full/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    console.log(url)
+    // console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
@@ -180,12 +179,15 @@ exports.getUserStocks = async (req, res) => {
     let {stocks, user_id, type_id, sort_type} = req.query;
     let whereType = type_id ? {type_id: +type_id} : {};
     console.log('get user stocks!!!!')
-    console.log(whereType)
+    console.log(sort_type)
+
 
     let order = [[sequelize.col(`user_stocks->users_stocks.position_id`), 'asc']];
 
     if (sort_type === 'A-Z') {
         order = [[sequelize.col(`user_stocks.name`), 'asc']];
+    } else if (sort_type === 'Gain' || sort_type === 'Loss') {
+        order = [[sequelize.col(`user_stocks.change`), sort_type === 'Gain' ? 'desc' : 'asc']];
     }
 
 
@@ -254,17 +256,18 @@ exports.updateUserStocksPriority = async (req, res) => {
     console.log(stocks_order)
     if (stocks_order) {
         await Users.update({stocks_order_type_id: stocks_order.id}, {where: {id: user_id}});
+        if (order_type === 'custom') {
+            rows.map(async (r) => {
+                await UsersStocks.update({position_id: rows.indexOf(r) + 1}, {
+                    where: {
+                        user_id: user_id,
+                        stock_id: r.id
+                    }
+                });
+            });
+        }
+        await usersController.changeJwt({id: user_id}, res);
     }
-    rows.map(async (r) => {
-        await UsersStocks.update({position_id: rows.indexOf(r) + 1}, {
-            where: {
-                user_id: user_id,
-                stock_id: r.id
-            }
-        });
-    });
-
-    res.json('OK');
 };
 
 exports.refreshUserStocks = async (stock, user_id) => {
