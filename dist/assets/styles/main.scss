@@ -280,6 +280,8 @@ li {
 .loader-holder {
     display: flex;
     justify-content: center;
+    height: 50px;
+
 }
 
 .error {
@@ -773,8 +775,19 @@ input, textarea {
     color: $red !important;
 }
 
+.red-bg {
+    background-color: $red !important;
+    color: $white;
+}
+
 .green {
     color: $green !important;
+}
+
+.green-bg {
+    background-color: $green !important;
+    color: $white;
+
 }
 
 mat-optgroup {
