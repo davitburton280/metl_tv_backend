@@ -17,6 +17,7 @@ router.put('/update-user-stocks-priority', validateStock.rules, stocksController
 router.get('/search', stocksController.searchInStockTypeData);
 router.get('/search-in-stock-type-data', stocksController.searchInStockTypeData);
 router.get('/search-in-symbols-only', stocksController.searchStocksBySymbol);
+router.get('/get-custom-stocks-chart-data', stocksController.getCustomStocksChartData);
 // router.get('/session/leave', usersController.leaveSession);
 // router.get('/get-user-info', usersController.getUserInfo);
 // router.post('/change-profile-image', uploadAvatar, usersController.changeAvatar);

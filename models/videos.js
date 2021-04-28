@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
                 through: models.video_tags,
                 foreignKey: 'video_id'
             });
+            videos.belongsTo(models.video_categories, {as: 'category', foreignKey: 'category_id'});
         }
     };
 

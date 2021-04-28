@@ -70,7 +70,6 @@ exports.getStocksByType = async (req, res) => {
 
 };
 
-
 exports.getHistoricalPrices = async (req, res) => {
     let url = `https://financialmodelingprep.com/api/v3/historical-price-full/MSFT,GOOG,AAPL,SPCE,DIS?apikey=${process.env.FMP_CLOUD_API_KEY}&timeseries=1`;
     // let url = `https://financialmodelingprep.com/api/v3/quote/MSFT,GOOG,AAPL,SPCE,DIS?apikey=${process.env.FMP_CLOUD_API_KEY}&timeseries=1`;
@@ -130,6 +129,19 @@ exports.getStockHistoricalPrices = async (req, res) => {
     }
 };
 
+exports.getCustomStocksChartData = async (req, res) => {
+    let {stocks} = req.query;
+    let url = `https://financialmodelingprep.com/api/v3/private/historical-chart/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    // console.log(url)
+    const response = await axios.get(url);
+    if (response.data['Error Message']) {
+        res.status(400).send({msg: response.data['Error Message']})
+    } else {
+
+        res.json(response.data);
+    }
+};
+
 exports.searchStocksBySymbol = async (req, res) => {
     let {search} = req.query;
     let url = `https://financialmodelingprep.com/web/v2/tickers/summary?count=7&symbol=${search}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
@@ -176,7 +188,7 @@ exports.searchInStockTypeData = async (req, res) => {
 };
 
 exports.getUserStocks = async (req, res) => {
-    let {stocks, user_id, type_id, sort_type} = req.query;
+    let {user_id, type_id, sort_type} = req.query;
     let whereType = type_id ? {type_id: +type_id} : {};
     console.log('get user stocks!!!!')
     console.log(sort_type)
@@ -191,7 +203,7 @@ exports.getUserStocks = async (req, res) => {
     }
 
 
-    let user_stocks = await Users.findOne({
+    let userStocks = await Users.findOne({
         where: {id: user_id},
         include: [
             {model: Stocks, as: 'user_stocks', where: whereType},
@@ -199,8 +211,32 @@ exports.getUserStocks = async (req, res) => {
         ], attributes: ['id'],
         order: order
     });
-    // console.log(user_stocks)
-    res.json(user_stocks);
+
+    let stocks = '';
+    userStocks.user_stocks.map((us, index) => {
+        if (index < 9) {
+            stocks += us.symbol + ',';
+        }
+    });
+
+    console.log(stocks)
+
+    let graphDataUrl = `https://financialmodelingprep.com/api/v3/private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    console.log(graphDataUrl)
+    const graphDataResponse = await axios.get(graphDataUrl);
+
+    // graphDataResponse.data.map(i => {
+    //     graphDataResponse.data[i.symbol].map(d => {
+    //         d.name = d.date;
+    //         d.value = d.close;
+    //     });
+    //     i.series = graphDataResponse.data[i.symbol];
+    // });
+
+    if (graphDataResponse.data['Error Message']) {
+        res.status(400).send({msg: graphDataResponse.data['Error Message']})
+    } else res.json(userStocks);
+
 };
 
 
