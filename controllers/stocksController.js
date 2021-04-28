@@ -209,6 +209,7 @@ exports.getUserStocks = async (req, res) => {
             {model: Stocks, as: 'user_stocks', where: whereType},
             {model: StocksOrderType, as: 'stocks_order_type'}
         ], attributes: ['id'],
+        plain: true,
         order: order
     });
 
@@ -219,23 +220,35 @@ exports.getUserStocks = async (req, res) => {
         }
     });
 
-    console.log(stocks)
-
     let graphDataUrl = `https://financialmodelingprep.com/api/v3/private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    console.log(graphDataUrl)
     const graphDataResponse = await axios.get(graphDataUrl);
 
-    // graphDataResponse.data.map(i => {
-    //     graphDataResponse.data[i.symbol].map(d => {
-    //         d.name = d.date;
-    //         d.value = d.close;
-    //     });
-    //     i.series = graphDataResponse.data[i.symbol];
-    // });
+    let ret = {};
+    graphDataResponse.data.map(i => {
+        let symb = i[0];
+        let [symbol, open, low, high, close, date] = i;
+        if (!ret[symb]) {
+            ret[symb] = {
+                symbol,
+                series: [{
+                    open, low, high, value: close, name: date
+                }], ...userStocks.user_stocks.find(us => us.symbol === symb).toJSON()
+            }
+        } else if (ret[symb]['series']) {
+            ret[symb]['series'].push({open, low, high, value: close, name: date});
+        }
+        // graphDataResponse.data[i.symbol].map(d => {
+        //     d.name = d.date;
+        //     d.value = d.close;
+        // });
+        // i.series = graphDataResponse.data[i.symbol];
+    });
+
+    let result = {user_stocks: Object.values(ret), stocks_order_type: userStocks.stocks_order_type};
 
     if (graphDataResponse.data['Error Message']) {
         res.status(400).send({msg: graphDataResponse.data['Error Message']})
-    } else res.json(userStocks);
+    } else res.json(result);
 
 };
 

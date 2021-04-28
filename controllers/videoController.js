@@ -13,7 +13,6 @@ const UsersTags = db.users_tags;
 const usersController = require('../controllers/usersController');
 
 
-const VideoStreams = require('../mongoose/video_streams');
 const to = require('../helpers/getPromiseResult');
 const showIfErrors = require('../helpers/showIfErrors');
 
@@ -146,20 +145,6 @@ exports.saveVideoToken = async (req, res) => {
     } else {
         res.json('OK');
     }
-
-    // const videoStream = await VideoStreams.findOne({token: token});
-    // if (!videoStream) {
-    //     const videoStreams = new VideoStreams(req.body);
-    //     await to(videoStreams.save());
-    // } else {
-    //     console.log(req.body)
-    //     console.log('name', name)
-    //     videoStream.name = name;
-    //     videoStream.save();
-    // }
-
-    // const user = await Users.findOne({where: {username: username}});
-
 };
 
 
@@ -204,20 +189,6 @@ exports.saveVideoData = async (req, res) => {
         });
         await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
 
-
-        // let found = await to(VideoStreams.findOne({status: 'pending', username: data.username}));
-        // console.log(found)
-        // found.name = videoSettings.name;
-        // found.description = videoSettings.description;
-        // found.tags = videoSettings.tags;
-        // found.thumbnail = videoSettings.thumbnail;
-        // found.category = videoSettings.category;
-        // found.author = data.full_name;
-        // found.avatar = data.avatar;
-        // found.filename = data.video_name;
-        // found.status = 'recorded';
-        // await found.save();
-
         res.json('OK');
     })
 
@@ -232,20 +203,6 @@ exports.saveVideoThumbnail = async (req, res) => {
         res.json(file.filename)
     });
 };
-
-
-// exports.saveVideoMessage = async (req, res) => {
-//     const {token, from, message} = req.body;
-//     console.log(token)
-//     const videoStream = await VideoStreams.findOne({token: token});
-//     if (videoStream) {
-//         videoStream.messages.push({from: from, message: message});
-//         videoStream.save();
-//     }
-//     res.json('OK');
-//     console.log(videoStream)
-//
-// };
 
 exports.getCategories = async (req, res) => {
     let data = req.query;
