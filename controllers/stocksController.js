@@ -24,7 +24,6 @@ exports.getStockTypes = async (req, res) => {
     res.json(stockTypes);
 };
 
-
 exports.getMajorIndexes = async (req, res) => {
     let url = `https://financialmodelingprep.com/api/v3/quote-order/%5EDJI,%5EGSPC,%5EIXIC,OVX,BTCUSD,EURUSD?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const indices = await axios.get(url);
@@ -51,6 +50,7 @@ exports.getMajorIndexes = async (req, res) => {
 exports.getStocksByType = async (req, res) => {
     let data = req.query;
     let {type} = data;
+    console.log('get stocks by type!!!!')
 
     let url = `https://financialmodelingprep.com/api/v3/quotes/${type}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     if (type === 'stocks') {
@@ -58,15 +58,45 @@ exports.getStocksByType = async (req, res) => {
     }
     // console.log(url)
     const response = await axios.get(url);
-    let ret = [];
-    response.data.map((d, index) => {
-        // if (index < 50) {
-        ret.push(d)
-        // }
+    // let ret = [];
+    // response.data.map((d, index) => {
+    //     if (index < 50) {
+    //         ret.push(d)
+    //     }
+    // });
+
+    let stocks = '';
+    response.data.map((us, index) => {
+        if (index < 9) {
+            stocks += us.symbol + ',';
+        }
     });
+
+
+    let graphDataUrl = `https://financialmodelingprep.com/api/v3/private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    const graphDataResponse = await axios.get(graphDataUrl);
+
+
+    let ret = {};
+    graphDataResponse.data.map(i => {
+        let symb = i[0];
+        let [symbol, open, low, high, close, date] = i;
+        if (!ret[symb]) {
+            ret[symb] = {
+                symbol,
+                series: [{
+                    open, low, high, value: close, name: date
+                }], ...response.data.find(us => us.symbol === symb)
+            }
+        } else if (ret[symb]['series']) {
+            ret[symb]['series'].push({open, low, high, value: close, name: date});
+        }
+    });
+
+    // console.log(ret)
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
-    } else res.json(ret);
+    } else res.json(Object.values(ret));
 
 };
 
@@ -103,18 +133,18 @@ exports.getStockChartData = async (req, res) => {
 
 };
 
-exports.getStockQuote = async (req, res) => {
-    let {stock} = req.query;
-    let url = `https://financialmodelingprep.com/api/v3/quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    const response = await axios.get(url);
-    if (response.data['Error Message']) {
-        res.status(400).send({msg: response.data['Error Message']})
-    } else {
-
-        res.json(response.data);
-    }
-
-};
+// exports.getStockQuote = async (req, res) => {
+//     let {stock} = req.query;
+//     let url = `https://financialmodelingprep.com/api/v3/quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+//     const response = await axios.get(url);
+//     if (response.data['Error Message']) {
+//         res.status(400).send({msg: response.data['Error Message']})
+//     } else {
+//
+//         res.json(response.data);
+//     }
+//
+// };
 
 exports.getStockHistoricalPrices = async (req, res) => {
     let {stock} = req.query;
@@ -209,7 +239,6 @@ exports.getUserStocks = async (req, res) => {
             {model: Stocks, as: 'user_stocks', where: whereType},
             {model: StocksOrderType, as: 'stocks_order_type'}
         ], attributes: ['id'],
-        plain: true,
         order: order
     });
 
@@ -220,9 +249,13 @@ exports.getUserStocks = async (req, res) => {
         }
     });
 
-    let graphDataUrl = `https://financialmodelingprep.com/api/v3/private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    const graphDataResponse = await axios.get(graphDataUrl);
+    stocks = stocks.slice(0, -1);
+    let stockNamesArr = stocks.split(',');
 
+
+    let graphDataUrl = `https://financialmodelingprep.com/api/v3/private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    const graphDataResponse = await axios.get(graphDataUrl);
+    console.log(graphDataUrl)
     let ret = {};
     graphDataResponse.data.map(i => {
         let symb = i[0];
@@ -244,7 +277,12 @@ exports.getUserStocks = async (req, res) => {
         // i.series = graphDataResponse.data[i.symbol];
     });
 
-    let result = {user_stocks: Object.values(ret), stocks_order_type: userStocks.stocks_order_type};
+    console.log(stockNamesArr)
+    let r = Object.values(ret);
+    let ress = r.sort((a, b) => stockNamesArr.indexOf(a.symbol) - stockNamesArr.indexOf(b.symbol))
+    console.log(ress.map(r => r.symbol))
+
+    let result = {user_stocks: r, stocks_order_type: userStocks.stocks_order_type};
 
     if (graphDataResponse.data['Error Message']) {
         res.status(400).send({msg: graphDataResponse.data['Error Message']})
@@ -298,14 +336,14 @@ exports.updateUserStocks = async (req, res) => {
 };
 
 exports.updateUserStocksPriority = async (req, res) => {
-    let {user_id, rows, order_type} = req.body;
+    let {user_id, rows, order_type, changeSortTypeOnly} = req.body;
     rows = JSON.parse(rows);
     console.log('priority update!!!')
     let stocks_order = await StocksOrderType.findOne({where: {value: order_type}, raw: true, attributes: ['id']});
     console.log(stocks_order)
     if (stocks_order) {
         await Users.update({stocks_order_type_id: stocks_order.id}, {where: {id: user_id}});
-        if (order_type === 'custom') {
+        if (order_type === 'custom' && !changeSortTypeOnly) {
             rows.map(async (r) => {
                 await UsersStocks.update({position_id: rows.indexOf(r) + 1}, {
                     where: {
@@ -319,12 +357,14 @@ exports.updateUserStocksPriority = async (req, res) => {
     }
 };
 
-exports.refreshUserStocks = async (stock, user_id) => {
-    console.log({user_id: user_id, stock_id: stock.id})
-    // let userStocksFind = await UsersStocks.findOne({where: {user_id: user_id, stock_id: stock.id}});
+exports.getBatchResults = async (req, res) => {
+    let {stocks} = req.query;
+    let url = `https://financialmodelingprep.com/api/v3/quote/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    const response = await axios.get(url);
+    if (response.data['Error Message']) {
+        res.status(400).send({msg: response.data['Error Message']})
+    } else {
 
-    // if (!userStocksFind) {
-
-
-    // }
+        res.json(response.data);
+    }
 };

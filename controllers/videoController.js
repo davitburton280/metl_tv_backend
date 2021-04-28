@@ -36,7 +36,8 @@ exports.getVideos = async (req, res) => {
     let whereFilters = this.getVideoFiltersQuery(filters);
     let whereTag = tag ? {name: tag} : {};
     let wherePrivacy = user_id ? {} : {name: 'Public'};
-    let whereCategory = filters.category ? sequelize.where(sequelize.col('`category`.`name`'), filters.category.name)
+    let whereCategory = filters.category && filters.category.name !== 'All'
+        ? sequelize.where(sequelize.col('`category`.`name`'), filters.category.name)
         : {};
     console.log('get videos!!!')
     let v = await Videos.findAll({
@@ -228,7 +229,9 @@ exports.getUserVideos = async (req, res) => {
     let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
     let filters = data.filters ? JSON.parse(data.filters) : {};
     let whereFilters = this.getVideoFiltersQuery(filters);
-    let whereCategory = filters.category ? sequelize.where(sequelize.col('`videos->category`.`name`'), filters.category.name) : {};
+    let whereCategory = filters.category && filters.category.name !== 'All'
+        ? sequelize.where(sequelize.col('`videos->category`.`name`'), filters.category.name)
+        : {};
     // let wherePrivacy = user_id ? {}:  {name: 'Public'};
 
     let v = await Users.findOne({
