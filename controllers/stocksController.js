@@ -77,6 +77,8 @@ exports.getStocksByType = async (req, res) => {
             });
 
             ret.push({...r, series: graphDataResponse.data[r.symbol]})
+        } else {
+            ret.push(r)
         }
     });
 
