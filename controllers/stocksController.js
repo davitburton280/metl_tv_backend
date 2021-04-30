@@ -11,8 +11,10 @@ const StockTypes = db.stock_types;
 const showIfErrors = require('../helpers/showIfErrors');
 const usersController = require('./usersController');
 
+const config = require('../config/constants');
+
 exports.getDailyStocks = async (req, res) => {
-    let url = `https://financialmodelingprep.com/api/v3/ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
@@ -25,13 +27,12 @@ exports.getStockTypes = async (req, res) => {
 };
 
 exports.getMajorIndexes = async (req, res) => {
-    let url = `https://financialmodelingprep.com/api/v3/quote-order/%5EDJI,%5EGSPC,%5EIXIC,OVX,BTCUSD,EURUSD?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}quote-order/%5EDJI,%5EGSPC,%5EIXIC,OVX,BTCUSD,EURUSD?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const indices = await axios.get(url);
 
-    let graphDataUrl = `https://financialmodelingprep.com/api/v3/historical-chart-menu?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let graphDataUrl = `${config.FMP_API_V3_URL}historical-chart-menu?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const graphDataResponse = await axios.get(graphDataUrl);
 
-    let ret = {};
     indices.data.map(i => {
         graphDataResponse.data[i.symbol].map(d => {
             d.name = d.date;
@@ -39,8 +40,6 @@ exports.getMajorIndexes = async (req, res) => {
         });
         i.series = graphDataResponse.data[i.symbol];
     });
-
-    // console.log(indices.data[0]);
 
     if (graphDataResponse.data['Error Message']) {
         res.status(400).send({msg: graphDataResponse.data['Error Message']})
@@ -52,58 +51,43 @@ exports.getStocksByType = async (req, res) => {
     let {type} = data;
     console.log('get stocks by type!!!!')
 
-    let url = `https://financialmodelingprep.com/api/v3/quotes/${type}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}quotes/${type}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     if (type === 'stocks') {
-        url = `https://financialmodelingprep.com/api/v3/private/quotes?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+        url = `${config.FMP_API_V3_URL}private/quotes?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     }
-    // console.log(url)
     const response = await axios.get(url);
-    // let ret = [];
-    // response.data.map((d, index) => {
-    //     if (index < 50) {
-    //         ret.push(d)
-    //     }
-    // });
-
     let stocks = '';
     response.data.map((us, index) => {
-        if (index < 9) {
+        if (index < 13) {
             stocks += us.symbol + ',';
         }
     });
 
-
-    let graphDataUrl = `https://financialmodelingprep.com/api/v3/private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const graphDataResponse = await axios.get(graphDataUrl);
 
 
-    let ret = {};
-    graphDataResponse.data.map(i => {
-        let symb = i[0];
-        let [symbol, open, low, high, close, date] = i;
-        if (!ret[symb]) {
-            ret[symb] = {
-                symbol,
-                series: [{
-                    open, low, high, value: close, name: date
-                }], ...response.data.find(us => us.symbol === symb)
-            }
-        } else if (ret[symb]['series']) {
-            ret[symb]['series'].push({open, low, high, value: close, name: date});
+    let ret = [];
+    response.data.map((r) => {
+        if (graphDataResponse.data[r.symbol]) {
+
+            graphDataResponse.data[r.symbol].map(d => {
+                d.name = d.date;
+                d.value = d.close;
+            });
+
+            ret.push({...r, series: graphDataResponse.data[r.symbol]})
         }
     });
 
-    // console.log(ret)
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
-    } else res.json(Object.values(ret));
+    } else res.json(ret);
 
 };
 
 exports.getHistoricalPrices = async (req, res) => {
-    let url = `https://financialmodelingprep.com/api/v3/historical-price-full/MSFT,GOOG,AAPL,SPCE,DIS?apikey=${process.env.FMP_CLOUD_API_KEY}&timeseries=1`;
-    // let url = `https://financialmodelingprep.com/api/v3/quote/MSFT,GOOG,AAPL,SPCE,DIS?apikey=${process.env.FMP_CLOUD_API_KEY}&timeseries=1`;
-    // let url = `https://financialmodelingprep.com/api/v3/ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}historical-price-full/MSFT,GOOG,AAPL,SPCE,DIS?apikey=${process.env.FMP_CLOUD_API_KEY}&timeseries=1`;
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
@@ -112,12 +96,10 @@ exports.getHistoricalPrices = async (req, res) => {
 
 exports.getStockChartData = async (req, res) => {
     let {stock} = req.query;
-    let chartUrl = `https://financialmodelingprep.com/api/v3/historical-chart/1min/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}&limit=600`;
-    // console.log(chartUrl)
+    let chartUrl = `${config.FMP_API_V3_URL}historical-chart/1min/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}&limit=600`;
     const chartData = await axios.get(chartUrl);
-    // console.log(chartData.data.length)
 
-    let tableDataUrl = `https://financialmodelingprep.com/api/v3/quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let tableDataUrl = `${config.FMP_API_V3_URL}quote/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const tableData = await axios.get(tableDataUrl);
 
     let ret = {chart: [{series: [], name: stock}], table: tableData.data};
@@ -148,7 +130,7 @@ exports.getStockChartData = async (req, res) => {
 
 exports.getStockHistoricalPrices = async (req, res) => {
     let {stock} = req.query;
-    let url = `https://financialmodelingprep.com/api/v3/historical-price-full/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}historical-price-full/${stock}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     // console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
@@ -161,7 +143,7 @@ exports.getStockHistoricalPrices = async (req, res) => {
 
 exports.getCustomStocksChartData = async (req, res) => {
     let {stocks} = req.query;
-    let url = `https://financialmodelingprep.com/api/v3/private/historical-chart/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}private/historical-chart/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     // console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
@@ -174,7 +156,7 @@ exports.getCustomStocksChartData = async (req, res) => {
 
 exports.searchStocksBySymbol = async (req, res) => {
     let {search} = req.query;
-    let url = `https://financialmodelingprep.com/web/v2/tickers/summary?count=7&symbol=${search}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_URL}web/v2/tickers/summary?count=7&symbol=${search}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
 
     const response = await axios.get(url);
     if (response.data['Error Message']) {
@@ -188,7 +170,7 @@ exports.searchStocksBySymbol = async (req, res) => {
 exports.searchInStockTypeData = async (req, res) => {
     let {search, stockType, grouped} = req.query;
     let exchanges = grouped ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : (stockType === 'stocks' ? 'AMEX,NASDAQ,NYSE' : stockType);
-    let url = `https://financialmodelingprep.com/api/v3/search?query=${search}&limit=20&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}search?query=${search}&limit=20&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
@@ -221,7 +203,6 @@ exports.getUserStocks = async (req, res) => {
     let {user_id, type_id, sort_type} = req.query;
     let whereType = type_id ? {type_id: +type_id} : {};
     console.log('get user stocks!!!!')
-    console.log(sort_type)
 
 
     let order = [[sequelize.col(`user_stocks->users_stocks.position_id`), 'asc']];
@@ -243,53 +224,42 @@ exports.getUserStocks = async (req, res) => {
     });
 
     if (userStocks) {
-
-
         let stocks = '';
         userStocks.user_stocks.map((us, index) => {
-            if (index < 9) {
+            if (index < 13) {
                 stocks += us.symbol + ',';
             }
         });
 
         stocks = stocks.slice(0, -1);
-        let stockNamesArr = stocks.split(',');
+        let stocksArr = stocks.split(',');
+        console.log(stocksArr)
 
-
-        let graphDataUrl = `https://financialmodelingprep.com/api/v3/private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-        const graphDataResponse = await axios.get(graphDataUrl);
+        console.log("USER STOCKS TOTAL:" + userStocks.user_stocks.length)
+        let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
         console.log(graphDataUrl)
-        let ret = {};
-        graphDataResponse.data.map(i => {
-            let symb = i[0];
-            let [symbol, open, low, high, close, date] = i;
-            if (!ret[symb]) {
-                ret[symb] = {
-                    symbol,
-                    series: [{
-                        open, low, high, value: close, name: date
-                    }], ...userStocks.user_stocks.find(us => us.symbol === symb).toJSON()
-                }
-            } else if (ret[symb]['series']) {
-                ret[symb]['series'].push({open, low, high, value: close, name: date});
+        const graphDataResponse = await axios.get(graphDataUrl);
+        console.log("URL STOCKS TOTAL:" + stocksArr.length)
+
+        let ret = [];
+        userStocks.user_stocks.map((us, index) => {
+            if (graphDataResponse.data[us.symbol]) {
+
+                graphDataResponse.data[us.symbol].map(d => {
+                    d.name = d.date;
+                    d.value = d.close;
+                });
+
+                ret.push({...us.toJSON(), series: graphDataResponse.data[us.symbol]})
             }
-            // graphDataResponse.data[i.symbol].map(d => {
-            //     d.name = d.date;
-            //     d.value = d.close;
-            // });
-            // i.series = graphDataResponse.data[i.symbol];
         });
 
-        console.log(stockNamesArr)
-        let r = Object.values(ret);
-        let ress = r.sort((a, b) => stockNamesArr.indexOf(a.symbol) - stockNamesArr.indexOf(b.symbol))
-        console.log(ress.map(r => r.symbol))
-
-        let result = {user_stocks: r, stocks_order_type: userStocks.stocks_order_type};
+        let result = {user_stocks: ret, stocks_order_type: userStocks.stocks_order_type};
+        console.log(ret.length)
 
         if (graphDataResponse.data['Error Message']) {
             res.status(400).send({msg: graphDataResponse.data['Error Message']})
-        } else res.json(result);
+        } else res.json(result)
     } else {
         res.json(userStocks)
     }
@@ -345,7 +315,6 @@ exports.updateUserStocksPriority = async (req, res) => {
     rows = JSON.parse(rows);
     console.log('priority update!!!')
     let stocks_order = await StocksOrderType.findOne({where: {value: order_type}, raw: true, attributes: ['id']});
-    console.log(stocks_order)
     if (stocks_order) {
         await Users.update({stocks_order_type_id: stocks_order.id}, {where: {id: user_id}});
         if (order_type === 'custom' && !changeSortTypeOnly) {
@@ -364,7 +333,7 @@ exports.updateUserStocksPriority = async (req, res) => {
 
 exports.getBatchResults = async (req, res) => {
     let {stocks} = req.query;
-    let url = `https://financialmodelingprep.com/api/v3/quote/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}quote/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
