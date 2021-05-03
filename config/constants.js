@@ -4,6 +4,7 @@ module.exports = {
     NUMBER_AFTER_TEXT_PATTERN: /^[a-zA-Z ]/,
     TEXT_ONLY_WITH_SPECIALS_PATTERN: /^[a-zA-Z -/]*$/,
     FMP_URL: 'https://financialmodelingprep.com/',
-    FMP_API_V3_URL: 'https://financialmodelingprep.com/api/v3/'
+    FMP_API_V3_URL: 'https://financialmodelingprep.com/api/v3/',
+    MAX_STOCKS_COUNT_FOR_BATCH: 14
 };
 

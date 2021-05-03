@@ -13,6 +13,7 @@ const usersController = require('./usersController');
 
 const config = require('../config/constants');
 
+
 exports.getDailyStocks = async (req, res) => {
     let url = `${config.FMP_API_V3_URL}ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const response = await axios.get(url);
@@ -51,31 +52,26 @@ exports.getStocksByType = async (req, res) => {
     let {type} = data;
     console.log('get stocks by type!!!!')
 
-    let url = `${config.FMP_API_V3_URL}quotes/${type}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    if (type === 'stocks') {
-        url = `${config.FMP_API_V3_URL}private/quotes?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    }
-    const response = await axios.get(url);
+    let urlPart = type === 'stocks' ? `private/quotes` : `quotes/${type}`;
+    const response = await axios.get(`${config.FMP_API_V3_URL}${urlPart}?apikey=${process.env.FMP_CLOUD_API_KEY}`);
     let stocks = '';
-    response.data.map((us, index) => {
-        if (index < 13) {
+    response.data.map((us, i) => {
+        if (i < config.MAX_STOCKS_COUNT_FOR_BATCH) {
             stocks += us.symbol + ',';
         }
     });
 
+
     let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const graphDataResponse = await axios.get(graphDataUrl);
-
 
     let ret = [];
     response.data.map((r) => {
         if (graphDataResponse.data[r.symbol]) {
-
             graphDataResponse.data[r.symbol].map(d => {
                 d.name = d.date;
                 d.value = d.close;
             });
-
             ret.push({...r, series: graphDataResponse.data[r.symbol]})
         } else {
             ret.push(r)
@@ -146,60 +142,14 @@ exports.getStockHistoricalPrices = async (req, res) => {
 exports.getCustomStocksChartData = async (req, res) => {
     let {stocks} = req.query;
     let url = `${config.FMP_API_V3_URL}private/historical-chart/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    // console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
     } else {
-
         res.json(response.data);
     }
 };
 
-exports.searchStocksBySymbol = async (req, res) => {
-    let {search} = req.query;
-    let url = `${config.FMP_URL}web/v2/tickers/summary?count=7&symbol=${search}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
-
-    const response = await axios.get(url);
-    if (response.data['Error Message']) {
-        res.status(400).send({msg: response.data['Error Message']})
-    } else {
-
-        res.json(response.data);
-    }
-};
-
-exports.searchInStockTypeData = async (req, res) => {
-    let {search, stockType, grouped} = req.query;
-    let exchanges = grouped ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : (stockType === 'stocks' ? 'AMEX,NASDAQ,NYSE' : stockType);
-    let url = `${config.FMP_API_V3_URL}search?query=${search}&limit=20&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    console.log(url)
-    const response = await axios.get(url);
-    if (response.data['Error Message']) {
-        res.status(400).send({msg: response.data['Error Message']})
-    } else {
-        let ret = [];
-
-        if (grouped) {
-            response.data.map((item, index) => {
-                if (['NYSE', 'AMEX', 'NASDAQ'].indexOf(item.exchangeShortName) !== -1) {
-                    item.exchangeShortName = 'STOCKS'
-                }
-                let indexOfFoundInRet = ret.indexOf(ret.find(d => d.name === item.exchangeShortName));
-                let firstOccurrence = response.data.indexOf(response.data.find(d => d.exchangeShortName === item.exchangeShortName));
-                if (firstOccurrence === index) {
-                    ret.push({name: item.exchangeShortName, stocks: [item]});
-                } else if (indexOfFoundInRet !== -1) {
-                    ret[indexOfFoundInRet].stocks.push(item)
-                }
-            });
-        } else {
-            ret = response.data;
-        }
-
-        res.json(ret);
-    }
-};
 
 exports.getUserStocks = async (req, res) => {
     let {user_id, type_id, sort_type} = req.query;
@@ -228,20 +178,16 @@ exports.getUserStocks = async (req, res) => {
     if (userStocks) {
         let stocks = '';
         userStocks.user_stocks.map((us, index) => {
-            if (index < 13) {
+            if (index <= config.MAX_STOCKS_COUNT_FOR_BATCH) {
                 stocks += us.symbol + ',';
             }
         });
 
         stocks = stocks.slice(0, -1);
-        let stocksArr = stocks.split(',');
-        console.log(stocksArr)
 
-        console.log("USER STOCKS TOTAL:" + userStocks.user_stocks.length)
         let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
         console.log(graphDataUrl)
         const graphDataResponse = await axios.get(graphDataUrl);
-        console.log("URL STOCKS TOTAL:" + stocksArr.length)
 
         let ret = [];
         userStocks.user_stocks.map((us, index) => {
@@ -257,7 +203,6 @@ exports.getUserStocks = async (req, res) => {
         });
 
         let result = {user_stocks: ret, stocks_order_type: userStocks.stocks_order_type};
-        console.log(ret.length)
 
         if (graphDataResponse.data['Error Message']) {
             res.status(400).send({msg: graphDataResponse.data['Error Message']})
@@ -265,6 +210,32 @@ exports.getUserStocks = async (req, res) => {
     } else {
         res.json(userStocks)
     }
+};
+
+
+exports.getStocksGraphData = async (req, res) => {
+    let {stocks} = req.query;
+
+
+    let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let stocksArr = stocks.split(',');
+
+    const graphDataResponse = await axios.get(graphDataUrl);
+    console.log('get stocks graph data!!!!')
+
+    let ret = [];
+    stocksArr.map((symbol) => {
+        if (graphDataResponse.data[symbol]) {
+            graphDataResponse.data[symbol].map(d => {
+                d.name = d.date;
+                d.value = d.close;
+            });
+
+            ret.push({...{symbol}, series: graphDataResponse.data[symbol]})
+        }
+    });
+
+    res.json(ret)
 };
 
 
@@ -333,6 +304,51 @@ exports.updateUserStocksPriority = async (req, res) => {
     }
 };
 
+exports.searchStocksBySymbol = async (req, res) => {
+    let {search} = req.query;
+    let url = `${config.FMP_URL}web/v2/tickers/summary?count=7&symbol=${search}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+
+    const response = await axios.get(url);
+    if (response.data['Error Message']) {
+        res.status(400).send({msg: response.data['Error Message']})
+    } else {
+
+        res.json(response.data);
+    }
+};
+
+exports.searchInStockTypeData = async (req, res) => {
+    let {search, stockType, grouped} = req.query;
+    let exchanges = grouped ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : (stockType === 'stocks' ? 'AMEX,NASDAQ,NYSE' : stockType);
+    let url = `${config.FMP_API_V3_URL}search?query=${search}&limit=20&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    console.log(url)
+    const response = await axios.get(url);
+    if (response.data['Error Message']) {
+        res.status(400).send({msg: response.data['Error Message']})
+    } else {
+        let ret = [];
+
+        if (grouped) {
+            response.data.map((item, index) => {
+                if (['NYSE', 'AMEX', 'NASDAQ'].indexOf(item.exchangeShortName) !== -1) {
+                    item.exchangeShortName = 'STOCKS'
+                }
+                let indexOfFoundInRet = ret.indexOf(ret.find(d => d.name === item.exchangeShortName));
+                let firstOccurrence = response.data.indexOf(response.data.find(d => d.exchangeShortName === item.exchangeShortName));
+                if (firstOccurrence === index) {
+                    ret.push({name: item.exchangeShortName, stocks: [item]});
+                } else if (indexOfFoundInRet !== -1) {
+                    ret[indexOfFoundInRet].stocks.push(item)
+                }
+            });
+        } else {
+            ret = response.data;
+        }
+
+        res.json(ret);
+    }
+};
+
 exports.getBatchResults = async (req, res) => {
     let {stocks} = req.query;
     let url = `${config.FMP_API_V3_URL}quote/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
@@ -340,7 +356,6 @@ exports.getBatchResults = async (req, res) => {
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
     } else {
-
         res.json(response.data);
     }
 };
