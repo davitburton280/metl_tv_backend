@@ -320,7 +320,7 @@ exports.searchStocksBySymbol = async (req, res) => {
 exports.searchInStockTypeData = async (req, res) => {
     let {search, stockType, grouped} = req.query;
     let exchanges = grouped ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : (stockType === 'stocks' ? 'AMEX,NASDAQ,NYSE' : stockType);
-    let url = `${config.FMP_API_V3_URL}search?query=${search}&limit=20&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    let url = `${config.FMP_API_V3_URL}search?query=${search}&limit=5&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
