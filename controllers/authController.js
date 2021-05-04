@@ -109,7 +109,7 @@ exports.sendVerificationCode = async (req, res) => {
                 res.status(500).json({msg: error.toString()})
             } else if (info) {
                 if (!data.resend) {
-                    this.register(req, res);
+                    // this.register(req, res);
                 } else {
                     console.log(data)
                     await Users.update({verification_code: data.verification_code}, {where: {email: data.email}});
