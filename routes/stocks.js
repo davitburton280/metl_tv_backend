@@ -15,7 +15,7 @@ router.get('/get-user-stocks', stocksController.getUserStocks);
 router.put('/update-user-stocks', validateStock.rules, stocksController.updateUserStocks);
 router.put('/update-user-stocks-priority', validateStock.rules, stocksController.updateUserStocksPriority);
 router.get('/search', stocksController.searchInStockTypeData);
-router.get('/search-in-stock-type-data', stocksController.searchInStockTypeData);
+router.get('/search-in-typed-stocks-data', stocksController.searchInStockTypeData);
 router.get('/search-in-symbols-only', stocksController.searchStocksBySymbol);
 router.get('/get-custom-stocks-chart-data', stocksController.getCustomStocksChartData);
 router.get('/get-batch-results', stocksController.getBatchResults);
