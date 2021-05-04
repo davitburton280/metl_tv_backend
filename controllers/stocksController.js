@@ -321,7 +321,6 @@ exports.searchInStockTypeData = async (req, res) => {
     let {search, stockType, grouped} = req.query;
     let exchanges = grouped ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : (stockType === 'stocks' ? 'AMEX,NASDAQ,NYSE' : stockType);
     let url = `${config.FMP_API_V3_URL}search?query=${search}&limit=14&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    console.log(url)
     const response = await axios.get(url);
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
@@ -341,11 +340,32 @@ exports.searchInStockTypeData = async (req, res) => {
                     ret[indexOfFoundInRet].stocks.push(item)
                 }
             });
+
+            res.json(ret);
         } else {
             ret = response.data;
+            let stocks = '';
+            ret.map((us, index) => {
+                if (index <= config.MAX_STOCKS_COUNT_FOR_BATCH) {
+                    stocks += us.symbol + ',';
+                }
+            });
+
+            let url = `${config.FMP_API_V3_URL}quote/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+            const resp = await axios.get(url);
+
+            let result = [];
+            resp.data.map(r => {
+                let foundStock = ret.find(st => st.symbol === r.symbol);
+                if (foundStock) {
+                    result.push({...foundStock, ...r});
+                }
+            });
+
+            res.json(result)
         }
 
-        res.json(ret);
+
     }
 };
 
