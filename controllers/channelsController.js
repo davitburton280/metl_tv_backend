@@ -29,7 +29,7 @@ exports.getSubscriptions = async (req, res) => {
             include: [{model: Videos, as: 'videos', attributes: ['id']}, {model: Users, as: 'user'}]
         }]
     });
-    console.log(channels.subscriptions)
+    console.log(channels)
     res.json(channels);
 };
 
