@@ -178,7 +178,7 @@ exports.getUserStocks = async (req, res) => {
     if (userStocks) {
         let stocks = '';
         userStocks.user_stocks.map((us, index) => {
-            if (index <= config.MAX_STOCKS_COUNT_FOR_BATCH) {
+            if (index < config.MAX_STOCKS_COUNT_FOR_BATCH) {
                 stocks += us.symbol + ',';
             }
         });
@@ -346,7 +346,7 @@ exports.searchInStockTypeData = async (req, res) => {
             ret = response.data;
             let stocks = '';
             ret.map((us, index) => {
-                if (index <= config.MAX_STOCKS_COUNT_FOR_BATCH) {
+                if (index < config.MAX_STOCKS_COUNT_FOR_BATCH) {
                     stocks += us.symbol + ',';
                 }
             });
