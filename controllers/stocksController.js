@@ -203,7 +203,7 @@ exports.getUserStocks = async (req, res) => {
         });
 
         let result = {user_stocks: ret, stocks_order_type: userStocks.stocks_order_type};
-
+        console.log('result ready!!!')
         if (graphDataResponse.data['Error Message']) {
             res.status(400).send({msg: graphDataResponse.data['Error Message']})
         } else res.json(result)
@@ -247,8 +247,6 @@ exports.updateUserStocks = async (req, res) => {
         if (type_id) {
             where.type_id = type_id
         }
-
-
         await UsersStocks.destroy({where: where});
 
         let all = stocks.map(async (st, index) => {
@@ -319,15 +317,17 @@ exports.searchStocksBySymbol = async (req, res) => {
 
 exports.searchInStockTypeData = async (req, res) => {
     let {search, stockType, grouped} = req.query;
+
     let exchanges = grouped ? 'ETF,CRYPTO,FOREX,AMEX,NASDAQ,NYSE' : (stockType === 'stocks' ? 'AMEX,NASDAQ,NYSE' : stockType);
     let url = `${config.FMP_API_V3_URL}search?query=${search}&limit=14&exchange=${exchanges}&apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const response = await axios.get(url);
+    // console.log(response.data)
     if (response.data['Error Message']) {
         res.status(400).send({msg: response.data['Error Message']})
     } else {
         let ret = [];
+        if (+grouped) {
 
-        if (grouped) {
             response.data.map((item, index) => {
                 if (['NYSE', 'AMEX', 'NASDAQ'].indexOf(item.exchangeShortName) !== -1) {
                     item.exchangeShortName = 'STOCKS'
@@ -345,23 +345,35 @@ exports.searchInStockTypeData = async (req, res) => {
         } else {
             ret = response.data;
             let stocks = '';
+
+            let stockTypes = await StockTypes.findAll({raw: true});
+
             ret.map((us, index) => {
+                if (['NYSE', 'AMEX', 'NASDAQ'].indexOf(us.exchangeShortName) !== -1) {
+                    us.exchangeShortName = 'STOCKS'
+                }
                 if (index < config.MAX_STOCKS_COUNT_FOR_BATCH) {
                     stocks += us.symbol + ',';
                 }
-            });
-
-            let url = `${config.FMP_API_V3_URL}quote/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-            const resp = await axios.get(url);
-
-            let result = [];
-            resp.data.map(r => {
-                let foundStock = ret.find(st => st.symbol === r.symbol);
-                if (foundStock) {
-                    result.push({...foundStock, ...r});
+                let foundStockType = stockTypes.find(st => us.exchangeShortName.toLowerCase() === st.value);
+                if (foundStockType) {
+                    us.type_id = foundStockType.id;
                 }
             });
 
+            let result = [];
+            if (stocks) {
+                let url = `${config.FMP_API_V3_URL}quote/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+                console.log(url)
+                const resp = await axios.get(url);
+
+                resp.data.map(r => {
+                    let foundStock = ret.find(st => st.symbol === r.symbol);
+                    if (foundStock) {
+                        result.push({...foundStock, ...r});
+                    }
+                });
+            }
             res.json(result)
         }
 
