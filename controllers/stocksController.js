@@ -186,9 +186,7 @@ exports.getUserStocks = async (req, res) => {
         stocks = stocks.slice(0, -1);
 
         let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-        console.log(graphDataUrl)
         const graphDataResponse = await axios.get(graphDataUrl);
-
         let ret = [];
         userStocks.user_stocks.map((us, index) => {
             if (graphDataResponse.data[us.symbol]) {
@@ -199,8 +197,11 @@ exports.getUserStocks = async (req, res) => {
                 });
 
                 ret.push({...us.toJSON(), series: graphDataResponse.data[us.symbol]})
+            } else {
+                ret.push({...us.toJSON()});
             }
         });
+
 
         let result = {user_stocks: ret, stocks_order_type: userStocks.stocks_order_type};
         console.log('result ready!!!')
