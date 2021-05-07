@@ -12,12 +12,13 @@ const rules = [
     body().custom(async (req) => {
         let stocks = req.stocks;
         console.log('validation!!!')
+        console.log(stocks.length)
         // stocks.map(st =>{
         //    let found = await Stocks.findOne({})
         // });
         //
         //
-        // if (tags.length > 3) throw new Error('We support only 3 tags per video');
+        if (stocks.length > 14) throw new Error('We support not more than 14 tags per user');
         return true;
     })
 ];
