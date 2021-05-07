@@ -18,7 +18,7 @@ exports.login = async (req, res) => {
         // Getting request data and setting user fields to return
         let {email} = req.body;
 
-        let attributes = [`full_name`, 'email', 'username', 'birthday', 'avatar', 'cover', 'password', 'stocks_order_type_id','id', 'status_id'];
+        let attributes = [`full_name`, 'email', 'username', 'birthday', 'avatar', 'cover', 'password', 'stocks_order_type_id', 'id', 'status_id'];
 
         // Active status selecting
         let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
@@ -26,7 +26,7 @@ exports.login = async (req, res) => {
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
             attributes: attributes,
-            include: [{model: Channels, as: 'channel'},  {model: StocksOrderType, as: 'stocks_order_type'}],
+            include: [{model: Channels, as: 'channel'}, {model: StocksOrderType, as: 'stocks_order_type'}],
             where: {email: email} //userTypeWhere
 
         }, res);
@@ -109,7 +109,7 @@ exports.sendVerificationCode = async (req, res) => {
                 res.status(500).json({msg: error.toString()})
             } else if (info) {
                 if (!data.resend) {
-                    // this.register(req, res);
+                    this.register(req, res);
                 } else {
                     console.log(data)
                     await Users.update({verification_code: data.verification_code}, {where: {email: data.email}});
@@ -204,7 +204,13 @@ exports.register = async (req, res) => {
         // Saving the original password of user and hashing it to save in db
         let originalPass = data.password;
         data.password = bcrypt.hashSync(originalPass, 10);
+
+        // Setting default stocks ordering type to 'alphabetical'
+        let stocksOrderingType = await StocksOrderType.findOne({where: {value: 'alphabetical'}, attributes: ['id']});
+        data.stocks_order_type_id = stocksOrderingType.id;
+
         console.log(data)
+
         let user = await Users.create(data);
         await Channels.create({name: data.full_name, user_id: user.id, avatar: user.avatar, cover: user.cover});
 

@@ -11,7 +11,7 @@ const rules = [
         // if (!user) throw new Error('A user with such email doesn\'t exist');
 
         console.log('!!!!!!!!!!')
-        console.log(user.verification_code, req.code)
+        console.log(user)
         console.log('!!!!!!!!!!')
         if (user.verification_code !== +req.code) {
             throw new Error('Verification code is wrong')
