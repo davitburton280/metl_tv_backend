@@ -18,7 +18,7 @@ const rules = [
         // });
         //
         //
-        if (stocks.length > 14) throw new Error('We support not more than 14 tags per user');
+        if (stocks.length > 25) throw new Error('We support not more than 25 stocks per user');
         return true;
     })
 ];
