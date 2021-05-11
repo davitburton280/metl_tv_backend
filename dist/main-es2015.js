@@ -13149,7 +13149,7 @@ __webpack_require__.r(__webpack_exports__);
 const environment = {
     apiUrl: 'https://staging.metl.tv/',
     envName: 'staging',
-    production: true
+    production: false
 };
 
 

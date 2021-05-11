@@ -26407,7 +26407,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var environment = {
       apiUrl: 'https://staging.metl.tv/',
       envName: 'staging',
-      production: true
+      production: false
     };
     /***/
   },
