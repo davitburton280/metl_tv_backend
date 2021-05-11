@@ -169,8 +169,11 @@ exports.getUserStocks = async (req, res) => {
     let userStocks = await Users.findOne({
         where: {id: user_id},
         include: [
-            {model: Stocks, as: 'user_stocks', where: whereType},
-            {model: StocksOrderType, as: 'stocks_order_type'}
+            {model: Stocks, as: 'user_stocks', where: whereType,
+                // include: [{model: StockTypes, as: 'types'}]
+            },
+            {model: StocksOrderType, as: 'stocks_order_type'},
+
         ], attributes: ['id'],
         order: order
     });
