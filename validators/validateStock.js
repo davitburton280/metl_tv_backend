@@ -20,7 +20,8 @@ const rules = [
                 ]
             });
             console.log(req.stocks.length)
-            if (req.stocks.length >= 25) throw new Error('We support not more than 25 stocks per user');
+            console.log(userStocks.user_stocks.length)
+            if (userStocks.user_stocks.length > 25) throw new Error('We support not more than 25 stocks per user');
             return true;
         })
     ]
