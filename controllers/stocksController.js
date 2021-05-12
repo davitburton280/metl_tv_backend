@@ -174,7 +174,8 @@ exports.getUserStocks = async (req, res) => {
     let userStocks = await Users.findOne({
         where: {id: user_id},
         include: [
-            {model: Stocks, as: 'user_stocks', where: whereType,
+            {
+                model: Stocks, as: 'user_stocks', where: whereType,
                 // include: [{model: StockTypes, as: 'types'}]
             },
             {model: StocksOrderType, as: 'stocks_order_type'},
@@ -186,14 +187,16 @@ exports.getUserStocks = async (req, res) => {
     if (userStocks) {
         let stocks = '';
         userStocks.user_stocks.map((us, index) => {
-            if (index < config.MAX_STOCKS_COUNT_FOR_BATCH) {
-                stocks += us.symbol + ',';
-            }
+            // if (index < config.MAX_STOCKS_COUNT_FOR_BATCH) {
+            stocks += us.symbol + ',';
+            // }
         });
 
         stocks = stocks.slice(0, -1);
 
         let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+        console.log(graphDataUrl)
+        console.log(userStocks.user_stocks.length)
         const graphDataResponse = await axios.get(graphDataUrl);
         let ret = [];
         userStocks.user_stocks.map((us, index) => {
