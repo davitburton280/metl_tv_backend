@@ -7,6 +7,7 @@ router.get('/get-daily', stocksController.getDailyStocks);
 router.get('/get-by-type', stocksController.getStocksByType);
 router.get('/get-by-sort-type', stocksController.getUserStocks);
 router.get('/get-types', stocksController.getStockTypes);
+router.get('/get-sort-types', stocksController.getStockSortTypes);
 router.get('/get-indices', stocksController.getMajorIndexes);
 router.get('/get-historical', stocksController.getHistoricalPrices);
 router.get('/get-stock-historical', stocksController.getStockHistoricalPrices);

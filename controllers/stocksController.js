@@ -27,6 +27,11 @@ exports.getStockTypes = async (req, res) => {
     res.json(stockTypes);
 };
 
+exports.getStockSortTypes = async (req, res) => {
+    let stockTypes = await StocksOrderType.findAll({});
+    res.json(stockTypes);
+};
+
 exports.getMajorIndexes = async (req, res) => {
     let url = `${config.FMP_API_V3_URL}quote-order/%5EDJI,%5EGSPC,%5EIXIC,OVX,BTCUSD,EURUSD?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const indices = await axios.get(url);
