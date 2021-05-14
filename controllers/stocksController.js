@@ -47,6 +47,8 @@ exports.getMajorIndexes = async (req, res) => {
         i.series = graphDataResponse.data[i.symbol];
     });
 
+    console.log(graphDataResponse.status)
+
     if (graphDataResponse.data['Error Message']) {
         res.status(400).send({msg: graphDataResponse.data['Error Message']})
     } else res.json(indices.data);
