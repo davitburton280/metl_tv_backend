@@ -15,11 +15,18 @@ const config = require('../config/constants');
 
 
 exports.getDailyStocks = async (req, res) => {
-    let url = `${config.FMP_API_V3_URL}ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    const response = await axios.get(url);
-    if (response.data['Error Message']) {
-        res.status(400).send({msg: response.data['Error Message']})
-    } else res.json(response.data);
+
+    try {
+        let url = `${config.FMP_API_V3_URL}ticker-bar?limit=200&apikey=${process.env.FMP_CLOUD_API_KEY}`;
+        const response = await axios.get(url);
+        res.json(response.data);
+    } catch (error) {
+        // const {response} = error;
+        // const {request, ...errorObject} = response; // take everything but 'request'
+        console.log(error);
+        res.status(500).json({msg: error.message});
+    }
+
 };
 
 exports.getStockTypes = async (req, res) => {
@@ -36,22 +43,29 @@ exports.getMajorIndexes = async (req, res) => {
     let url = `${config.FMP_API_V3_URL}quote-order/%5EDJI,%5EGSPC,%5EIXIC,OVX,BTCUSD,EURUSD?apikey=${process.env.FMP_CLOUD_API_KEY}`;
     const indices = await axios.get(url);
 
+    console.log('get indices!!!')
+
     let graphDataUrl = `${config.FMP_API_V3_URL}historical-chart-menu?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    const graphDataResponse = await axios.get(graphDataUrl);
+    try {
+        const graphDataResponse = await axios.get(graphDataUrl);
 
-    indices.data.map(i => {
-        graphDataResponse.data[i.symbol].map(d => {
-            d.name = d.date;
-            d.value = d.close;
+        indices.data.map(i => {
+            graphDataResponse.data[i.symbol].map(d => {
+                d.name = d.date;
+                d.value = d.close;
+            });
+            i.series = graphDataResponse.data[i.symbol];
         });
-        i.series = graphDataResponse.data[i.symbol];
-    });
+        res.json(indices.data);
+        console.log(graphDataResponse.status)
+    } catch (error) {
+        // const {response} = error;
+        // const {request, ...errorObject} = response; // take everything but 'request'
+        console.log(error);
+        res.status(500).json({msg: error.message});
+    }
 
-    console.log(graphDataResponse.status)
 
-    if (graphDataResponse.data['Error Message']) {
-        res.status(400).send({msg: graphDataResponse.data['Error Message']})
-    } else res.json(indices.data);
 };
 
 exports.getStocksByType = async (req, res) => {
@@ -166,9 +180,9 @@ exports.getUserStocks = async (req, res) => {
 
     let order = [[sequelize.col(`user_stocks->users_stocks.position_id`), 'asc']];
 
-    if (sort_type === 'A-Z') {
+    if (sort_type === 'alphabetical') {
         order = [[sequelize.col(`user_stocks.name`), 'asc']];
-    } else if (sort_type === 'Gain' || sort_type === 'Loss') {
+    } else if (sort_type === 'gain' || sort_type === 'loss') {
         order = [[sequelize.col(`user_stocks.change`), sort_type === 'Gain' ? 'desc' : 'asc']];
     }
 
@@ -197,30 +211,35 @@ exports.getUserStocks = async (req, res) => {
         stocks = stocks.slice(0, -1);
 
         let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-        console.log(graphDataUrl)
-        console.log(userStocks.user_stocks.length)
-        const graphDataResponse = await axios.get(graphDataUrl);
-        let ret = [];
-        userStocks.user_stocks.map((us, index) => {
-            if (graphDataResponse.data[us.symbol]) {
 
-                graphDataResponse.data[us.symbol].map(d => {
-                    d.name = d.date;
-                    d.value = d.close;
-                });
+        try {
+            const graphDataResponse = await axios.get(graphDataUrl);
+            let ret = [];
+            userStocks.user_stocks.map((us, index) => {
+                if (graphDataResponse.data[us.symbol]) {
 
-                ret.push({...us.toJSON(), series: graphDataResponse.data[us.symbol]})
-            } else {
-                ret.push({...us.toJSON()});
-            }
-        });
+                    graphDataResponse.data[us.symbol].map(d => {
+                        d.name = d.date;
+                        d.value = d.close;
+                    });
+
+                    ret.push({...us.toJSON(), series: graphDataResponse.data[us.symbol]})
+                } else {
+                    ret.push({...us.toJSON()});
+                }
+            });
+
+            console.log(graphDataResponse.status)
+            let result = {user_stocks: ret, stocks_order_type: userStocks.stocks_order_type};
+            console.log('result ready!!!')
+            res.json(result)
+        } catch (error) {
+            // const { response } = error;
+            // const { request, ...errorObject } = response; // take everything but 'request'
+            res.status(500).json({msg: error.message});
+        }
 
 
-        let result = {user_stocks: ret, stocks_order_type: userStocks.stocks_order_type};
-        console.log('result ready!!!')
-        if (graphDataResponse.data['Error Message']) {
-            res.status(400).send({msg: graphDataResponse.data['Error Message']})
-        } else res.json(result)
     } else {
         res.json(userStocks)
     }
