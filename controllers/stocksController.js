@@ -82,26 +82,29 @@ exports.getStocksByType = async (req, res) => {
         }
     });
 
+    try {
+        let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+        const graphDataResponse = await axios.get(graphDataUrl);
 
-    let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks.slice(0, -1)}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    const graphDataResponse = await axios.get(graphDataUrl);
+        let ret = [];
+        response.data.map((r) => {
+            if (graphDataResponse.data[r.symbol]) {
+                graphDataResponse.data[r.symbol].map(d => {
+                    d.name = d.date;
+                    d.value = d.close;
+                });
+                ret.push({...r, series: graphDataResponse.data[r.symbol]})
+            } else {
+                ret.push(r)
+            }
+        });
 
-    let ret = [];
-    response.data.map((r) => {
-        if (graphDataResponse.data[r.symbol]) {
-            graphDataResponse.data[r.symbol].map(d => {
-                d.name = d.date;
-                d.value = d.close;
-            });
-            ret.push({...r, series: graphDataResponse.data[r.symbol]})
-        } else {
-            ret.push(r)
-        }
-    });
+        res.json(ret);
 
-    if (response.data['Error Message']) {
-        res.status(400).send({msg: response.data['Error Message']})
-    } else res.json(ret);
+    } catch (e) {
+        res.status(500).json({msg: e.message});
+    }
+
 
 };
 
