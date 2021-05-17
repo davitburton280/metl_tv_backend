@@ -2,15 +2,16 @@ const express = require('express');
 const router = express.Router();
 const channelsController = require('../controllers/channelsController');
 const validateChannelDescription = require('../validators/validateChannelDescription');
+const isAuth = require('../helpers/isAuth');
 
 router.get('/get', channelsController.get);
-router.get('/subscriptions', channelsController.getSubscriptions);
+router.get('/subscriptions', isAuth, channelsController.getSubscriptions);
 router.get('/search-with-videos', channelsController.searchChannelVideos);
-router.get('/check-subscription', channelsController.checkChannelSubscription);
-router.get('/get-subscriptions', channelsController.getSubscribers);
-router.put('/subscribe', channelsController.subscribeToChannel);
-router.put('/subscriptions/update-priority', channelsController.changeSubscriptionPriority);
-router.put('/save-description', validateChannelDescription.rules, channelsController.saveDescription);
-router.put('/save-channel-details', channelsController.saveChannelDetails);
+router.get('/check-subscription', isAuth, channelsController.checkChannelSubscription);
+router.get('/get-subscriptions', isAuth, channelsController.getSubscribers);
+router.put('/subscribe', isAuth, channelsController.subscribeToChannel);
+router.put('/subscriptions/update-priority',isAuth, channelsController.changeSubscriptionPriority);
+router.put('/save-description',isAuth, validateChannelDescription.rules, channelsController.saveDescription);
+router.put('/save-channel-details', isAuth, channelsController.saveChannelDetails);
 
 module.exports = router;
