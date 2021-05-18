@@ -4,6 +4,7 @@ const Channels = db.channels;
 const ChatMessages = db.chat_messages;
 const VideoCategories = db.video_categories;
 const VideosTags = db.video_tags;
+const VideosComments = db.video_comments;
 const Tags = db.tags;
 const PrivacyTypes = db.privacy_types;
 const UsersVideos = db.users_videos;
@@ -547,5 +548,8 @@ exports.updatePrivacy = async (req, res) => {
 
 
 exports.addCommentForVideo = async (req, res) => {
-
+    let data = req.body;
+    await to(VideosComments.create(data));
+    let vc = await to(VideosComments.findAll({where: {from_id: data.from_id}}));
+    res.json(vc);
 };
