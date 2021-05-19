@@ -29,6 +29,7 @@ router.put('/save-video-details', isAuth, validateVideoDetails.rules, videoContr
 router.delete('/remove', isAuth, uploadVideoThumbFile, videoController.removeVideo);
 router.delete('/remove-by-token', isAuth, uploadVideoThumbFile, videoController.removeVideo);
 router.post('/add-comment', isAuth, videoController.addCommentForVideo);
+router.put('/update-comment', isAuth, videoController.updateVideoComment);
 router.get('/get-comments', isAuth, videoController.getVideoComments);
 router.delete('/remove-comment', isAuth, videoController.removeVideoComment);
 

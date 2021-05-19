@@ -568,10 +568,15 @@ exports.getVideoComments = async (req, res) => {
     res.json(comments);
 };
 
+exports.updateVideoComment = async (req, res) => {
+    let d = req.body;
+    await VideosComments.update(d, {where: {id: d.id, from_id: d.from_id}});
+    req.query.video_id = req.body.video_id;
+    this.getVideoComments(req, res);
+};
+
 exports.removeVideoComment = async (req, res) => {
     let {id, user_id} = req.query;
-    console.log(req.query)
-    await to(VideosComments.destroy({where: {id: +id, from_id: +user_id}}));
-    console.log('remove')
+    await to(VideosComments.destroy({where: {id: id, from_id: user_id}}));
     this.getVideoComments(req, res);
 };
