@@ -7,7 +7,6 @@ const isAuth = require('../helpers/isAuth');
 
 router.post('/save-video-token', isAuth, videoController.saveVideoToken);
 router.post('/save-video-data', isAuth, uploadVideoStreamFile, videoController.saveVideoData);
-router.post('/add-comment', isAuth, videoController.addCommentForVideo);
 router.post('/save-video-thumbnail', isAuth, uploadVideoThumbFile, videoController.saveVideoThumbnail);
 router.delete('/remove-video-thumbnail', isAuth, uploadVideoThumbFile, videoController.removeVideoThumbnail);
 // router.post('/save-video-message', uploadVideoStreamFile, videoController.saveVideoMessage);
@@ -29,5 +28,8 @@ router.put('/save-video', isAuth, videoController.saveVideo);
 router.put('/save-video-details', isAuth, validateVideoDetails.rules, videoController.saveVideoDetails);
 router.delete('/remove', isAuth, uploadVideoThumbFile, videoController.removeVideo);
 router.delete('/remove-by-token', isAuth, uploadVideoThumbFile, videoController.removeVideo);
+router.post('/add-comment', isAuth, videoController.addCommentForVideo);
+router.get('/get-comments', isAuth, videoController.getVideoComments);
+router.delete('/remove-comment', isAuth, videoController.removeVideoComment);
 
 module.exports = router;

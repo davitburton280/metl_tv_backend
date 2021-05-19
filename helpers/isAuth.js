@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
 
         if (token.startsWith('Bearer ')) {
             // Remove Bearer from string
-            console.log(token)
+            // console.log(token)
             token = token.slice(7, token.length);
         }
 

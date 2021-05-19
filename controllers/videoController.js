@@ -550,6 +550,28 @@ exports.updatePrivacy = async (req, res) => {
 exports.addCommentForVideo = async (req, res) => {
     let data = req.body;
     await to(VideosComments.create(data));
-    let vc = await to(VideosComments.findAll({where: {from_id: data.from_id}}));
-    res.json(vc);
+    req.query.video_id = req.body.video_id;
+    this.getVideoComments(req, res);
+};
+
+exports.getVideoComments = async (req, res) => {
+    let {video_id, from_id} = req.query;
+    let where = {video_id: video_id};
+    if (from_id) {
+        where.from_id = from_id;
+    }
+    let comments = await to(VideosComments.findAll({
+        where: where,
+        include: [{model: Users, as: 'user', attributes: ['id', 'full_name']}],
+        order: [['created_at', 'desc']]
+    }));
+    res.json(comments);
+};
+
+exports.removeVideoComment = async (req, res) => {
+    let {id, user_id} = req.query;
+    console.log(req.query)
+    await to(VideosComments.destroy({where: {id: +id, from_id: +user_id}}));
+    console.log('remove')
+    this.getVideoComments(req, res);
 };
