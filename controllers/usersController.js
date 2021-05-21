@@ -225,7 +225,7 @@ exports.getUserInfo = async (req, res) => {
             }],
         order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });
-    console.log('OK!!!' + req.query.username)
+
     res.json(user);
 };
 

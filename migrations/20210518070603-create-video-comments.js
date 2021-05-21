@@ -17,8 +17,14 @@ module.exports = {
             comment: {
                 type: Sequelize.TEXT
             },
-            to_id: {
-                type: Sequelize.INTEGER
+            ///////////////
+            to_comment_id: {
+                type: Sequelize.INTEGER,
+                allowNull: true
+            },
+            to_user_id: {
+                type: Sequelize.INTEGER,
+                allowNull: true
             },
             created_at: {
                 allowNull: false,

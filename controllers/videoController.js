@@ -16,6 +16,7 @@ const usersController = require('../controllers/usersController');
 
 const to = require('../helpers/getPromiseResult');
 const showIfErrors = require('../helpers/showIfErrors');
+const nl2br = require('../helpers/nl2br');
 
 const Videos = db.videos;
 const Playlists = db.playlists;
@@ -549,6 +550,8 @@ exports.updatePrivacy = async (req, res) => {
 
 exports.addCommentForVideo = async (req, res) => {
     let data = req.body;
+    data.comment = nl2br(data.comment, false);
+    console.log(data.comment)
     await to(VideosComments.create(data));
     req.query.video_id = req.body.video_id;
     this.getVideoComments(req, res);
@@ -562,7 +565,14 @@ exports.getVideoComments = async (req, res) => {
     }
     let comments = await to(VideosComments.findAll({
         where: where,
-        include: [{model: Users, as: 'user', attributes: ['id', 'full_name']}],
+        include: [
+            {
+                model: Users, as: 'user', attributes: ['id', 'full_name', 'username', 'avatar'], include: [
+                    {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
+                ]
+            },
+            {model: VideosComments, as: 'replies'}
+        ],
         order: [['created_at', 'desc']]
     }));
     res.json(comments);
@@ -570,6 +580,8 @@ exports.getVideoComments = async (req, res) => {
 
 exports.updateVideoComment = async (req, res) => {
     let d = req.body;
+    d.comment = nl2br(d.comment, false);
+    console.log(d.comment)
     await VideosComments.update(d, {where: {id: d.id, from_id: d.from_id}});
     req.query.video_id = req.body.video_id;
     this.getVideoComments(req, res);
