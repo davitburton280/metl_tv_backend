@@ -17,6 +17,9 @@ module.exports = {
             comment: {
                 type: Sequelize.TEXT
             },
+            is_reply: {
+                type: Sequelize.INTEGER
+            },
             ///////////////
             to_comment_id: {
                 type: Sequelize.INTEGER,

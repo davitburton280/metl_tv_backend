@@ -559,7 +559,7 @@ exports.addCommentForVideo = async (req, res) => {
 
 exports.getVideoComments = async (req, res) => {
     let {video_id, from_id} = req.query;
-    let where = {video_id: video_id};
+    let where = {video_id: video_id, is_reply: 0};
     if (from_id) {
         where.from_id = from_id;
     }
@@ -571,7 +571,17 @@ exports.getVideoComments = async (req, res) => {
                     {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
                 ]
             },
-            {model: VideosComments, as: 'replies'}
+
+            {
+                model: VideosComments, as: 'replies', where: {is_reply: 1}, required: false, include: [
+                    {
+                        model: Users, as: 'user', attributes: ['id', 'full_name', 'username', 'avatar'], include: [
+                            {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
+                        ]
+                    },
+                ]
+            }
+
         ],
         order: [['created_at', 'desc']]
     }));

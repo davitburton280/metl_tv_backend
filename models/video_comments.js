@@ -27,11 +27,13 @@ module.exports = (sequelize, DataTypes) => {
         from_id: DataTypes.INTEGER,
         comment: DataTypes.TEXT,
         to_comment_id: DataTypes.INTEGER,
-        to_user_id: DataTypes.INTEGER
+        to_user_id: DataTypes.INTEGER,
+        is_reply: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'video_comments',
         underscored: true,
+        timestamps: false,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
     });
