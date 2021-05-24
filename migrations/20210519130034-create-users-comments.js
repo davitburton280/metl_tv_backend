@@ -15,10 +15,12 @@ module.exports = {
                 type: Sequelize.INTEGER
             },
             liked: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             disliked: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             created_at: {
                 allowNull: false,

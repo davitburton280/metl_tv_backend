@@ -18,10 +18,12 @@ module.exports = {
                 type: Sequelize.TEXT
             },
             is_reply: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             likes_count: {
-                type: Sequelize.INTEGER
+                type: Sequelize.INTEGER,
+                defaultValue: 0
             },
             to_comment_id: {
                 type: Sequelize.INTEGER,
