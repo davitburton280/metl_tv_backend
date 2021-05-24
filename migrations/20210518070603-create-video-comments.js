@@ -21,7 +21,11 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 defaultValue: 0
             },
-            likes_count: {
+            likes: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
+            dislikes: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0
             },
