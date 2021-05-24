@@ -20,7 +20,9 @@ module.exports = {
             is_reply: {
                 type: Sequelize.INTEGER
             },
-            ///////////////
+            likes_count: {
+                type: Sequelize.INTEGER
+            },
             to_comment_id: {
                 type: Sequelize.INTEGER,
                 allowNull: true

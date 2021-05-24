@@ -26,9 +26,10 @@ module.exports = (sequelize, DataTypes) => {
         video_id: DataTypes.INTEGER,
         from_id: DataTypes.INTEGER,
         comment: DataTypes.TEXT,
+        likes_count: DataTypes.INTEGER,
+        is_reply: DataTypes.INTEGER,
         to_comment_id: DataTypes.INTEGER,
         to_user_id: DataTypes.INTEGER,
-        is_reply: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'video_comments',
