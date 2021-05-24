@@ -178,7 +178,7 @@ exports.getCustomStocksChartData = async (req, res) => {
 exports.getUserStocks = async (req, res) => {
     let {user_id, type_id, sort_type} = req.query;
     let whereType = type_id ? {type_id: +type_id} : {};
-    console.log('get user stocks!!!!')
+    console.log('get user stocks!!!!', req.query.close)
 
 
     let order = [[sequelize.col(`user_stocks->users_stocks.position_id`), 'asc']];
