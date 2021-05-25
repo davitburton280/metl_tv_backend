@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
         sequelize,
         modelName: 'users_comments',
         createdAt: 'created_at',
-        updatedAt: 'updated_at'
+        updatedAt: 'updated_at',
+        underscored: true
     });
     return users_comments;
 };

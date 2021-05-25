@@ -8,6 +8,7 @@ const VideosComments = db.video_comments;
 const Tags = db.tags;
 const PrivacyTypes = db.privacy_types;
 const UsersVideos = db.users_videos;
+const UsersComments = db.users_comments;
 const PlaylistsVideos = db.playlists_videos;
 const UsersTags = db.users_tags;
 
@@ -563,6 +564,7 @@ exports.getVideoComments = async (req, res) => {
     if (from_id) {
         where.from_id = from_id;
     }
+    console.log('get video comments!!!!')
     let comments = await to(VideosComments.findAll({
         where: where,
         include: [
@@ -580,7 +582,14 @@ exports.getVideoComments = async (req, res) => {
                         ]
                     },
                 ]
-            }
+            },
+            {
+                model: Users,
+                as: 'likers',
+                attributes: ['id', 'full_name', 'username'],
+                through: {attributes: ['liked', 'disliked']},
+                required: false
+            },
 
         ],
         order: [['created_at', 'desc']]
@@ -601,4 +610,36 @@ exports.removeVideoComment = async (req, res) => {
     let {id, user_id} = req.query;
     await to(VideosComments.destroy({where: {id: id, from_id: user_id}}));
     this.getVideoComments(req, res);
+};
+
+exports.updateCommentLikes = async (req, res) => {
+    let data = req.body;
+    const {user_id, video_id, likes, dislikes, liked, disliked} = data;
+
+
+    let found = await UsersComments.findOne({
+        where: {
+            user_id: user_id,
+            video_id: video_id
+        }
+    });
+
+
+    if (!found) {
+        await UsersComments.create({
+            ...data,
+            disliked: liked,
+            liked: disliked
+        });
+
+    } else {
+        await UsersComments.update({disliked: disliked, liked: liked}, {
+            where: {
+                user_id: user_id,
+                video_id: video_id
+            }
+        });
+    }
+    await VideosComments.update({dislikes: dislikes, likes: likes}, {where: {id: video_id}});
+    res.json('OK');
 };

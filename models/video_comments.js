@@ -19,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: "to_comment_id",
                 useJunctionTable: false
             });
+            video_comments.belongsToMany(models.users, {
+                as: 'likers',
+                through: models.users_comments,
+                foreignKey: 'comment_id'
+            });
         }
     }
 
