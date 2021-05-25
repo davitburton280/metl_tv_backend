@@ -355,13 +355,11 @@ exports.updateLikes = async (req, res) => {
         }
     });
 
-    console.log({disliked: likeStatus === 'disliked' ? 1 : 0, liked: likeStatus === 'liked' ? 1 : 0})
-
     if (!found) {
         await UsersVideos.create({
             ...data,
-            disliked: liked,
-            liked: disliked
+            disliked: disliked,
+            liked: liked
         });
 
     } else {
@@ -559,12 +557,18 @@ exports.addCommentForVideo = async (req, res) => {
 };
 
 exports.getVideoComments = async (req, res) => {
-    let {video_id, from_id} = req.query;
+    let {video_id, from_id, comment_id} = req.query;
+    console.log(req.query)
     let where = {video_id: video_id, is_reply: 0};
     if (from_id) {
         where.from_id = from_id;
     }
+    if (comment_id) {
+
+        where.id = comment_id;
+    }
     console.log('get video comments!!!!')
+    console.log(where)
     let comments = await to(VideosComments.findAll({
         where: where,
         include: [
@@ -585,7 +589,7 @@ exports.getVideoComments = async (req, res) => {
             },
             {
                 model: Users,
-                as: 'likers',
+                as: 'reactors',
                 attributes: ['id', 'full_name', 'username'],
                 through: {attributes: ['liked', 'disliked']},
                 required: false
@@ -614,13 +618,14 @@ exports.removeVideoComment = async (req, res) => {
 
 exports.updateCommentLikes = async (req, res) => {
     let data = req.body;
-    const {user_id, video_id, likes, dislikes, liked, disliked} = data;
-
+    const {user_id, comment_id, likes, dislikes, liked, disliked} = data;
+    let video_id = data.video_id;
+    delete data.video_id;
 
     let found = await UsersComments.findOne({
         where: {
             user_id: user_id,
-            video_id: video_id
+            comment_id: comment_id
         }
     });
 
@@ -628,18 +633,21 @@ exports.updateCommentLikes = async (req, res) => {
     if (!found) {
         await UsersComments.create({
             ...data,
-            disliked: liked,
-            liked: disliked
+            disliked: disliked,
+            liked: liked
         });
 
     } else {
         await UsersComments.update({disliked: disliked, liked: liked}, {
             where: {
                 user_id: user_id,
-                video_id: video_id
+                comment_id: comment_id
             }
         });
     }
-    await VideosComments.update({dislikes: dislikes, likes: likes}, {where: {id: video_id}});
-    res.json('OK');
+    await VideosComments.update({dislikes: dislikes, likes: likes}, {where: {id: comment_id}});
+    // req.query.comment_id = req.body.comment_id;
+    req.query.video_id = video_id;
+    this.getVideoComments(req, res);
+    // res.json('OK');
 };
