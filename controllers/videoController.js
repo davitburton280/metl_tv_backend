@@ -592,6 +592,22 @@ exports.getVideoComments = async (req, res) => {
                         through: {attributes: ['liked', 'disliked']},
                         required: false
                     },
+                    // {
+                    //     model: VideosComments, as: 'replies', where: {is_reply: 1}, required: false, include: [
+                    //         {
+                    //             model: Users, as: 'user', attributes: ['id', 'full_name', 'username', 'avatar'], include: [
+                    //                 {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
+                    //             ]
+                    //         },
+                    //         {
+                    //             model: Users,
+                    //             as: 'reactors',
+                    //             attributes: ['id', 'full_name', 'username'],
+                    //             through: {attributes: ['liked', 'disliked']},
+                    //             required: false
+                    //         },
+                    //     ]
+                    // },
                 ]
             },
             {

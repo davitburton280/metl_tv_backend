@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         dislikes: DataTypes.INTEGER,
         is_reply: DataTypes.INTEGER,
         to_comment_id: DataTypes.INTEGER,
+        to_reply_id: DataTypes.INTEGER,
         to_user_id: DataTypes.INTEGER,
     }, {
         sequelize,

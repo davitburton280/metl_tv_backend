@@ -33,6 +33,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: true
             },
+            to_reply_id: {
+                type: Sequelize.INTEGER,
+                allowNull: true
+            },
             to_user_id: {
                 type: Sequelize.INTEGER,
                 allowNull: true
