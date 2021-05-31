@@ -26,6 +26,12 @@ const rules = [
 
         if (user != null) throw new Error('E-mail exists');
 
+        let userByUsername = await Users.findOne({where: {username: req.username}});
+
+        if(userByUsername){
+
+        }
+
         if (req.password !== req.confirm_password) {
             throw new Error('Passwords don\'t match');
         }

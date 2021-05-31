@@ -214,8 +214,12 @@ exports.changeJwt = async (data, res) => {
 exports.getUserInfo = async (req, res) => {
     console.log('get user info!!!!')
     let data = req.query;
+    let excludeFields = ['password', 'role_id', 'status_id', 'verification_code', 'phone']
     let user = await Users.findOne({
-        where: {username: data.username},
+        where:
+            sequelize.where(sequelize.fn('BINARY', sequelize.col('username')), data.username)
+        ,
+        attributes: {exclude: excludeFields},
         include: [
             {model: Channels, as: 'channel'},
             {
