@@ -2,6 +2,7 @@ const sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const Users = db.users;
+const UsersCards = db.users_cards;
 const Channels = db.channels;
 const StocksOrderType = db.stocks_ordering_types;
 
@@ -26,7 +27,11 @@ exports.login = async (req, res) => {
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
             attributes: attributes,
-            include: [{model: Channels, as: 'channel'}, {model: StocksOrderType, as: 'stocks_order_type'}],
+            include: [
+                {model: Channels, as: 'channel'},
+                {model: StocksOrderType, as: 'stocks_order_type'},
+                {model: UsersCards}
+            ],
             where: {email: email} //userTypeWhere
 
         }, res);

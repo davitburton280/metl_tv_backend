@@ -36,6 +36,7 @@ var mapSessionNamesTokens = {};
 
 const db = require('../models');
 const Users = db.users;
+const UsersCards = db.users_cards;
 const Videos = db.videos;
 const Tags = db.tags;
 const Channels = db.channels;
@@ -50,6 +51,9 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 const bcrypt = require('bcryptjs');
+const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
+
+const moment = require('moment');
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
@@ -245,3 +249,58 @@ exports.saveProfileChanges = async (req, res) => {
 
     });
 };
+
+exports.createStripeUserCard = async (req, res) => {
+
+    let data = req.body;
+    let stripeUserFound = await UsersCards.findOne({where: {user_id: data.user_id}});
+
+    if (!stripeUserFound) {
+
+        let customer = await stripe.customers
+            .create({
+                email: data.stripeEmail,
+                // source: req.body.stripeToken,
+            });
+
+        await this.createStripeCard(data, customer.id);
+        res.json('OK')
+
+    } else {
+        let card = {
+            holder_name: data.holderName,
+            number_part: data.last4,
+            expiry_date: moment(data.exp_month + '/' + data.exp_year, 'MM/YYYY').format('MM/YYYY'),
+            brand: data.brand,
+            country: data.country
+        };
+        let stripeUserCardFound = await UsersCards.findOne({where: card});
+        if (stripeUserCardFound) {
+            res.status(500).json({msg: 'A card with such details already exists'})
+        } else {
+            await this.createStripeCard(data, stripeUserFound.stripe_customer_id);
+            res.json('OK')
+        }
+
+    }
+};
+
+exports.createStripeCard = async (data, customer_id) => {
+    stripe.customers.createSource(
+        customer_id,
+        {source: data.stripeToken}).then(async (d) => {
+        console.log(d)
+        let userCard = {
+            card_id: d.id,
+            user_id: data.user_id,
+            brand: d.brand,
+            country: d.country,
+            stripe_customer_id: d.customer,
+            expiry_date: moment(d.exp_month + '/' + d.exp_year, 'MM/YYYY').format('MM/YYYY'),
+            holder_name: d.name,
+            number_part: d.last4
+        };
+        await UsersCards.create(userCard)
+    });
+};
+
