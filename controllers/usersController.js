@@ -1,3 +1,4 @@
+require('dotenv').config()
 /* OPENVIDU CONFIGURATION */
 
 const OpenVidu = require('openvidu-node-client').OpenVidu;
@@ -10,7 +11,6 @@ const OpenViduRole = require('openvidu-node-client').OpenViduRole;
 // }
 // For demo purposes we ignore self-signed certificate
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 
 // Environment variable: URL where our OpenVidu server is listening
 let OPENVIDU_URL = 'https://localhost:4443';
