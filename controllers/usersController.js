@@ -250,6 +250,27 @@ exports.saveProfileChanges = async (req, res) => {
     });
 };
 
+exports.getCustomerCards = async (req, res) => {
+    let data = req.query;
+    let userCards = await UsersCards.findOne({where: {user_id: data.user_id}});
+    if (userCards) {
+        await stripe.customers.listSources(
+            userCards.toJSON().stripe_customer_id,
+            {object: 'card'},
+            function (err, cards) {
+                console.log(cards)
+                if (err) {
+                    res.status(500).json(err);
+                } else if (cards) {
+                    res.json(cards.data)
+                }
+            }
+        );
+    } else {
+        res.status(500).json('This user doesn\'t have any cards registered in our system');
+    }
+};
+
 exports.createStripeUserCard = async (req, res) => {
 
     let data = req.body;
