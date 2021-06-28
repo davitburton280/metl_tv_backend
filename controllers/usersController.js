@@ -250,7 +250,7 @@ exports.saveProfileChanges = async (req, res) => {
     });
 };
 
-exports.getCustomerCards = async (req, res) => {
+exports.getCustomerCards = async (req, res, getCount = false) => {
     let data = req.query;
     let userCards = await UsersCards.findOne({where: {user_id: data.user_id}});
     if (userCards) {
@@ -267,7 +267,25 @@ exports.getCustomerCards = async (req, res) => {
             }
         );
     } else {
-        res.status(500).json('This user doesn\'t have any cards registered in our system');
+        if (getCount) {
+            res.json([]);
+        } else {
+            res.status(500).json({msg: 'This user doesn\'t have any cards registered in our system'});
+        }
+    }
+};
+
+exports.getCardDetails = async (req, res) => {
+    let {card_id} = req.query;
+    let userCards = await UsersCards.findOne({where: {card_id}});
+    if (userCards?.stripe_customer_id) {
+        const card = await stripe.customers.retrieveSource(
+            userCards?.stripe_customer_id,
+            card_id
+        );
+        res.json({...card, ...userCards?.toJSON()});
+    } else {
+        res.status(500).json({msg: 'The specified card isn\'t found in database'});
     }
 };
 
@@ -275,7 +293,7 @@ exports.createStripeUserCard = async (req, res) => {
 
     let data = req.body;
     let stripeUserFound = await UsersCards.findOne({where: {user_id: data.user_id}});
-
+    console.log(process.env.STRIPE_TEST_PRIVATE_KEY)
     if (!stripeUserFound) {
 
         let customer = await stripe.customers
@@ -284,8 +302,7 @@ exports.createStripeUserCard = async (req, res) => {
                 // source: req.body.stripeToken,
             });
 
-        await this.createStripeCard(data, customer.id);
-        res.json('OK')
+        await this.createStripeCard(data, customer.id, res);
 
     } else {
         let card = {
@@ -299,18 +316,16 @@ exports.createStripeUserCard = async (req, res) => {
         if (stripeUserCardFound) {
             res.status(500).json({msg: 'A card with such details already exists'})
         } else {
-            await this.createStripeCard(data, stripeUserFound.stripe_customer_id);
-            res.json('OK')
+            await this.createStripeCard(data, stripeUserFound.stripe_customer_id, res);
         }
 
     }
 };
 
-exports.createStripeCard = async (data, customer_id) => {
+exports.createStripeCard = async (data, customer_id, res) => {
     stripe.customers.createSource(
         customer_id,
         {source: data.stripeToken}).then(async (d) => {
-        console.log(d)
         let userCard = {
             card_id: d.id,
             user_id: data.user_id,
@@ -319,9 +334,41 @@ exports.createStripeCard = async (data, customer_id) => {
             stripe_customer_id: d.customer,
             expiry_date: moment(d.exp_month + '/' + d.exp_year, 'MM/YYYY').format('MM/YYYY'),
             holder_name: d.name,
-            number_part: d.last4
+            number_part: d.last4,
+            name: data.name
         };
         await UsersCards.create(userCard)
+        res.json('OK')
     });
 };
 
+exports.removeStripeCard = async (req, res) => {
+    let data = req.query;
+    console.log(data)
+
+    await stripe.customers.deleteSource(
+        data.stripe_customer_id,
+        data.card_id,
+        async (err, confirmation) => {
+            if (confirmation.deleted) {
+                await UsersCards.destroy({where: {user_id: data.user_id, card_id: data.card_id}});
+                await this.getCustomerCards(req, res, true);
+            }
+        }
+    );
+};
+
+exports.updateStripeCard = async (req, res) => {
+    let {card_id, name} = req.body;
+    console.log('update stripe card!!!')
+    await UsersCards.update({name}, {where: {card_id}});
+    res.json('OK');
+    // await stripe.customers.updateSource(
+    //     data.stripe_customer_id,
+    //     data.card_id,
+    //     {name: 'Jenny Rosen'},
+    //     function (err, card) {
+    //         // asynchronously called
+    //     }
+    // );
+};
