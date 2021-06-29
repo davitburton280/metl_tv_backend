@@ -266,7 +266,8 @@ exports.getCustomerCards = async (req, res, getCount = false) => {
                     let userCards = await UsersCards.findAll({
                         where: {user_id: data.user_id},
                         attributes: {exclude: ['id']},
-                        raw: true
+                        raw: true,
+                        order: ['is_primary']
                     });
                     res.json(cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)})))
                 }
@@ -411,7 +412,8 @@ exports.setCardAsDefault = async (req, res) => {
             } else {
                 await UsersCards.update({is_primary: 0}, {where: {stripe_customer_id}});
                 await UsersCards.update({is_primary: 1}, {where: {card_id}});
-                res.json('OK');
+                req.query = req.body;
+                await this.getCustomerCards(req, res);
             }
         }
     );
