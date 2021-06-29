@@ -32,9 +32,10 @@ exports.login = async (req, res) => {
                 {model: StocksOrderType, as: 'stocks_order_type'},
                 {model: UsersCards}
             ],
-            where: {email: email} //userTypeWhere
+            where: {email} //userTypeWhere
 
         }, res);
+
 
 
         if (!res.headersSent) {
@@ -68,7 +69,6 @@ exports.logout = (req, res) => {
     // req.session.destroy();
     res.status(200).json({msg: 'OK'})
 };
-
 
 exports.sendVerificationCode = async (req, res) => {
     console.log('OK')
@@ -130,7 +130,6 @@ exports.sendVerificationCode = async (req, res) => {
         });
     }
 };
-
 
 exports.sendForgotPassEmail = async (req, res) => {
 
