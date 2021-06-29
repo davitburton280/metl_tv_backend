@@ -263,7 +263,11 @@ exports.getCustomerCards = async (req, res, getCount = false) => {
                 if (err) {
                     res.status(500).json(err);
                 } else if (cards) {
-                    let userCards = await UsersCards.findAll({where: {user_id: data.user_id}, raw: true});
+                    let userCards = await UsersCards.findAll({
+                        where: {user_id: data.user_id},
+                        attributes: {exclude: ['id']},
+                        raw: true
+                    });
                     res.json(cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)})))
                 }
             }
