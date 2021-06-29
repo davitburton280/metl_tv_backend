@@ -15,5 +15,6 @@ router.post('/change-cover-image', isAuth, uploadCover, usersController.changeCo
 router.post('/create-stripe-user-card', isAuth, usersController.createStripeUserCard);
 router.get('/get-card-details', usersController.getCardDetails);
 router.put('/update-stripe-user-card-info', isAuth, usersController.updateStripeCard);
+router.put('/set-customer-card-as-default',usersController.setCardAsDefault);
 router.delete('/remove-stripe-user-card', isAuth, usersController.removeStripeCard);
 module.exports = router;

@@ -259,12 +259,12 @@ exports.getCustomerCards = async (req, res, getCount = false) => {
         await stripe.customers.listSources(
             userCards.toJSON().stripe_customer_id,
             {object: 'card'},
-            function (err, cards) {
-                console.log(cards)
+            async (err, cards) => {
                 if (err) {
                     res.status(500).json(err);
                 } else if (cards) {
-                    res.json(cards.data)
+                    let userCards = await UsersCards.findAll({where: {user_id: data.user_id}, raw: true});
+                    res.json(cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)})))
                 }
             }
         );
@@ -324,7 +324,7 @@ exports.createStripeUserCard = async (req, res) => {
 
 };
 
-exports.createStripeCard = async(data, customer_id, res) => {
+exports.createStripeCard = async (data, customer_id, res) => {
 
     await stripe.tokens.retrieve(
         data.stripeToken,
@@ -337,7 +337,6 @@ exports.createStripeCard = async(data, customer_id, res) => {
                 stripe.customers.createSource(
                     customer_id,
                     {source: data.stripeToken}).then(async (d) => {
-                    console.log(d)
                     let userCard = {
                         card_id: d.id,
                         user_id: data.user_id,
@@ -394,4 +393,22 @@ exports.updateStripeCard = async (req, res) => {
     //         // asynchronously called
     //     }
     // );
+};
+
+exports.setCardAsDefault = async (req, res) => {
+    let {card_id, stripe_customer_id} = req.body;
+    await stripe.customers.update(
+        stripe_customer_id,
+        {
+            default_source: card_id
+        }, async (err, customer) => {
+            if (err) {
+                res.status(500).json(err);
+            } else {
+                await UsersCards.update({is_primary: 0}, {where: {stripe_customer_id}});
+                await UsersCards.update({is_primary: 1}, {where: {card_id}});
+                res.json('OK');
+            }
+        }
+    );
 };

@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         stripe_customer_id: DataTypes.STRING,
         card_id: DataTypes.STRING,
         fingerprint: DataTypes.STRING,
+        is_primary: DataTypes.INTEGER,
         name: DataTypes.STRING,
         number_part: DataTypes.INTEGER,
         country: DataTypes.STRING,
