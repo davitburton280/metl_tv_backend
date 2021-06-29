@@ -17,6 +17,9 @@ module.exports = {
       card_id: {
         type: Sequelize.STRING
       },
+      fingerprint: {
+        type: Sequelize.STRING
+      },
       name: {
         type: Sequelize.STRING
       },

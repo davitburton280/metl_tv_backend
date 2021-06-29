@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/usersController');
 const isAuth = require('../helpers/isAuth');
+const validateStripeCard = require('../validators/validateUserStripeCard');
 
 // router.get('/session/:room', usersController.getOpentokParams);
 router.get('/session/get-token', usersController.getSession);
