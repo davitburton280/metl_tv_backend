@@ -4,10 +4,11 @@ const UsersCards = db.users_cards;
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
 const showIfErrors = require('../helpers/showIfErrors');
+const moment = require('moment')
 
 exports.getCustomerCards = async (req, res, getCount = false) => {
-    let data = req.query;
-    let userCards = await UsersCards.findOne({where: {user_id: data.user_id}});
+    let {user_id} = req.query;
+    let userCards = await UsersCards.findOne({where: {user_id}});
     if (userCards) {
         await stripe.customers.listSources(
             userCards.toJSON().stripe_customer_id,
@@ -16,11 +17,12 @@ exports.getCustomerCards = async (req, res, getCount = false) => {
                 if (err) {
                     res.status(500).json(err);
                 } else if (cards) {
+                    console.log('here!!!')
                     let userCards = await UsersCards.findAll({
-                        where: {user_id: data.user_id},
+                        where: {user_id},
                         attributes: {exclude: ['id']},
                         raw: true,
-                        order: ['is_primary']
+                        order: ['created_at']
                     });
                     res.json(cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)})))
                 }

@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
         let attributes = [`full_name`, 'email', 'username', 'birthday', 'avatar', 'cover', 'password', 'stocks_order_type_id', 'id', 'status_id'];
 
         // Active status selecting
-        let statusWhere = sequelize.where(sequelize.col('`users_status`.`name_en`'), 'active');
+        let statusWhere = sequelize.where(sequelize.col('`users_status`.`name`'), 'active');
 
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
@@ -32,10 +32,9 @@ exports.login = async (req, res) => {
                 {model: StocksOrderType, as: 'stocks_order_type'},
                 {model: UsersCards}
             ],
-            where: {email} //userTypeWhere
-
+            where: {email},
+            order: [[{model: UsersCards}, sequelize.col('is_primary'), 'DESC']]
         }, res);
-
 
 
         if (!res.headersSent) {
