@@ -53,6 +53,7 @@ const bcrypt = require('bcryptjs');
 
 
 const moment = require('moment');
+const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
@@ -247,5 +248,13 @@ exports.saveProfileChanges = async (req, res) => {
         await this.changeJwt({id: id, ...data}, res);
 
     });
+};
+
+exports.getStripeCustomerInfo = async (req, res) => {
+    let {stripe_customer_id} = req.query;
+    const customer = await stripe.customers.retrieve(
+        stripe_customer_id
+    );
+    res.json(customer)
 };
 

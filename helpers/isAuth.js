@@ -12,7 +12,9 @@ module.exports = (req, res, next) => {
             token = token.slice(7, token.length);
         }
 
-        jwt.verify(token, 'secretkey', (err, decoded) => {
+        // console.log(token)
+
+        jwt.verify(token.replace('Bearer ', ''), 'secretkey', (err, decoded) => {
             if (err) {
                 console.log(err)
                 return res.json({

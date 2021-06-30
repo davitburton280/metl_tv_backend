@@ -59,7 +59,12 @@ exports.createStripeUserCard = async (req, res) => {
             let customer = await stripe.customers
                 .create({
                     email: data.stripeEmail,
+                    // source: req.body.stripeToken,
                 });
+
+           /* console.log('CUSTOMER!!!')
+            console.log(customer)
+            console.log('CUSTOMER!!!')*/
 
             await this.createStripeCard(data, customer.id, res);
 
