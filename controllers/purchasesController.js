@@ -3,12 +3,11 @@ const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 exports.createStripeCheckoutSession = async (req, res) => {
     let data = req.body;
     let {card, purchase} = req.body;
-    // console.log('stripe checkout', card)
+    console.log('stripe checkout', card)
 
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         customer: card.stripe_customer_id,
-        client_reference_id: card.id,
         line_items: [
             {
                 price_data: {
