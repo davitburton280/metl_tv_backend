@@ -15,7 +15,7 @@ exports.getCustomerCards = async (req, res, getCount = false) => {
             {object: 'card'},
             async (err, cards) => {
                 if (err) {
-                    res.status(500).json(err);
+                    res.status(500).json({msg: err.raw.message});
                 } else if (cards) {
                     console.log('here!!!')
                     let userCards = await UsersCards.findAll({
