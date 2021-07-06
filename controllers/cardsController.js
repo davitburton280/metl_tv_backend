@@ -55,19 +55,21 @@ exports.createStripeUserCard = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
         let stripeUserFound = await UsersCards.findOne({where: {user_id: data.user_id}});
-        if (!stripeUserFound) {
+        let customerFound = await stripe.customers.list({
+            email: data.stripeEmail
+        })
+
+        // If customer not found
+        if (!stripeUserFound && customerFound.data.length === 0) {
             let customer = await stripe.customers
                 .create({
                     email: data.stripeEmail,
                     // source: req.body.stripeToken,
                 });
 
-           /* console.log('CUSTOMER!!!')
-            console.log(customer)
-            console.log('CUSTOMER!!!')*/
-
             await this.createStripeCard(data, customer.id, res);
 
+            // If customer found
         } else {
             let card = {
                 holder_name: data.holderName,
@@ -76,8 +78,8 @@ exports.createStripeUserCard = async (req, res) => {
                 brand: data.brand,
                 country: data.country
             };
-            let stripeUserCardFound = await UsersCards.findOne({where: card});
-            if (stripeUserCardFound) {
+            let stripeCardFound = await UsersCards.findOne({where: card});
+            if (stripeCardFound) {
                 res.status(500).json({msg: 'A card with such details already exists'})
             } else {
                 await this.createStripeCard(data, stripeUserFound.stripe_customer_id, res);
@@ -177,3 +179,8 @@ exports.setCardAsDefault = async (req, res) => {
         }
     );
 };
+
+exports.getBalances = async (req, res) => {
+     let txns = await stripe.customers.listBalanceTransactions(req.query.customer_id);
+     res.json(txns)
+}
