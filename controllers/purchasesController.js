@@ -34,3 +34,5 @@ exports.createStripeCheckoutSession = async (req, res) => {
 
     res.json({id: session.id});
 };
+
+

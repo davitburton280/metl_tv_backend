@@ -9,7 +9,6 @@ exports.getProducts = async (req, res) => {
     const products = await stripe.products.list({});
 
     const prices = await stripe.prices.list({});
-
     let merged = [];
 
     for (let i = 0; i < products.data.length; i++) {
@@ -23,3 +22,12 @@ exports.getProducts = async (req, res) => {
 
     res.json(merged.sort((a, b) => a.unit_amount > b.unit_amount && 1 || -1));
 };
+
+exports.removeProduct = async (req, res) => {
+    const deleted = await stripe.products.del(
+        'prod_Jo9971iDFvOtot'
+    );
+
+    console.log(deleted)
+    res.json(deleted)
+}
