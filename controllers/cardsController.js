@@ -55,9 +55,11 @@ exports.createStripeUserCard = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
         let stripeUserFound = await UsersCards.findOne({where: {user_id: data.user_id}});
+        console.log(stripeUserFound)
         let customerFound = await stripe.customers.list({
             email: data.stripeEmail
         })
+        console.log(customerFound.data)
 
         // If customer not found
         if (!stripeUserFound && customerFound.data.length === 0) {
@@ -140,6 +142,10 @@ exports.removeStripeCard = async (req, res) => {
         async (err, confirmation) => {
             if (confirmation.deleted) {
                 await UsersCards.destroy({where: {user_id: data.user_id, card_id: data.card_id}});
+                let userCards = await UsersCards.findAll({where: {user_id: data.user_id}});
+                if (userCards.length === 0) {
+                    await this.removeCustomer(req, res);
+                }
                 await this.getCustomerCards(req, res, true);
             }
         }
@@ -181,6 +187,13 @@ exports.setCardAsDefault = async (req, res) => {
 };
 
 exports.getBalances = async (req, res) => {
-     let txns = await stripe.customers.listBalanceTransactions(req.query.customer_id);
-     res.json(txns)
+    let txns = await stripe.customers.listBalanceTransactions(req.query.customer_id);
+    res.json(txns)
 }
+
+exports.removeCustomer = async (req, res) => {
+    const deleted = await stripe.customers.del(
+        req.query.stripe_customer_id
+    );
+    return deleted;
+};
