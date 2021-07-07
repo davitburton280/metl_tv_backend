@@ -4,9 +4,10 @@ const UsersCards = db.users_cards;
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
 const showIfErrors = require('../helpers/showIfErrors');
-const moment = require('moment')
+const moment = require('moment');
+const usersController = require('../controllers/usersController');
 
-exports.getCustomerCards = async (req, res, getCount = false) => {
+exports.getCustomerCards = async (req, res, getCount = false, token = null) => {
     let {user_id} = req.query;
     let userCards = await UsersCards.findOne({where: {user_id}});
     if (userCards) {
@@ -24,13 +25,22 @@ exports.getCustomerCards = async (req, res, getCount = false) => {
                         raw: true,
                         order: ['created_at']
                     });
-                    res.json(cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)})))
+                    let cs = cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)}));
+                    if (!token) {
+                        res.json(cs)
+                    } else {
+                        res.json({cards: cs, token: token})
+                    }
                 }
             }
         );
     } else {
         if (getCount) {
-            res.json([]);
+            if (token) {
+                res.json({cards: [], token: token})
+            } else {
+                res.json([]);
+            }
         } else {
             res.status(500).json({msg: 'This user doesn\'t have any cards registered in our system'});
         }
@@ -59,17 +69,27 @@ exports.createStripeUserCard = async (req, res) => {
         let customerFound = await stripe.customers.list({
             email: data.stripeEmail
         })
-        console.log(customerFound.data)
 
         // If customer not found
-        if (!stripeUserFound && customerFound.data.length === 0) {
-            let customer = await stripe.customers
-                .create({
-                    email: data.stripeEmail,
-                    // source: req.body.stripeToken,
-                });
+        if (!stripeUserFound) {
 
-            await this.createStripeCard(data, customer.id, res);
+            if (customerFound.data.length === 0) {
+                let customer = await stripe.customers
+                    .create({
+                        email: data.stripeEmail,
+                        // source: req.body.stripeToken,
+                    });
+                await this.createStripeCard(data, customer.id, res);
+            } else {
+                let customer = await stripe.customers
+                    .list(
+                        {email: data.stripeEmail}
+                        // source: req.body.stripeToken,
+                    );
+                console.log(customer)
+                await this.createStripeCard(data, customer?.data[0]?.id, res);
+            }
+
 
             // If customer found
         } else {
@@ -103,9 +123,11 @@ exports.createStripeCard = async (data, customer_id, res) => {
                 res.status(500).json({msg: 'The card fingerprint exists. Please use another card'});
             } else {
 
+                console.log(data.stripeToken, customer_id)
                 stripe.customers.createSource(
                     customer_id,
                     {source: data.stripeToken}).then(async (d) => {
+                    console.log(d)
                     let userCard = {
                         card_id: d.id,
                         user_id: data.user_id,
@@ -120,8 +142,9 @@ exports.createStripeCard = async (data, customer_id, res) => {
                     };
 
                     await UsersCards.create(userCard);
-                    res.json('OK')
+                    await usersController.changeJwt({id: data.user_id}, res);
                 }).catch(err => {
+                    console.log(err)
                     res.status(500).json({msg: err?.raw?.message})
                 });
 
@@ -146,7 +169,8 @@ exports.removeStripeCard = async (req, res) => {
                 if (userCards.length === 0) {
                     await this.removeCustomer(req, res);
                 }
-                await this.getCustomerCards(req, res, true);
+                let token = await usersController.changeJwt({id: data.user_id}, null, true);
+                await this.getCustomerCards(req, res, true, token);
             }
         }
     );

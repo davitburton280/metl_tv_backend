@@ -36,6 +36,7 @@ var mapSessionNamesTokens = {};
 
 const db = require('../models');
 const Users = db.users;
+const UsersCards = db.users_cards;
 const Videos = db.videos;
 const Tags = db.tags;
 const Channels = db.channels;
@@ -191,12 +192,13 @@ exports.changeCover = async (req, res) => {
     });
 };
 
-exports.changeJwt = async (data, res) => {
+exports.changeJwt = async (data, res, ret = false) => {
 
     let user = await Users.findOne({
         where: {id: data.id}, include: [
             {model: Channels, as: 'channel'},
-            {model: StocksOrderType, as: 'stocks_order_type'}
+            {model: StocksOrderType, as: 'stocks_order_type'},
+            {model: UsersCards}
         ]
     });
 
@@ -206,13 +208,19 @@ exports.changeJwt = async (data, res) => {
         password,
         ...details
     } = user.toJSON();
-    res.json({
-        token: jwt.sign(details, 'secretkey', {
+    if (res) {
+        res.json({
+            token: jwt.sign(details, 'secretkey', {
+                expiresIn: '8h'
+            }),
+            user_id: user.id,
+            full_name: full_name
+        })
+    } else if (ret) {
+        return jwt.sign(details, 'secretkey', {
             expiresIn: '8h'
-        }),
-        user_id: user.id,
-        full_name: full_name
-    })
+        });
+    }
 };
 
 exports.getUserInfo = async (req, res) => {
