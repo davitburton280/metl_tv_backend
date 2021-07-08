@@ -25,6 +25,8 @@ exports.getCustomerCards = async (req, res, getCount = false, token = null) => {
                         raw: true,
                         order: ['created_at']
                     });
+                    console.log(userCards)
+                    console.log(cards)
                     let cs = cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)}));
                     if (!token) {
                         res.json(cs)
