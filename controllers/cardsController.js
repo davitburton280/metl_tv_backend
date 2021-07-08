@@ -125,7 +125,15 @@ exports.createStripeCard = async (data, customer_id, res) => {
                 res.status(500).json({msg: 'The card fingerprint exists. Please use another card'});
             } else {
 
-                console.log(data.stripeToken, customer_id)
+                const intent = await stripe.paymentIntents.create({
+                    amount: 1099,
+                    currency: 'gbp',
+                    customer: customer_id,
+                });
+
+
+
+                console.log(data.stripeToken, )
                 stripe.customers.createSource(
                     customer_id,
                     {source: data.stripeToken}).then(async (d) => {
