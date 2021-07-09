@@ -81,7 +81,7 @@ exports.createStripeUserCard = async (req, res) => {
                         email: data.stripeEmail,
                         // source: req.body.stripeToken,
                     });
-                await this.createStripeCard(data, customer.id, res);
+                await this.createStripeCard(data, customer.id, req, res);
             } else {
                 let customer = await stripe.customers
                     .list(
@@ -89,7 +89,7 @@ exports.createStripeUserCard = async (req, res) => {
                         // source: req.body.stripeToken,
                     );
                 console.log(customer)
-                await this.createStripeCard(data, customer?.data[0]?.id, res);
+                await this.createStripeCard(data, customer?.data[0]?.id, req, res);
             }
 
 
@@ -106,7 +106,7 @@ exports.createStripeUserCard = async (req, res) => {
             if (stripeCardFound) {
                 res.status(500).json({msg: 'A card with such details already exists'})
             } else {
-                await this.createStripeCard(data, stripeUserFound.stripe_customer_id, res);
+                await this.createStripeCard(data, stripeUserFound.stripe_customer_id, req, res);
             }
 
         }
@@ -115,7 +115,7 @@ exports.createStripeUserCard = async (req, res) => {
 
 };
 
-exports.createStripeCard = async (data, customer_id, res) => {
+exports.createStripeCard = async (data, customer_id, req, res) => {
 
     await stripe.tokens.retrieve(
         data.stripeToken,
@@ -132,7 +132,6 @@ exports.createStripeCard = async (data, customer_id, res) => {
                 });
 
 
-                console.log(data.stripeToken,)
                 stripe.customers.createSource(
                     customer_id,
                     {source: data.stripeToken}).then(async (d) => {
@@ -151,7 +150,10 @@ exports.createStripeCard = async (data, customer_id, res) => {
                     };
 
                     await UsersCards.create(userCard);
-                    await usersController.changeJwt({id: data.user_id}, res);
+                    req.query = data;
+
+                    await this.getCustomerCards(req, res, true, token);
+                    // await usersController.changeJwt({id: data.user_id}, res);
                 }).catch(err => {
                     console.log(err)
                     res.status(500).json({msg: err?.raw?.message})
@@ -236,5 +238,5 @@ exports.getTransactions = async (req, res) => {
     // const transactions = await stripe.issuing.transactions.list({
     //     limit: 3,
     // });
-    res.json(transactions)
+    // res.json(transactions)
 }
