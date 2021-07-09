@@ -5,7 +5,7 @@ exports.createStripeCheckoutSession = async (req, res) => {
     let {card, purchase} = req.body;
     console.log('stripe checkout', card)
 
-    const session = await stripe.checkout.sessions.create({
+    stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         customer: card.stripe_customer_id,
         line_items: [
@@ -28,11 +28,18 @@ exports.createStripeCheckoutSession = async (req, res) => {
         mode: 'payment',
         success_url: `${process.env.API_URL}/payment-success`,
         cancel_url: `${process.env.API_URL}/payment-cancel`,
+    })
+        .then(session =>{
+            res.json({id: session.id});
+        })
+        .catch(err => {
+        // console.log(err)
+        res.status(500).json({msg: err?.raw?.message})
     });
 
-    console.log(session)
+    // console.log(session)
 
-    res.json({id: session.id});
+
 };
 
 

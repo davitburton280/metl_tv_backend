@@ -132,8 +132,7 @@ exports.createStripeCard = async (data, customer_id, res) => {
                 });
 
 
-
-                console.log(data.stripeToken, )
+                console.log(data.stripeToken,)
                 stripe.customers.createSource(
                     customer_id,
                     {source: data.stripeToken}).then(async (d) => {
@@ -231,3 +230,11 @@ exports.removeCustomer = async (req, res) => {
     );
     return deleted;
 };
+
+exports.getTransactions = async (req, res) => {
+    console.log('aaa')
+    // const transactions = await stripe.issuing.transactions.list({
+    //     limit: 3,
+    // });
+    res.json(transactions)
+}
