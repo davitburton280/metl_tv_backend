@@ -9,23 +9,32 @@ exports.createStripeCheckoutSession = async (req, res) => {
         payment_method_types: ['card'],
         customer: card.stripe_customer_id,
         // customer_email: email,
-        line_items: [
-            {
-                price: purchase.id,
-                quantity: 1
-            }
-            // {
-            //     price_data: {
-            //         currency: 'usd',
-            //         // price: purchase.id,
-            //         product_data: {
-            //             name: `${purchase.name} Metl Coins Bundle`,
-            //         },
-            //         unit_amount: purchase.unit_amount,
-            //     },
-            //     quantity: 1,
-            // },
-        ],
+        line_items: {
+            data: [
+                {
+                    description: `${purchase.name} Metl Coins Bundle`,
+                    price: purchase.id,
+                    quantity: 1
+                }
+                // {
+                //     price: purchase.id,
+                //     quantity: 1
+                // }
+
+                // {
+                //     price_data: {
+                //         currency: 'usd',
+                //         // price: purchase.id,
+                //         product_data: {
+                //             name: `${purchase.name} Metl Coins Bundle`,
+                //         },
+                //         unit_amount: purchase.unit_amount,
+                //     },
+                //     quantity: 1,
+                // },
+            ]
+
+        },
         mode: 'payment',
         success_url: `${process.env.API_URL}/payment-success`,
         cancel_url: `${process.env.API_URL}/payment-cancel`,
