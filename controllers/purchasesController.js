@@ -3,18 +3,22 @@ const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 exports.createStripeCheckoutSession = async (req, res) => {
     let data = req.body;
     let {card, purchase, email} = req.body;
-    console.log('stripe checkout', card.stripe_customer_id)
+    console.log('checkout', purchase)
 
     stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         customer: card.stripe_customer_id,
         // customer_email: email,
-        line_items: {
-            data: [
+        line_items:
+        // data:
+            [
                 {
                     description: `${purchase.name} Metl Coins Bundle`,
-                    price: purchase.id,
-                    quantity: 1
+                    // price: purchase.unit,
+                    quantity: 1,
+                    name: purchase.name,
+                    currency: purchase.currency,
+                    amount: purchase.unit_amount
                 }
                 // {
                 //     price: purchase.id,
@@ -34,12 +38,12 @@ exports.createStripeCheckoutSession = async (req, res) => {
                 // },
             ]
 
-        },
+        ,
         mode: 'payment',
         success_url: `${process.env.API_URL}/payment-success`,
         cancel_url: `${process.env.API_URL}/payment-cancel`,
     })
-        .then(session => {
+        .then(async (session) => {
             res.json({id: session.id});
         })
         .catch(err => {
