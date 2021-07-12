@@ -233,10 +233,3 @@ exports.removeCustomer = async (req, res) => {
     return deleted;
 };
 
-exports.getTransactions = async (req, res) => {
-    console.log('aaa')
-    // const transactions = await stripe.issuing.transactions.list({
-    //     limit: 3,
-    // });
-    // res.json(transactions)
-}

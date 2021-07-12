@@ -7,7 +7,7 @@ const showIfErrors = require('../helpers/showIfErrors');
 
 exports.getProducts = async (req, res) => {
     const products = await stripe.products.list({});
-
+    console.log(products)
     const prices = await stripe.prices.list({});
     let merged = [];
 
