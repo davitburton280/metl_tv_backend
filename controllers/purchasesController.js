@@ -1,4 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
+const to = require('../helpers/getPromiseResult');
 
 exports.createStripeCheckoutSession = async (req, res) => {
     let data = req.body;
@@ -12,34 +13,40 @@ exports.createStripeCheckoutSession = async (req, res) => {
         line_items:
         // data:
             [
-                {
-                    description: `${purchase.name} Metl Coins Bundle`,
-                    // price: purchase.unit,
-                    quantity: 1,
-                    name: purchase.name,
-                    currency: purchase.currency,
-                    amount: purchase.unit_amount
-                }
+                // {
+                //     description: `${purchase.name} Metl Coins Bundle`,
+                //     // price: purchase.unit,
+                //     quantity: 1,
+                //     name: purchase.name,
+                //     currency: purchase.currency,
+                //     amount: purchase.unit_amount,
+                //
+                // }
                 // {
                 //     price: purchase.id,
                 //     quantity: 1
                 // }
 
-                // {
-                //     price_data: {
-                //         currency: 'usd',
-                //         // price: purchase.id,
-                //         product_data: {
-                //             name: `${purchase.name} Metl Coins Bundle`,
-                //         },
-                //         unit_amount: purchase.unit_amount,
-                //     },
-                //     quantity: 1,
-                // },
+                {
+                    price_data: {
+                        currency: 'usd',
+                        // price: purchase.id,
+                        product_data: {
+                            name: purchase.name,
+                            description: `${purchase.name} Metl Coins Bundle`,
+                        },
+                        unit_amount: purchase.unit_amount,
+                    },
+                    quantity: 1,
+                },
             ]
 
         ,
         mode: 'payment',
+        metadata: {
+            description: `${purchase.name} Metl Coins Bundle`,
+            name: purchase.name,
+        },
         success_url: `${process.env.API_URL}/payment-success`,
         cancel_url: `${process.env.API_URL}/payment-cancel`,
     })
@@ -54,6 +61,26 @@ exports.createStripeCheckoutSession = async (req, res) => {
     // console.log(session)
 
 
+};
+
+exports.createStripeCharge = async (req, res) => {
+    let data = req.body;
+    let {card, purchase, email} = req.body;
+    // console.log('card', card)
+
+
+    const charge = await stripe.charges.create({
+        amount: purchase.unit_amount,
+        currency: purchase.currency,
+        source: card.id,
+        customer: card.stripe_customer_id,
+        description: `${purchase.name} Metl Coins Bundle`,
+        metadata: {name: purchase.name}
+    }).catch(e => {
+        res.status(500).json({msg: e?.raw?.message})
+    });
+
+    res.json(charge);
 };
 
 
