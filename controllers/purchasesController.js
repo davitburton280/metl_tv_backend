@@ -63,6 +63,22 @@ exports.createStripeCheckoutSession = async (req, res) => {
 
 };
 
+exports.createPaymentIntent = async (req, res) => {
+    let {customer_id, currency, card, purchase} = req.body;
+    const intent = await stripe.paymentIntents.create({
+        amount: purchase.unit_amount,
+        currency,
+        customer: customer_id,
+        description: `${purchase.name} Metl Coins Bundle`,
+        metadata: {name: purchase.name}
+    }).catch(e => {
+        res.status(500).json({msg: e?.raw?.message})
+    });
+
+    console.log(intent)
+    res.json(intent.client_secret)
+}
+
 exports.createStripeCharge = async (req, res) => {
     let data = req.body;
     let {card, purchase, email} = req.body;
