@@ -101,10 +101,14 @@ exports.createStripeCharge = async (req, res) => {
 
 
 exports.getAllPaymentsHistory = async (req, res) => {
-    const paymentIntents = await stripe.paymentIntents.list({});
+    let created = req.query;
+    const paymentIntents = await stripe.paymentIntents.list({
+        created
+    });
     res.json(paymentIntents.data)
 }
 exports.getPurchasesHistory = async (req, res) => {
-    const charges = await stripe.charges.list({});
+    let created = req.query;
+    const charges = await stripe.charges.list({created});
     res.json(charges.data)
 }
