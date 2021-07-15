@@ -81,6 +81,14 @@ exports.createStripeUserCard = async (req, res) => {
                         email: data.stripeEmail,
                         // source: req.body.stripeToken,
                     });
+
+                // @todo call usersController method from here
+                await stripe.accounts.create({
+                    type:'express',
+                    email: data.stripeEmail,
+                    country: 'US'
+                })
+
                 await this.createStripeCard(data, customer.id, req, res);
             } else {
                 let customer = await stripe.customers

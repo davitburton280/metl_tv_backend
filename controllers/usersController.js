@@ -266,3 +266,65 @@ exports.getStripeCustomerInfo = async (req, res) => {
     res.json(customer)
 };
 
+exports.createStripeAccount = async (req, res) => {
+    let {email} = req.body;
+    console.log(email)
+    let acc = await stripe.accounts.create({
+        type: "custom",
+        business_type: "individual",
+        country: "US",
+        email,
+        capabilities: {
+            card_payments: {requested: true},
+            transfers: {requested: true},
+        },
+        // settings: {
+        //     payments: true,
+        //     payouts: true
+        // },
+        tos_acceptance: {
+            ip: req.ip,
+            date: moment().format('X')
+        },
+        individual: {
+            address: {
+                city: "New York",
+                country: "US",
+                line1: "13 Street",
+                line2: "47 W",
+                postal_code: "10001",
+                state: "New York"
+            },
+            email,
+            dob: {day: 30, month: 3, year: 1986},
+            id_number: "000000000",
+            first_name: "John",
+            last_name: "Doe",
+            phone: "000 000 0000"
+        },
+        business_profile: {
+            mcc: '5734',
+            url: "https://metl.tv/",
+            support_address: {
+                city: "New York",
+                country: "US",
+                line1: "13 Street",
+                line2: "47 W",
+                postal_code: "10001",
+                state: "New York"
+            }
+        },
+        external_account: {
+            object: 'bank_account',
+            currency: 'USD',
+            country: 'US',
+            account_holder_type: 'individual',
+            account_holder_name: "Jenny Rosen",
+            routing_number: '110000000',
+            account_number: '000123456789'
+            // token: 'tok_1JDTf1KqYIKd5fEIm8QKJEtQ'
+        }
+
+    })
+    res.json(acc)
+};
