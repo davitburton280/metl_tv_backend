@@ -268,7 +268,7 @@ exports.getStripeCustomerInfo = async (req, res) => {
 
 exports.createStripeAccount = async (req, res) => {
     let {email} = req.body;
-    console.log(email)
+    console.log("CREATE STRIPE ACCOUNT" + email)
     let acc = await stripe.accounts.create({
         type: "custom",
         business_type: "individual",
@@ -326,5 +326,5 @@ exports.createStripeAccount = async (req, res) => {
         }
 
     })
-   return acc;
+    return acc;
 };

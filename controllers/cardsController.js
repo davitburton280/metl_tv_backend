@@ -25,9 +25,9 @@ exports.getCustomerCards = async (req, res, getCount = false, token = null) => {
                         raw: true,
                         order: ['created_at']
                     });
-                    console.log(userCards)
-                    console.log(cards)
+                    // console.log(userCards)
                     let cs = cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)}));
+                    // console.log(cs)
                     if (!token) {
                         res.json(cs)
                     } else {
@@ -81,10 +81,10 @@ exports.createStripeUserCard = async (req, res) => {
                         email: data.stripeEmail,
                         // source: req.body.stripeToken,
                     });
-                req.email = req.stripeEmail;
+                req.body.email = req.body.stripeEmail;
                 let acc = await usersController.createStripeAccount(req, res);
                 data.stripe_account_id = acc.id;
-                console.log(acc.id)
+                console.log("ACCOUNT ID" + acc.id)
 
                 await this.createStripeCard(data, customer.id, req, res);
             } else {
@@ -134,7 +134,7 @@ exports.createStripeCard = async (data, customer_id, req, res) => {
                 stripe.customers.createSource(
                     customer_id,
                     {source: data.stripeToken}).then(async (d) => {
-                    console.log(d)
+                    // console.log(d)
                     let userCard = {
                         card_id: d.id,
                         user_id: data.user_id,
@@ -169,17 +169,18 @@ exports.createStripeCard = async (data, customer_id, req, res) => {
 
 exports.removeStripeCard = async (req, res) => {
     let data = req.query;
+    console.log(data)
 
     await stripe.customers.deleteSource(
         data.stripe_customer_id,
         data.card_id,
         async (err, confirmation) => {
-            if (confirmation.deleted) {
+            if (confirmation?.deleted) {
                 await UsersCards.destroy({where: {user_id: data.user_id, card_id: data.card_id}});
                 let userCards = await UsersCards.findAll({where: {user_id: data.user_id}});
                 if (userCards.length === 0) {
-                    await this.removeCustomer(req, res);
-                    await this.removeAccount(req, res);
+                    await this.removeCustomer(data);
+                    await this.removeAccount(data);
                 }
                 let token = await usersController.changeJwt({id: data.user_id}, null, true);
                 await this.getCustomerCards(req, res, true, token);
@@ -227,17 +228,38 @@ exports.getBalances = async (req, res) => {
     res.json(txns)
 }
 
-exports.removeCustomer = async (req, res) => {
+exports.removeCustomer = async (data) => {
+    console.log("STRIPE CUSTOMER ID:" + data.stripe_customer_id)
     const deleted = await stripe.customers.del(
-        req.query.stripe_customer_id
+        data.stripe_customer_id
     );
     return deleted;
 };
 
-exports.removeAccount = async (req, res) => {
+exports.removeAccount = async (data) => {
+    console.log("STRIPE ACCOUNT ID:" + data.stripe_account_id)
     const deleted = await stripe.accounts.del(
-        req.query.stripe_account_id
+        data.stripe_account_id
     );
     return deleted;
 };
 
+exports.createTransfer = async (req, res) => {
+    let {stripe_customer_id, to_account_id} = req.body;
+    // Create a PaymentIntent:
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: 100,
+        currency: 'usd',
+        payment_method_types: ['card'],
+        transfer_group: '{ORDER10}',
+        customer: stripe_customer_id
+    });
+
+// Create a Transfer to the connected account (later):
+    const transfer = await stripe.transfers.create({
+        amount: 70,
+        currency: 'usd',
+        destination: to_account_id,
+        transfer_group: '{ORDER10}',
+    });
+}
