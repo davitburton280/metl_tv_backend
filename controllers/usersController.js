@@ -326,5 +326,5 @@ exports.createStripeAccount = async (req, res) => {
         }
 
     })
-    res.json(acc)
+   return acc;
 };

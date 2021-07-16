@@ -81,13 +81,10 @@ exports.createStripeUserCard = async (req, res) => {
                         email: data.stripeEmail,
                         // source: req.body.stripeToken,
                     });
-
-                // @todo call usersController method from here
-                await stripe.accounts.create({
-                    type:'express',
-                    email: data.stripeEmail,
-                    country: 'US'
-                })
+                req.email = req.stripeEmail;
+                let acc = await usersController.createStripeAccount(req, res);
+                data.stripe_account_id = acc.id;
+                console.log(acc.id)
 
                 await this.createStripeCard(data, customer.id, req, res);
             } else {
@@ -96,7 +93,7 @@ exports.createStripeUserCard = async (req, res) => {
                         {email: data.stripeEmail}
                         // source: req.body.stripeToken,
                     );
-                console.log(customer)
+                // console.log(customer)
                 await this.createStripeCard(data, customer?.data[0]?.id, req, res);
             }
 
@@ -134,8 +131,6 @@ exports.createStripeCard = async (data, customer_id, req, res) => {
             } else {
 
 
-
-
                 stripe.customers.createSource(
                     customer_id,
                     {source: data.stripeToken}).then(async (d) => {
@@ -146,6 +141,7 @@ exports.createStripeCard = async (data, customer_id, req, res) => {
                         brand: d.brand,
                         country: d.country,
                         stripe_customer_id: d.customer,
+                        stripe_account_id: data.stripe_account_id,
                         expiry_date: moment(d.exp_month + '/' + d.exp_year, 'MM/YYYY').format('MM/YYYY'),
                         holder_name: d.name,
                         number_part: d.last4,
@@ -183,6 +179,7 @@ exports.removeStripeCard = async (req, res) => {
                 let userCards = await UsersCards.findAll({where: {user_id: data.user_id}});
                 if (userCards.length === 0) {
                     await this.removeCustomer(req, res);
+                    await this.removeAccount(req, res);
                 }
                 let token = await usersController.changeJwt({id: data.user_id}, null, true);
                 await this.getCustomerCards(req, res, true, token);
@@ -233,6 +230,13 @@ exports.getBalances = async (req, res) => {
 exports.removeCustomer = async (req, res) => {
     const deleted = await stripe.customers.del(
         req.query.stripe_customer_id
+    );
+    return deleted;
+};
+
+exports.removeAccount = async (req, res) => {
+    const deleted = await stripe.accounts.del(
+        req.query.stripe_account_id
     );
     return deleted;
 };
