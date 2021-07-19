@@ -99,16 +99,16 @@ exports.createStripeCharge = async (req, res) => {
     res.json(charge);
 };
 
-
 exports.getAllPaymentsHistory = async (req, res) => {
     let created = req.query;
     const paymentIntents = await stripe.paymentIntents.list({
         created
     });
     res.json(paymentIntents.data)
-}
+};
+
 exports.getPurchasesHistory = async (req, res) => {
     let created = req.query;
     const charges = await stripe.charges.list({created});
     res.json(charges.data)
-}
+};

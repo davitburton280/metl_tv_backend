@@ -45,25 +45,26 @@ exports.getMajorIndexes = async (req, res) => {
 
     console.log('get indices!!!')
 
-    let graphDataUrl = `${config.FMP_API_V3_URL}historical-chart-menu?apikey=${process.env.FMP_CLOUD_API_KEY}`;
-    try {
-        const graphDataResponse = await axios.get(graphDataUrl);
-
-        indices.data.map(i => {
-            graphDataResponse.data[i.symbol].map(d => {
-                d.name = d.date;
-                d.value = d.close;
-            });
-            i.series = graphDataResponse.data[i.symbol];
-        });
-        res.json(indices.data);
-        console.log(graphDataResponse.status)
-    } catch (error) {
-        // const {response} = error;
-        // const {request, ...errorObject} = response; // take everything but 'request'
-        console.log(error);
-        res.status(500).json({msg: error.message});
-    }
+    // let graphDataUrl = `${config.FMP_API_V3_URL}historical-chart-menu?apikey=${process.env.FMP_CLOUD_API_KEY}`;
+    // try {
+    //     const graphDataResponse = await axios.get(graphDataUrl);
+    //
+    //     indices?.data.map(i => {
+    //         graphDataResponse.data[i.symbol].map(d => {
+    //             d.name = d.date;
+    //             d.value = d.close;
+    //         });
+    //         i.series = graphDataResponse.data[i.symbol];
+    //     });
+    //     res.json(indices.data);
+    //     console.log(graphDataResponse.status)
+    // } catch (error) {
+    //     // const {response} = error;
+    //     // const {request, ...errorObject} = response; // take everything but 'request'
+    //     console.log(error);
+    //     res.status(500).json({msg: error.message});
+    // }
+    res.json([])
 
 
 };
