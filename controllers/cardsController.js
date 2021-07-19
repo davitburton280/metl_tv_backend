@@ -276,11 +276,11 @@ exports.createTransfer = async (req, res) => {
 
     // Create a Transfer to the connected account (later):
     const transfer = await to(stripe.transfers.create({
-        amount: 70,
+        amount: 100,
         currency: 'usd',
         destination: to_account_id,
         transfer_group: '{ORDER10}',
-        description: 'Test Transfer',
+        description: 'Test Transfer 2',
         metadata :{
             channel: channel.name
         }
@@ -291,9 +291,9 @@ exports.createTransfer = async (req, res) => {
 
 exports.getAccountTransfers = async (req, res) => {
     let {stripe_account_id} = req.query;
-    const transfers = await stripe.transfers.list({
+    const transfers = await to(stripe.transfers.list({
         destination: stripe_account_id
-    });
+    }));
 
     res.json(transfers);
 };
