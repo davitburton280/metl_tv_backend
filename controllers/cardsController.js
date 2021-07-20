@@ -29,7 +29,7 @@ exports.getCustomerCards = async (req, res, getCount = false, token = null) => {
                     });
                     // console.log(userCards)
                     let cs = cards.data.map(t1 => ({...t1, ...userCards.find(t2 => t2.card_id === t1.id)}));
-                    // console.log(cs)
+                    console.log(cs)
                     if (!token) {
                         res.json(cs)
                     } else {
@@ -90,8 +90,7 @@ exports.createStripeUserCard = async (req, res) => {
 
                 if (acc.id) {
                     await this.createStripeCard(data, customer.id, req, res);
-                }
-                else {
+                } else {
                     res.status(500).json({msg: 'Account is not created'})
                 }
             } else {
@@ -233,7 +232,7 @@ exports.setCardAsDefault = async (req, res) => {
 exports.getBalances = async (req, res) => {
     let txns = await stripe.customers.listBalanceTransactions(req.query.customer_id);
     res.json(txns)
-}
+};
 
 exports.removeCustomer = async (data) => {
     console.log("STRIPE CUSTOMER ID:" + data.stripe_customer_id)
@@ -248,7 +247,7 @@ exports.removeAccount = async (data) => {
     let deleted = false;
     if (data.stripe_account_id) {
 
-        const deleted = await stripe.accounts.del(
+        deleted = await stripe.accounts.del(
             data.stripe_account_id
         );
     }
@@ -256,44 +255,65 @@ exports.removeAccount = async (data) => {
 };
 
 exports.createTransfer = async (req, res) => {
-    let {stripe_customer_id, to_account_id, card_id} = req.body;
+    let data = req.body;
+    console.log(data)
+
     // Create a PaymentIntent:
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await to(stripe.paymentIntents.create({
         amount: 100,
         currency: 'usd',
         payment_method_types: ['card'],
-        payment_method: card_id,
+        payment_method: data.card_id,
         transfer_group: '{ORDER10}',
-        customer: stripe_customer_id,
+        customer: data.stripe_customer_id,
         confirm: true
-    });
+    }));
 
-    console.log(paymentIntent)
-
-    let user = await UsersCards.findOne({where:{stripe_customer_id}, attributes: ['user_id']});
-    let channel = await Channel.findOne({where:{user_id: user.user_id}, attributes: ['id', 'name']});
+    let user = await to(UsersCards.findOne({
+        where: {stripe_customer_id: data.stripe_customer_id},
+        attributes: ['user_id']
+    }));
+    let channel = await to(Channel.findOne({where: {user_id: user?.user_id}, attributes: ['id', 'name']}));
 
 
     // Create a Transfer to the connected account (later):
     const transfer = await to(stripe.transfers.create({
         amount: 100,
         currency: 'usd',
-        destination: to_account_id,
+        destination: data.to_account_id,
         transfer_group: '{ORDER10}',
-        description: 'Test Transfer 2',
-        metadata :{
+        description: data.description,
+        metadata: {
             channel: channel.name
         }
     }));
+
+    const payout = await to(stripe.payouts.create({
+        amount: 100,
+        currency: 'usd',
+        description: data.description + ' Payout'
+    }));
+
+    console.log(payout)
 
     res.json(transfer)
 };
 
 exports.getAccountTransfers = async (req, res) => {
-    let {stripe_account_id} = req.query;
+    let {stripe_account_id, ...created} = req.query;
+    console.log(created)
     const transfers = await to(stripe.transfers.list({
-        destination: stripe_account_id
+        destination: stripe_account_id,
+        created
     }));
 
     res.json(transfers);
+};
+
+exports.getAccountPayouts = async (req, res) => {
+    let {stripe_account_id} = req.query;
+    const payouts = await stripe.payouts.list({
+        // destination: stripe_account_id
+    });
+    res.json(payouts);
 };

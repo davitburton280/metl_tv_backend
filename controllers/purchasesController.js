@@ -77,7 +77,7 @@ exports.createPaymentIntent = async (req, res) => {
 
     console.log(intent)
     res.json(intent.client_secret)
-}
+};
 
 exports.createStripeCharge = async (req, res) => {
     let data = req.body;
@@ -101,6 +101,7 @@ exports.createStripeCharge = async (req, res) => {
 
 exports.getAllPaymentsHistory = async (req, res) => {
     let created = req.query;
+    console.log(created)
     const paymentIntents = await stripe.paymentIntents.list({
         created
     });
