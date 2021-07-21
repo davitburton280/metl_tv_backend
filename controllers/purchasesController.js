@@ -113,3 +113,14 @@ exports.getPurchasesHistory = async (req, res) => {
     const charges = await stripe.charges.list({created});
     res.json(charges.data)
 };
+
+exports.getAccountPayouts = async (req, res) => {
+    let {stripe_account_id} = req.query;
+    console.log("PAYOUTS")
+    const payouts = await stripe.payouts.list({
+        // destination: stripe_account_id
+    });
+
+    console.log("PAYOUTS"+payouts)
+    res.json(payouts);
+};

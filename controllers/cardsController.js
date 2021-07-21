@@ -236,10 +236,16 @@ exports.getBalances = async (req, res) => {
 
 exports.removeCustomer = async (data) => {
     console.log("STRIPE CUSTOMER ID:" + data.stripe_customer_id)
-    const deleted = await stripe.customers.del(
+    const deleted = await to(stripe.customers.del(
         data.stripe_customer_id
-    );
+    ));
     return deleted;
+};
+
+exports.removePaymentsFromHistory = async(data) =>{
+    await to(stripe.charges.del(data.stripe_customer_id));
+    await to(stripe.transfers.del(data.stripe_customer_id));
+    await to(stripe.payouts.del(data.stripe_customer_id));
 };
 
 exports.removeAccount = async (data) => {
@@ -291,29 +297,24 @@ exports.createTransfer = async (req, res) => {
     const payout = await to(stripe.payouts.create({
         amount: 100,
         currency: 'usd',
-        description: data.description + ' Payout'
+        description: data.description + ' Payout',
+        metadata: {
+            channel: channel.name
+        }
     }));
-
-    console.log(payout)
 
     res.json(transfer)
 };
 
 exports.getAccountTransfers = async (req, res) => {
     let {stripe_account_id, ...created} = req.query;
-    console.log(created)
     const transfers = await to(stripe.transfers.list({
         destination: stripe_account_id,
         created
     }));
 
+
     res.json(transfers);
 };
 
-exports.getAccountPayouts = async (req, res) => {
-    let {stripe_account_id} = req.query;
-    const payouts = await stripe.payouts.list({
-        // destination: stripe_account_id
-    });
-    res.json(payouts);
-};
+
