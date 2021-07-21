@@ -100,8 +100,8 @@ exports.createStripeCharge = async (req, res) => {
 };
 
 exports.getAllPaymentsHistory = async (req, res) => {
-    let {created, customer} = req.query;
-    console.log(created)
+    let {customer, ...created} = req.query;
+    console.log(req.query)
     const paymentIntents = await stripe.paymentIntents.list({
         created,
         customer
@@ -110,18 +110,19 @@ exports.getAllPaymentsHistory = async (req, res) => {
 };
 
 exports.getPurchasesHistory = async (req, res) => {
-    let {created, customer} = req.query;
+    let {customer, ...created} = req.query;
     const charges = await stripe.charges.list({created, customer});
     res.json(charges.data)
 };
 
 exports.getAccountPayouts = async (req, res) => {
-    let {stripe_account_id} = req.query;
-    console.log("PAYOUTS")
+    let {stripe_account_id, ...created} = req.query;
+    console.log("PAYOUTS", stripe_account_id)
     const payouts = await stripe.payouts.list({
-        // destination: stripe_account_id
+        // destination: stripe_account_id,
+        created
     });
 
-    console.log("PAYOUTS"+payouts)
-    res.json(payouts);
+    console.log( payouts)
+    res.json(payouts.data);
 };

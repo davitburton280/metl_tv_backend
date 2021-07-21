@@ -300,7 +300,7 @@ exports.createTransfer = async (req, res) => {
         description: data.description + ' Payout',
         metadata: {
             channel: channel.name
-        }
+        },
     }));
 
     res.json(transfer)
