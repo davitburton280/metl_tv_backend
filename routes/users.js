@@ -12,5 +12,6 @@ router.put('/save-profile-changes', isAuth, uploadUserAvatar, usersController.sa
 router.post('/change-profile-image', isAuth, uploadAvatar, usersController.changeAvatar);
 router.post('/change-cover-image', isAuth, uploadCover, usersController.changeCover);
 router.post('/create-stripe-account', isAuth, usersController.createStripeAccount);
+router.get('/create-stripe-account-link', isAuth, usersController.createStripeAccountLink);
 
 module.exports = router;

@@ -86,7 +86,7 @@ exports.createStripeUserCard = async (req, res) => {
                 req.body.email = req.body.stripeEmail;
                 let acc = await usersController.createStripeAccount(req, res);
                 data.stripe_account_id = acc.id;
-                console.log("ACCOUNT ID" + acc.id)
+                console.log("STRIPE ACCOUNT !!!", acc.external_accounts.data)
 
                 if (acc.id) {
                     await this.createStripeCard(data, customer.id, req, res);
@@ -242,7 +242,7 @@ exports.removeCustomer = async (data) => {
     return deleted;
 };
 
-exports.removePaymentsFromHistory = async(data) =>{
+exports.removePaymentsFromHistory = async (data) => {
     await to(stripe.charges.del(data.stripe_customer_id));
     await to(stripe.transfers.del(data.stripe_customer_id));
     await to(stripe.payouts.del(data.stripe_customer_id));
@@ -284,7 +284,7 @@ exports.createTransfer = async (req, res) => {
 
     // Create a Transfer to the connected account (later):
     const transfer = await to(stripe.transfers.create({
-        amount: 100,
+        amount: 10,
         currency: 'usd',
         destination: data.to_account_id,
         transfer_group: '{ORDER10}',
@@ -294,14 +294,28 @@ exports.createTransfer = async (req, res) => {
         }
     }));
 
+    const accountBankAccounts = await to(stripe.accounts.listExternalAccounts(
+        data.to_account_id,
+        {object: 'bank_account', limit: 1}
+    ));
+
+    console.log("PAYOUT TO.....!!!!"+ accountBankAccounts?.data?.[0]?.id)
+
     const payout = await to(stripe.payouts.create({
-        amount: 100,
+        amount: 10,
         currency: 'usd',
         description: data.description + ' Payout',
+        destination: accountBankAccounts?.data?.[0]?.id,
         metadata: {
             channel: channel.name
         },
+        // source_type: 'bank_account',
+        // method: 'instant'
+    }, {
+        stripeAccount: data.to_account_id,
     }));
+
+    console.log(payout)
 
     res.json(transfer)
 };
@@ -311,10 +325,19 @@ exports.getAccountTransfers = async (req, res) => {
     const transfers = await to(stripe.transfers.list({
         destination: stripe_account_id,
         created
-    }));
+    } ));
 
 
     res.json(transfers);
 };
 
+exports.createTopup = async (req, res) => {
+    const topup = await stripe.topups.create({
+        amount: 200000,
+        currency: 'usd',
+        description: 'Top-up for week of May 31',
+        statement_descriptor: 'Weekly top-up',
+    });
 
+    res.json(topup);
+};

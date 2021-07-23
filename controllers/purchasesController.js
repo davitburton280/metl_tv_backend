@@ -117,12 +117,21 @@ exports.getPurchasesHistory = async (req, res) => {
 
 exports.getAccountPayouts = async (req, res) => {
     let {stripe_account_id, ...created} = req.query;
-    console.log("PAYOUTS", stripe_account_id)
-    const payouts = await stripe.payouts.list({
-        // destination: stripe_account_id,
-        created
-    });
 
+    const accountBankAccounts = await to(stripe.accounts.listExternalAccounts(
+        stripe_account_id,
+        {object: 'bank_account', limit: 1}
+    ));
+
+    // console.log("PAYOUTS", accountBankAccounts)
+    const payouts = await stripe.payouts.list({
+        destination: accountBankAccounts?.data?.[0]?.id,
+        created
+    },
+        {
+            stripeAccount: stripe_account_id,
+        });
+console.log('aaaaaa')
     console.log( payouts)
     res.json(payouts.data);
 };

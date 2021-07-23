@@ -8,4 +8,5 @@ router.post('/create-payment-intent', purchasesController.createPaymentIntent);
 router.get('/get-all-payments-history', purchasesController.getAllPaymentsHistory);
 router.get('/get-purchases-history', purchasesController.getPurchasesHistory);
 router.get('/get-payouts-history', purchasesController.getAccountPayouts);
+router.get('/get-account-payouts', purchasesController.getAccountPayouts);
 module.exports = router;

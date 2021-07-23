@@ -1,3 +1,4 @@
+
 require('dotenv').config()
 /* OPENVIDU CONFIGURATION */
 
@@ -278,10 +279,6 @@ exports.createStripeAccount = async (req, res) => {
             card_payments: {requested: true},
             transfers: {requested: true},
         },
-        // settings: {
-        //     payments: true,
-        //     payouts: true
-        // },
         tos_acceptance: {
             ip: req.ip,
             date: moment().format('X')
@@ -325,6 +322,31 @@ exports.createStripeAccount = async (req, res) => {
             // token: 'tok_1JDTf1KqYIKd5fEIm8QKJEtQ'
         }
 
-    })
+    });
     return acc;
+};
+
+exports.createStripeAccountLink = async (req,res) =>{
+    const {user_id} = req.query;
+    let account = await stripe.accounts.create({
+        type: "express",
+        business_type: "individual",
+        capabilities: {
+            card_payments: {requested: true},
+            transfers: {requested: true},
+        },
+        country: 'US',
+    });
+
+    await UsersCards.update({stripe_account_id: account.id}, {where: {user_id}});
+
+    const accountLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: process.env.API_URL,
+        return_url: process.env.API_URL,
+        type: 'account_onboarding',
+        // collect: 'eventually_due',
+    });
+
+    res.json(accountLink)
 };
