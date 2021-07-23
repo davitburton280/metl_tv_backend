@@ -131,7 +131,7 @@ exports.getAccountPayouts = async (req, res) => {
         {
             stripeAccount: stripe_account_id,
         });
-console.log('aaaaaa')
+
     console.log( payouts)
     res.json(payouts.data);
 };
