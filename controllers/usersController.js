@@ -204,7 +204,7 @@ exports.changeJwt = async (data, res, ret = false) => {
     });
 
 
-    let full_name = user[`full_name`];
+    let full_name = user[`first_name`]+' '+user[`last_name`];
     let {
         password,
         ...details
@@ -215,7 +215,7 @@ exports.changeJwt = async (data, res, ret = false) => {
                 expiresIn: '8h'
             }),
             user_id: user.id,
-            full_name: full_name
+            full_name
         })
     } else if (ret) {
         return jwt.sign(details, 'secretkey', {

@@ -155,7 +155,7 @@ exports.getSubscribers = async (req, res) => {
         include: [
             {
                 model: Users, as: 'subscribers',
-                attributes: ['email', 'full_name', 'id'],
+                attributes: ['email', ['full_name', ['first_name','last_name']], 'id'],
                 where:
                     sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
             },

@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
                 res.status(200).json({
                     token: jwt.sign(details, 'secretkey', {expiresIn: '8h'}),
                     user_id: user.id,
-                    full_name: user[`full_name`]
+                    full_name: user[`first_name`]+' '+user['last_name']
                 })
             }
 
@@ -158,7 +158,7 @@ exports.sendForgotPassEmail = async (req, res) => {
         let tempToken = jwt.sign({
             email: foundUser.email,
             id: foundUser.id,
-            full_name: foundUser.full_name,
+            full_name: foundUser.first_name+' '+foundUser.last_name,
             gender: foundUser.gender,
         }, 'secretkey', {expiresIn: '1h'});
 
@@ -215,7 +215,7 @@ exports.register = async (req, res) => {
         console.log(data)
 
         let user = await Users.create(data);
-        await Channels.create({name: data.full_name, user_id: user.id, avatar: user.avatar, cover: user.cover});
+        await Channels.create({name: data.first_name+' '+data.last_name, user_id: user.id, avatar: user.avatar, cover: user.cover});
 
         // Saving the original password again to request for authenticating the user at once
         data.password = originalPass;

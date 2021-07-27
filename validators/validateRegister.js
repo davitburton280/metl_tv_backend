@@ -6,9 +6,12 @@ const Users = db.users;
 
 
 const rules = [
-    body('full_name')
-        .matches(TEXT_ONLY_WITHOUT_SPECIALS_PATTERN).withMessage('Full name should contain only alphabetical characters')
-        .not().isEmpty().withMessage('Full name is required'),
+    body('first_name')
+        .matches(TEXT_ONLY_WITHOUT_SPECIALS_PATTERN).withMessage('First name should contain only alphabetical characters')
+        .not().isEmpty().withMessage('First name is required'),
+    body('last_name')
+        .matches(TEXT_ONLY_WITHOUT_SPECIALS_PATTERN).withMessage('Last name should contain only alphabetical characters')
+        .not().isEmpty().withMessage('Last name is required'),
     body('username')
         .not().isEmpty().withMessage('Username is required')
         .matches(NUMBER_AFTER_TEXT_PATTERN).withMessage('Please write alphabetical characters before numbers for username'),

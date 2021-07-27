@@ -6,7 +6,8 @@ module.exports = {
 
         return queryInterface.bulkInsert('users', [
             {
-                first_name: process.env.DEV_FULL_NAME,
+                first_name: process.env.DEV_FIRST_NAME,
+                last_name: process.env.DEV_LAST_NAME,
                 birthday: '1986-03-30',
                 gender: 'male',
                 email: process.env.DEV_EMAIL,
@@ -19,7 +20,8 @@ module.exports = {
                 updated_at: new Date()
             },
             // {
-            //     full_name: process.env.CLIENT_FULL_NAME,
+            //     first_name: process.env.CLIENT_FIRST_NAME,
+            //     last_name: process.env.CLIENT_LAST_NAME,
             //     birthday: '1993-05-30',
             //     gender: 'male',
             //     email: process.env.CLIENT_EMAIL,

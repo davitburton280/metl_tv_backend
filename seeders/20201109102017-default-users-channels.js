@@ -7,7 +7,7 @@ module.exports = {
         const users = await Users.findAll({});
         const channels = [];
         users.map(user => {
-            channels.push({user_id: user.id, name: user.full_name});
+            channels.push({user_id: user.id, name: `${user.first_name} ${user.last_name}`});
         });
 
         return queryInterface.bulkInsert('channels', channels);

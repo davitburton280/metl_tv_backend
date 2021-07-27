@@ -299,7 +299,7 @@ exports.getVideoById = async (req, res) => {
             {
                 model: Users,
                 as: 'users_vids',
-                attributes: ['id', 'full_name', 'username'],
+                attributes: ['id', ['full_name', ['first_name','last_name']], 'username'],
                 // where: {id: user_id},
                 // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
                 through: {attributes: ['liked', 'disliked', 'saved', 'viewed']}
@@ -573,7 +573,7 @@ exports.getVideoComments = async (req, res) => {
         where: where,
         include: [
             {
-                model: Users, as: 'user', attributes: ['id', 'full_name', 'username', 'avatar'], include: [
+                model: Users, as: 'user', attributes: ['id', ['full_name', ['first_name','last_name']], 'username', 'avatar'], include: [
                     {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
                 ]
             },
@@ -581,14 +581,14 @@ exports.getVideoComments = async (req, res) => {
             {
                 model: VideosComments, as: 'replies', where: {is_reply: 1}, required: false, include: [
                     {
-                        model: Users, as: 'user', attributes: ['id', 'full_name', 'username', 'avatar'], include: [
+                        model: Users, as: 'user', attributes: ['id', ['full_name', ['first_name','last_name']], 'username', 'avatar'], include: [
                             {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
                         ]
                     },
                     {
                         model: Users,
                         as: 'reactors',
-                        attributes: ['id', 'full_name', 'username'],
+                        attributes: ['id', ['full_name', ['first_name','last_name']], 'username'],
                         through: {attributes: ['liked', 'disliked']},
                         required: false
                     },
@@ -613,7 +613,7 @@ exports.getVideoComments = async (req, res) => {
             {
                 model: Users,
                 as: 'reactors',
-                attributes: ['id', 'full_name', 'username'],
+                attributes: ['id', ['full_name', ['first_name','last_name']], 'username'],
                 through: {attributes: ['liked', 'disliked']},
                 required: false
             },
