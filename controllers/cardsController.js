@@ -84,15 +84,15 @@ exports.createStripeUserCard = async (req, res) => {
                         // source: req.body.stripeToken,
                     });
                 req.body.email = req.body.stripeEmail;
-                let acc = await usersController.createStripeAccount(req, res);
-                data.stripe_account_id = acc.id;
-                console.log("STRIPE ACCOUNT !!!", acc.external_accounts.data)
-
-                if (acc.id) {
+                // let acc = await usersController.createStripeAccount(req, res);
+                // data.stripe_account_id = acc.id;
+                // console.log("STRIPE ACCOUNT !!!", acc.external_accounts.data)
+                //
+                // if (acc.id) {
                     await this.createStripeCard(data, customer.id, req, res);
-                } else {
-                    res.status(500).json({msg: 'Account is not created'})
-                }
+                // } else {
+                //     res.status(500).json({msg: 'Account is not created'})
+                // }
             } else {
                 let customer = await stripe.customers
                     .list(
