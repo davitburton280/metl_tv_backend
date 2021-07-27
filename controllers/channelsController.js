@@ -12,6 +12,7 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 const nl2br = require('../helpers/nl2br');
 const showIfErrors = require('../helpers/showIfErrors');
+const getFullName = require('../helpers/getFullNameCol');
 
 exports.get = async (req, res) => {
     console.log('here!!!!!!!!!!!!!')
@@ -148,6 +149,7 @@ exports.checkChannelSubscription = async (req, res) => {
 
 exports.getSubscribers = async (req, res) => {
     let {user_id} = req.query;
+    let fullName = getFullName();
     console.log('user channel subscriptions!!!!!')
     let userSubscriptions = await Channels.findAll({
         // where: {user_id: user_id},
@@ -155,7 +157,7 @@ exports.getSubscribers = async (req, res) => {
         include: [
             {
                 model: Users, as: 'subscribers',
-                attributes: ['email', ['full_name', ['first_name','last_name']], 'id'],
+                attributes: ['email',fullName, 'id'],
                 where:
                     sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
             },
