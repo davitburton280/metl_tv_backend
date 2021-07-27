@@ -6,7 +6,7 @@ module.exports = {
 
         return queryInterface.bulkInsert('users', [
             {
-                full_name: process.env.DEV_FULL_NAME,
+                first_name: process.env.DEV_FULL_NAME,
                 birthday: '1986-03-30',
                 gender: 'male',
                 email: process.env.DEV_EMAIL,

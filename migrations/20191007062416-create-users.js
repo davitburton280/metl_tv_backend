@@ -17,15 +17,15 @@ module.exports = {
             stocks_order_type_id: {
                 type: Sequelize.INTEGER
             },
-            full_name: {
+            first_name: {
+                type: Sequelize.STRING
+            },
+            last_name: {
                 type: Sequelize.STRING
             },
             username: {
                 type: Sequelize.STRING
             },
-            // last_name: {
-            //   type: Sequelize.STRING
-            // },
             birthday: {
                 type: Sequelize.DATEONLY
             },
