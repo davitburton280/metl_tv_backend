@@ -299,7 +299,7 @@ exports.createTransfer = async (req, res) => {
         {object: 'bank_account', limit: 1}
     ));
 
-    console.log("PAYOUT TO.....!!!!"+ accountBankAccounts?.data?.[0]?.id)
+    console.log("PAYOUT TO.....!!!!" + accountBankAccounts?.data?.[0]?.id)
 
     const payout = await to(stripe.payouts.create({
         amount: 10,
@@ -325,10 +325,10 @@ exports.getAccountTransfers = async (req, res) => {
     const transfers = await to(stripe.transfers.list({
         destination: stripe_account_id,
         created
-    } ));
+    }));
 
-
-    res.json(transfers);
+    console.log("TRANSFERS" + transfers.data)
+    res.json(transfers.data || []);
 };
 
 exports.createTopup = async (req, res) => {
