@@ -7,5 +7,6 @@ module.exports = (promise,res = '') => {
     .catch(err => {
         if(res) res.status(500).json(err)
         else return err;
+
     });
 };
