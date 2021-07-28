@@ -69,7 +69,7 @@ exports.createStripeUserCard = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
         let stripeUserFound = await UsersCards.findOne({where: {user_id: data.user_id}});
-        console.log(stripeUserFound)
+        // console.log(stripeUserFound)
         let customerFound = await stripe.customers.list({
             email: data.stripeEmail
         });
