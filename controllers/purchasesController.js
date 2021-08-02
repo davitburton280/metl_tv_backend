@@ -70,7 +70,7 @@ exports.createPaymentIntent = async (req, res) => {
         currency,
         customer: customer_id,
         description: `${purchase.name} Metl Coins Bundle`,
-        metadata: {name: purchase.name}
+        metadata: {name: purchase.name, price: purchase.unit_amount} // temporary unit_amount, maybe will be changed after currencies converter implemented
     }).catch(e => {
         res.status(500).json({msg: e?.raw?.message})
     });
