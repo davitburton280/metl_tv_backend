@@ -311,17 +311,30 @@ exports.createStripeAccount = async (req, res) => {
     //         //     state: "New York"
     //         // }
     //     },
-    //     external_account: {
-    //         object: 'bank_account',
-    //         currency: 'USD',
-    //         country: 'US',
-    //         account_holder_type: 'individual',
-    //         account_holder_name: "Jenny Rosen",
-    //         routing_number: '110000000',
-    //         account_number: '000123456789'
-    //         // token: 'tok_1JDTf1KqYIKd5fEIm8QKJEtQ'
-    //     }
-    //
+        // external_account: {
+        //     object: 'bank_account',
+        //     currency: 'USD',
+        //     country: 'US',
+        //     account_holder_type: 'individual',
+        //     account_holder_name: "Jenny Rosen",
+        //     routing_number: '110000000',
+        //     account_number: '000123456789'
+        //     // token: 'tok_1JDTf1KqYIKd5fEIm8QKJEtQ'
+        // }
+        // external_account: 'tok_visa_debit_transferSuccess',
+            // {
+        //     object: 'card',
+        //     number: ['4242 4242 4242 4242'],
+        //     exp_month: ['02'],
+        //     exp_year: ['24'],
+        //         currency: 'USD',
+        //         country: 'US',
+        //         account_holder_type: 'individual',
+        //         account_holder_name: "Jenny Rosen",
+        //
+        //     // token: 'tok_1JDTf1KqYIKd5fEIm8QKJEtQ'
+        // }
+
     // }));
 
     let acc = await to(stripe.accounts.create({

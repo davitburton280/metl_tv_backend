@@ -64,18 +64,20 @@ exports.getVideos = async (req, res) => {
                 where: whereTag,
                 required: !!tag
             },
-            {model: PrivacyTypes, as: 'privacy', where: wherePrivacy},
+        // @todo this part was breaking when loading live videos, please check
+            //  {model: PrivacyTypes, as: 'privacy', where: wherePrivacy},
             {
                 model: VideoCategories,
                 as: 'category',
                 where: whereCategory
             }
-
+        //
         ],
         order: trendingOption,
         where: whereFilters,
         limitOption
     });
+    console.log(v)
     ret['videos'] = v;
     // whereFilters = this.getVideoFiltersQuery(filters, '`videos->category`.`name`');
     // console.log(filters, whereFilters)
