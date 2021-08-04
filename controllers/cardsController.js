@@ -74,9 +74,9 @@ exports.createStripeUserCard = async (req, res) => {
             email: data.stripeEmail
         });
 
-        // If customer not found
         if (!stripeUserFound) {
 
+            // If customer not found
             if (customerFound.data.length === 0) {
                 let customer = await stripe.customers
                     .create({
@@ -90,7 +90,7 @@ exports.createStripeUserCard = async (req, res) => {
                 // console.log("STRIPE ACCOUNT !!!", acc.external_accounts.data)
                 //
                 // if (acc.id) {
-                    await this.createStripeCard(data, customer.id, req, res);
+                await this.createStripeCard(data, customer.id, req, res);
                 // } else {
                 //     res.status(500).json({msg: 'Account is not created'})
                 // }
