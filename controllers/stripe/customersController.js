@@ -8,6 +8,7 @@ const showIfErrors = require('../../helpers/showIfErrors');
 const getCardData = require('../../helpers/generateCardData');
 const getExpDate = require('../../helpers/generateCardExpiryDate');
 
+
 exports.getCustomerCards = async (req, res) => {
     let {user_id} = req.query;
     let userCards = await UsersCards.findAll({
@@ -33,6 +34,20 @@ exports.getCustomerCards = async (req, res) => {
 
 }
 
+exports.getCardDetails = async (req, res) => {
+    let {card_id} = req.query;
+    let userCard = await UsersCards.findOne({where: {card_id}, raw: true});
+    if (userCard?.stripe_customer_id) {
+        const card = await stripe.customers.retrieveSource(
+            userCard.stripe_customer_id,
+            card_id
+        );
+        res.json({...card, ...userCard});
+    } else {
+        res.status(500).json({msg: 'The specified card isn\'t found in database'});
+    }
+};
+
 exports.createCustomerCard = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
@@ -52,7 +67,7 @@ exports.createCustomerCard = async (req, res) => {
             }
         } else {
 
-            let stripeCardFound = await UsersCards.findOne({where: {card: getCardData(data)}});
+            let stripeCardFound = await UsersCards.findOne({where: getCardData(data)});
 
             if (stripeCardFound) {
                 res.status(500).json({msg: 'A card with such details already exists'})
@@ -98,21 +113,21 @@ exports.createStripeCard = async (data, customer_id, req, res) => {
 
 exports.setCardAsDefault = async (req, res) => {
     let {card_id, stripe_customer_id} = req.body;
-    await stripe.customers.update(
+    await to(stripe.customers.update(
         stripe_customer_id,
-        {
-            default_source: card_id
-        }, async (err, customer) => {
-            if (err) {
-                res.status(500).json(err);
-            } else {
-                await UsersCards.update({is_primary: 0}, {where: {stripe_customer_id}});
-                await UsersCards.update({is_primary: 1}, {where: {card_id}});
-                req.query = req.body;
-                await this.getCustomerCards(req, res);
-            }
-        }
-    );
+        {default_source: card_id}
+    ), res)
+
+    await to(UsersCards.update({is_primary: 0}, {where: {stripe_customer_id}}));
+    await to(UsersCards.update({is_primary: 1}, {where: {card_id}}));
+    req.query = req.body;
+    await this.getCustomerCards(req, res);
+};
+
+exports.updateStripeCard = async (req, res) => {
+    let {card_id, name} = req.body;
+    await to(UsersCards.update({name}, {where: {card_id}}));
+    res.json('OK');
 };
 
 exports.removeStripeCard = async (req, res) => {
