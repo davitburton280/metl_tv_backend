@@ -114,3 +114,29 @@ exports.setCardAsDefault = async (req, res) => {
         }
     );
 };
+
+exports.removeStripeCard = async (req, res) => {
+    let data = req.query;
+
+    let confirmation = await to(stripe.customers.deleteSource(
+        data.stripe_customer_id,
+        data.card_id,
+    ));
+    if (confirmation?.deleted) {
+        await UsersCards.destroy({where: {user_id: data.user_id, card_id: data.card_id}});
+        let userCards = await UsersCards.findAll({where: {user_id: data.user_id}});
+        if (userCards.length === 0) {
+            await this.removeCustomer(data);
+            // await this.removeAccount(data);
+        }
+        await this.getCustomerCards(req, res);
+    }
+
+};
+
+exports.removeCustomer = async (data) => {
+    const deleted = await to(stripe.customers.del(
+        data.stripe_customer_id
+    ));
+    return deleted;
+};
