@@ -16,6 +16,7 @@ module.exports = {
                 username: process.env.DEV_USERNAME,
                 avatar: '',
                 cover: '',
+                phone: '000 000 0000',
                 created_at: new Date(),
                 updated_at: new Date()
             },
