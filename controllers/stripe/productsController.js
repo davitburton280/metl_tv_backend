@@ -1,9 +1,4 @@
-const db = require('../models');
-const UsersCards = db.users_cards;
-
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
-
-const showIfErrors = require('../helpers/showIfErrors');
 
 exports.getProducts = async (req, res) => {
     const products = await stripe.products.list({});
@@ -22,12 +17,3 @@ exports.getProducts = async (req, res) => {
 
     res.json(merged.sort((a, b) => a.unit_amount > b.unit_amount && 1 || -1));
 };
-
-exports.removeProduct = async (req, res) => {
-    const deleted = await stripe.products.del(
-        'prod_Jo9971iDFvOtot'
-    );
-
-    console.log(deleted)
-    res.json(deleted)
-}

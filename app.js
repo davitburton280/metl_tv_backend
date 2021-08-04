@@ -92,6 +92,7 @@ app.use('/cards', require('./routes/cards'));
 app.use('/products', require('./routes/products'));
 app.use('/chat', require('./routes/chat'));
 app.use('/webhooks', require('./routes/webhooks'));
+app.use('/stripe/customers', require('./routes/stripe/customers'));
 
 
 let dist = path.join(__dirname, 'dist/');

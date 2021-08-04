@@ -261,6 +261,7 @@ exports.removeAccount = async (data) => {
     return deleted;
 };
 
+// PAYMENTS CONTROLLER
 exports.createTransfer = async (req, res) => {
     let data = req.body;
     console.log(data)
