@@ -2,6 +2,7 @@ const db = require('../../models');
 const UsersCards = db.users_cards;
 
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
+const moment = require('moment');
 
 const to = require('../../helpers/getPromiseResult');
 
@@ -124,7 +125,7 @@ exports.createStripeAccountLink = async (req, res) => {
     res.json(accountLink)
 };
 
-exports.getStripeAccount = async (req,res) =>{
+exports.getStripeAccount = async (req, res) => {
     let {stripe_account_id} = req.query;
     const account = await to(stripe.accounts.retrieve(
         stripe_account_id
