@@ -9,7 +9,6 @@ const to = require('../../helpers/getPromiseResult');
 
 exports.createTransfer = async (req, res) => {
     let data = req.body;
-    console.log(data)
 
     // Create a PaymentIntent:
     const paymentIntent = await to(stripe.paymentIntents.create({
@@ -61,8 +60,6 @@ exports.createTransfer = async (req, res) => {
     }, {
         stripeAccount: data.to_account_id,
     }));
-
-    console.log(payout)
 
     res.json(transfer)
 };
