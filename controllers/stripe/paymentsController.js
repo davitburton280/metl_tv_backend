@@ -31,7 +31,7 @@ exports.createTransfer = async (req, res) => {
 
     // Create a Transfer to the connected account (later):
     const transfer = await to(stripe.transfers.create({
-        amount: 10,
+        amount: 100,
         currency: 'usd',
         destination: data.to_account_id,
         transfer_group: '{ORDER10}',
@@ -49,7 +49,7 @@ exports.createTransfer = async (req, res) => {
     console.log("PAYOUT TO.....!!!!" + accountBankAccounts?.data?.[0]?.id)
 
     const payout = await to(stripe.payouts.create({
-        amount: 10,
+        amount: 100,
         currency: 'usd',
         description: data.description + ' Payout',
         destination: accountBankAccounts?.data?.[0]?.id,
