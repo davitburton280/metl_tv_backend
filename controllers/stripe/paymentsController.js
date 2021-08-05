@@ -78,6 +78,80 @@ exports.getAccountTransfers = async (req, res) => {
     res.json(transfers.data || []);
 };
 
+
+exports.createPaymentIntent = async (req, res) => {
+    let {customer_id, currency, card, purchase} = req.body;
+    const intent = await stripe.paymentIntents.create({
+        amount: purchase.unit_amount,
+        currency,
+        customer: customer_id,
+        description: `${purchase.name} Metl Coins Bundle`,
+        metadata: {name: purchase.name, price: purchase.unit_amount} // temporary unit_amount, maybe will be changed after currencies converter implemented
+    }).catch(e => {
+        res.status(500).json({msg: e?.raw?.message})
+    });
+
+    res.json(intent.client_secret)
+};
+
+exports.createStripeCharge = async (req, res) => {
+    let data = req.body;
+    let {card, purchase, email} = req.body;
+    // console.log('card', card)
+
+
+    const charge = await stripe.charges.create({
+        amount: purchase.unit_amount,
+        currency: purchase.currency,
+        source: card.id,
+        customer: card.stripe_customer_id,
+        description: `${purchase.name} Metl Coins Bundle`,
+        metadata: {name: purchase.name}
+    }).catch(e => {
+        res.status(500).json({msg: e?.raw?.message})
+    });
+
+    res.json(charge);
+};
+
+exports.getAllPaymentsHistory = async (req, res) => {
+    let {customer, ...created} = req.query;
+    console.log(req.query)
+    const paymentIntents = await stripe.paymentIntents.list({
+        created,
+        customer
+    });
+    res.json(paymentIntents.data)
+};
+
+exports.getPurchasesHistory = async (req, res) => {
+    let {customer, ...created} = req.query;
+    const charges = await stripe.charges.list({created, customer});
+    res.json(charges.data)
+};
+
+exports.getAccountPayouts = async (req, res) => {
+    let {stripe_account_id, ...created} = req.query;
+
+    const accountBankAccounts = await to(stripe.accounts.listExternalAccounts(
+        stripe_account_id,
+        {object: 'bank_account', limit: 1}
+    ));
+
+    // console.log("PAYOUTS", accountBankAccounts)
+    const payouts = await stripe.payouts.list({
+            destination: accountBankAccounts?.data?.[0]?.id,
+            created
+        },
+        {
+            stripeAccount: stripe_account_id,
+        });
+
+    console.log( payouts)
+    res.json(payouts.data);
+};
+
+
 exports.createTopup = async (req, res) => {
     const topup = await stripe.topups.create({
         amount: 200000,
