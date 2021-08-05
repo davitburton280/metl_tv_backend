@@ -7,12 +7,9 @@ const isAuth = require('../helpers/isAuth');
 router.get('/session/get-token', usersController.getSession);
 router.get('/session/leave', usersController.leaveSession);
 router.get('/get-user-info', isAuth, usersController.getUserInfo);
-router.get('/get-stripe-customer-info', isAuth, usersController.getStripeCustomerInfo);
 router.put('/save-profile-changes', isAuth, uploadUserAvatar, usersController.saveProfileChanges);
 router.post('/change-profile-image', isAuth, uploadAvatar, usersController.changeAvatar);
 router.post('/change-cover-image', isAuth, uploadCover, usersController.changeCover);
-router.post('/create-stripe-account', isAuth, usersController.createStripeAccount);
-router.get('/create-stripe-account-link', isAuth, usersController.createStripeAccountLink);
-router.get('/get-stripe-account', isAuth, usersController.getStripeAccount);
+
 
 module.exports = router;

@@ -93,6 +93,7 @@ app.use('/products', require('./routes/products'));
 app.use('/chat', require('./routes/chat'));
 app.use('/webhooks', require('./routes/webhooks'));
 app.use('/stripe/customers', require('./routes/stripe/customers'));
+app.use('/stripe/accounts', require('./routes/stripe/accounts'));
 
 
 let dist = path.join(__dirname, 'dist/');
