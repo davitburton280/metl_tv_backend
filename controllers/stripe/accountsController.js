@@ -132,3 +132,15 @@ exports.getStripeAccount = async (req, res) => {
     ), res);
     res.json(account)
 };
+
+exports.removeAccount = async (data) => {
+    console.log("STRIPE ACCOUNT ID:" + data.stripe_account_id)
+    let deleted = false;
+    if (data.stripe_account_id) {
+
+        deleted = await stripe.accounts.del(
+            data.stripe_account_id
+        );
+    }
+    return deleted;
+};

@@ -66,13 +66,15 @@ exports.createTransfer = async (req, res) => {
 
 exports.getAccountTransfers = async (req, res) => {
     let {stripe_account_id, ...created} = req.query;
-    const transfers = await to(stripe.transfers.list({
-        destination: stripe_account_id,
-        created
-    }));
+    let transfers = [];
+    if (stripe_account_id) {
+        transfers = await to(stripe.transfers.list({
+            destination: stripe_account_id,
+            created
+        }));
+    }
 
-    console.log("TRANSFERS" + transfers.data)
-    res.json(transfers.data || []);
+    res.json(transfers?.data || []);
 };
 
 
@@ -144,7 +146,7 @@ exports.getAccountPayouts = async (req, res) => {
             stripeAccount: stripe_account_id,
         });
 
-    console.log( payouts)
+    console.log(payouts)
     res.json(payouts.data);
 };
 

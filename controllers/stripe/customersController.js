@@ -8,6 +8,8 @@ const showIfErrors = require('../../helpers/showIfErrors');
 const getCardData = require('../../helpers/generateCardData');
 const getExpDate = require('../../helpers/generateCardExpiryDate');
 
+const accountsController = require('./accountsController');
+
 
 exports.getCustomerCards = async (req, res) => {
     let {user_id} = req.query;
@@ -142,7 +144,7 @@ exports.removeStripeCard = async (req, res) => {
         let userCards = await UsersCards.findAll({where: {user_id: data.user_id}});
         if (userCards.length === 0) {
             await this.removeCustomer(data);
-            // await this.removeAccount(data);
+            await accountsController.removeAccount(data);
         }
         await this.getCustomerCards(req, res);
     }
