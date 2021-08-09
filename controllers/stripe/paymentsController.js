@@ -10,6 +10,8 @@ const to = require('../../helpers/getPromiseResult');
 exports.createTransfer = async (req, res) => {
     let data = req.body;
 
+    console.log('CREATE TRANSFER !!!')
+
     // Create a PaymentIntent:
     const paymentIntent = await to(stripe.paymentIntents.create({
         amount: 100,
@@ -42,16 +44,16 @@ exports.createTransfer = async (req, res) => {
 
     const accountBankAccounts = await to(stripe.accounts.listExternalAccounts(
         data.to_account_id,
-        {object: 'bank_account', limit: 1}
+        {}
     ));
 
-    console.log("PAYOUT TO.....!!!!" + accountBankAccounts?.data?.[0]?.id)
+    console.log("PAYOUT TO.....!!!!" , accountBankAccounts.data.find(ba => ba.default_for_currency))
 
     const payout = await to(stripe.payouts.create({
         amount: 100,
         currency: 'usd',
         description: data.description + ' Payout',
-        destination: accountBankAccounts?.data?.[0]?.id,
+        destination: accountBankAccounts.data.find(ba => ba.default_for_currency)?.id,
         metadata: {
             channel: channel.name
         },
@@ -133,21 +135,22 @@ exports.getPurchasesHistory = async (req, res) => {
 exports.getAccountPayouts = async (req, res) => {
     let {stripe_account_id, ...created} = req.query;
 
+    console.log(stripe_account_id)
+
     const accountBankAccounts = await to(stripe.accounts.listExternalAccounts(
         stripe_account_id,
-        {object: 'bank_account', limit: 1}
+        // {object: 'bank_account', limit: 1}
     ));
 
     // console.log("PAYOUTS", accountBankAccounts)
     const payouts = await stripe.payouts.list({
-            destination: accountBankAccounts?.data?.[0]?.id,
+            destination: accountBankAccounts.data.find(ba => ba.default_for_currency)?.id,
             created
         },
         {
             stripeAccount: stripe_account_id,
         });
 
-    console.log(payouts)
     res.json(payouts.data);
 };
 

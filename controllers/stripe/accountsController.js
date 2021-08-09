@@ -23,15 +23,18 @@ exports.createStripeAccount = async (req, res) => {
 
     if (userCards) {
         let stripeAccountId = userCards.filter(uc => uc.stripe_account_id)[0]?.stripe_account_id;
-        const externalAccountsList = await stripe.accounts.listExternalAccounts(
-            stripeAccountId, {});
-        console.log(externalAccountsList)
-        const bankAccountLen = externalAccountsList.data.filter(ea => ea.object === 'bank_account').length;
-        const debitCardAccountLen = externalAccountsList.data.filter(ea => ea.object === 'card').length;
+
 
         // If user already created Stripe account, just adding external account for him
         if (stripeAccountId) {
-            console.log(bankAccountLen, debitCardAccountLen)
+
+
+            const externalAccountsList = await stripe.accounts.listExternalAccounts(
+                stripeAccountId, {});
+
+            const bankAccountLen = externalAccountsList.data.filter(ea => ea.object === 'bank_account').length;
+            const debitCardAccountLen = externalAccountsList.data.filter(ea => ea.object === 'card').length;
+
             if (bankAccountLen === 0 || debitCardAccountLen === 0) {
 
                 const externalAccount = await to(stripe.accounts.createExternalAccount(
@@ -40,7 +43,8 @@ exports.createStripeAccount = async (req, res) => {
                         external_account: accountData.external_account,
                     }
                 ));
-                res.json(externalAccount)
+                req.query.user_id = req.body.user_id;
+                await customersController.getCustomerCards(req, res);
             } else {
                 res.status(500).json({msg: 'We support not more than 2 accounts for payouts'});
             }
@@ -105,6 +109,18 @@ exports.getStripeAccount = async (req, res) => {
     res.json(account)
 };
 
+exports.setAsDefaultExternalAccount = async (req, res) => {
+    let {stripe_account_id, ext_account_id} = req.body;
+    await to(stripe.accounts.updateExternalAccount(
+        stripe_account_id,
+        ext_account_id,
+        {default_for_currency: true}
+    ));
+
+    req.query.stripe_account_id = req.body.stripe_account_id;
+    await this.getStripeAccount(req, res);
+};
+
 exports.removeAccount = async (data) => {
     console.log("STRIPE ACCOUNT ID:" + data.stripe_account_id)
     let deleted = false;
@@ -119,12 +135,14 @@ exports.removeAccount = async (data) => {
 
 exports.removeBankAccount = async (req, res) => {
     let {bank_id, card_id, account_id} = req.query;
-    const deleted = await to(stripe.accounts.deleteExternalAccount(
+    await to(stripe.accounts.deleteExternalAccount(
         account_id,
         bank_id || card_id
     ), res);
 
-    res.json('OK');
+    if (!res.headersSent) {
+        res.json('OK');
+    }
 }
 
 exports.removeDebitCard = async (req, res) => {
