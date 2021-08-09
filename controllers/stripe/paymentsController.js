@@ -105,7 +105,8 @@ exports.createStripeCharge = async (req, res) => {
         source: card.id,
         customer: card.stripe_customer_id,
         description: `${purchase.name} Metl Coins Bundle`,
-        metadata: {name: purchase.name}
+        metadata: {name: purchase.name},
+        transfer_group: 'purchases'
     }).catch(e => {
         res.status(500).json({msg: e?.raw?.message})
     });
@@ -125,7 +126,7 @@ exports.getAllPaymentsHistory = async (req, res) => {
 
 exports.getPurchasesHistory = async (req, res) => {
     let {customer, ...created} = req.query;
-    const charges = await stripe.charges.list({created, customer});
+    const charges = await stripe.charges.list({created, customer, transfer_group: 'purchases'});
     res.json(charges.data)
 };
 
