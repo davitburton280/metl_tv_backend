@@ -14,90 +14,38 @@ exports.checkIfUserHasStripeAccount = async (req, res) => {
     res.json(+!!stripeAccountId);
 }
 
+
 exports.createStripeAccount = async (req, res) => {
     let {email, ret, user_id, ...accountData} = req.body;
     console.log("CREATE STRIPE ACCOUNT" + email)
-    // let acc = await to(stripe.accounts.create({
-    //     type: "custom",
-    //     business_type: "individual",
-    //     country: "US",
-    //     email,
-    //     capabilities: {
-    //         card_payments: {requested: true},
-    //         transfers: {requested: true},
-    //     },
-    //     tos_acceptance: {
-    //         ip: req.ip,
-    //         date: moment().format('X')
-    //     },
-    //     individual: {
-    //         address: {
-    //             country: "US",
-    //             city: "New York",
-    //             state: "New York",
-    //             line1: "13 Street",
-    //             line2: "47 W",
-    //             postal_code: "10001",
-    //         },
-    //         email,
-    //         dob: {day: 30, month: 3, year: 1986},
-    //         id_number: "000000000",
-    //         first_name: "John",
-    //         last_name: "Doe",
-    //         phone: "000 000 0000"
-    //     },
-    //     business_profile: {
-    //         mcc: '5734',
-    //         url: "https://metl.tv/",
-    //         // support_address: {
-    //         //     city: "New York",
-    //         //     country: "US",
-    //         //     line1: "13 Street",
-    //         //     line2: "47 W",
-    //         //     postal_code: "10001",
-    //         //     state: "New York"
-    //         // }
-    //     },
-    // external_account: {
-    //     object: 'bank_account',
-    //     currency: 'USD',
-    //     country: 'US',
-    //     account_holder_type: 'individual',
-    //     account_holder_name: "Jenny Rosen",
-    //     routing_number: '110000000',
-    //     account_number: '000123456789'
-    //     // token: 'tok_1JDTf1KqYIKd5fEIm8QKJEtQ'
-    // }
-    // external_account: 'tok_visa_debit_transferSuccess',
-    // {
-    //     object: 'card',
-    //     number: ['4242 4242 4242 4242'],
-    //     exp_month: ['02'],
-    //     exp_year: ['24'],
-    //         currency: 'USD',
-    //         country: 'US',
-    //         account_holder_type: 'individual',
-    //         account_holder_name: "Jenny Rosen",
-    //
-    //     // token: 'tok_1JDTf1KqYIKd5fEIm8QKJEtQ'
-    // }
-
-    // }));
 
     let userCards = await UsersCards.findAll({where: {user_id}});
 
     if (userCards) {
         let stripeAccountId = userCards.filter(uc => uc.stripe_account_id)[0]?.stripe_account_id;
+        const externalAccountsList = await stripe.accounts.listExternalAccounts(
+            stripeAccountId, {});
+        console.log(externalAccountsList)
+        const bankAccountLen = externalAccountsList.data.filter(ea => ea.object === 'bank_account').length;
+        const debitCardAccountLen = externalAccountsList.data.filter(ea => ea.object === 'card').length;
+
         // If user already created Stripe account, just adding external account for him
         if (stripeAccountId) {
-            const externalAccount = await to(stripe.accounts.createExternalAccount(
-                stripeAccountId,
-                {
-                    external_account: req.body.external_account,
-                }
-            ));
-            console.log('ACCOUNT ID', stripeAccountId)
-            res.json(externalAccount)
+            console.log(bankAccountLen, debitCardAccountLen)
+            if (bankAccountLen === 0 || debitCardAccountLen === 0) {
+
+                const externalAccount = await to(stripe.accounts.createExternalAccount(
+                    stripeAccountId,
+                    {
+                        external_account: accountData.external_account,
+                    }
+                ));
+                res.json(externalAccount)
+            } else {
+                res.status(500).json({msg: 'We support not more than 2 accounts for payouts'});
+            }
+
+            // If user hasn't got Stripe account, adding it with external account
         } else {
             let acc = await to(stripe.accounts.create({
                 type: "custom",
@@ -123,14 +71,6 @@ exports.createStripeAccount = async (req, res) => {
     } else {
         res.status(500).json({msg: 'Please add at least one credit card first'})
     }
-
-
-    // if (ret) {
-    //     return acc;
-    // } else if (!res.headersSent) {
-    //     req.query.user_id = req.body.user_id;
-    //     await customersController.getCustomerCards(req, res);
-    // }
 };
 
 exports.createStripeAccountLink = async (req, res) => {
