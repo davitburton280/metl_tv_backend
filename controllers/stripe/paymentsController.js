@@ -18,7 +18,7 @@ exports.createTransfer = async (req, res) => {
         currency: 'usd',
         payment_method_types: ['card'],
         payment_method: data.card_id,
-        transfer_group: '{ORDER10}',
+        transfer_group: 'transfers',
         customer: data.stripe_customer_id,
         confirm: true
     }));
@@ -35,7 +35,7 @@ exports.createTransfer = async (req, res) => {
         amount: 100,
         currency: 'usd',
         destination: data.to_account_id,
-        transfer_group: '{ORDER10}',
+        transfer_group: 'transfers',
         description: data.description,
         metadata: {
             channel: channel.name
@@ -47,7 +47,7 @@ exports.createTransfer = async (req, res) => {
         {}
     ));
 
-    console.log("PAYOUT TO.....!!!!" , accountBankAccounts.data.find(ba => ba.default_for_currency))
+    console.log("PAYOUT TO.....!!!!", accountBankAccounts.data.find(ba => ba.default_for_currency))
 
     const payout = await to(stripe.payouts.create({
         amount: 100,
@@ -87,7 +87,8 @@ exports.createPaymentIntent = async (req, res) => {
         currency,
         customer: customer_id,
         description: `${purchase.name} Metl Coins Bundle`,
-        metadata: {name: purchase.name, price: purchase.unit_amount} // temporary unit_amount, maybe will be changed after currencies converter implemented
+        metadata: {name: purchase.name, price: purchase.unit_amount}, // temporary unit_amount, maybe will be changed after currencies converter implemented
+        transfer_group: 'purchases'
     }).catch(e => {
         res.status(500).json({msg: e?.raw?.message})
     });
@@ -144,7 +145,7 @@ exports.getAccountPayouts = async (req, res) => {
 
     // console.log("PAYOUTS", accountBankAccounts)
     const payouts = await stripe.payouts.list({
-            destination: accountBankAccounts.data.find(ba => ba.default_for_currency)?.id,
+            destination: accountBankAccounts.data?.find(ba => ba.default_for_currency)?.id,
             created
         },
         {
