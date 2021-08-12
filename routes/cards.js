@@ -14,5 +14,14 @@ router.put('/update-stripe-user-card-info', isAuth, cardsController.updateStripe
 router.put('/set-customer-card-as-default', cardsController.setCardAsDefault);
 router.delete('/remove-stripe-user-card', isAuth, cardsController.removeStripeCard);
 
+router.get('/retrieve-balance', async (req, res) => {
+    console.log('aaaa')
+    const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
+    const balance = await stripe.balance.retrieve({
+        stripeAccount: 'acct_1JNGx1QMf5zn7mWx'
+    });
+    res.json(balance)
+})
+
 
 module.exports = router;

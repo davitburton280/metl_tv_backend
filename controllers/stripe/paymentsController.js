@@ -82,16 +82,14 @@ exports.getAccountTransfers = async (req, res) => {
 
 exports.createPaymentIntent = async (req, res) => {
     let {customer_id, currency, card, purchase} = req.body;
-    const intent = await stripe.paymentIntents.create({
+    const intent = await to(stripe.paymentIntents.create({
         amount: purchase.unit_amount,
         currency,
         customer: customer_id,
         description: `${purchase.name} Metl Coins Bundle`,
         metadata: {name: purchase.name, price: purchase.unit_amount}, // temporary unit_amount, maybe will be changed after currencies converter implemented
         transfer_group: 'purchases'
-    }).catch(e => {
-        res.status(500).json({msg: e?.raw?.message})
-    });
+    }), res)
 
     res.json(intent.client_secret)
 };

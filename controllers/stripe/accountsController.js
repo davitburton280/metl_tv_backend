@@ -152,7 +152,16 @@ exports.removeDebitCard = async (req, res) => {
         card_id
     ), res);
 
-    console.log(deleted)
+    if (!res.headersSent) {
+        res.json('OK');
+    }
+}
 
-    res.json('OK');
+exports.getBalance = async (req, res) => {
+    let {stripe_account_id} = req.query;
+    const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
+    const balance = await stripe.balance.retrieve({
+        stripeAccount: stripe_account_id
+    });
+    res.json(balance)
 }
