@@ -117,11 +117,13 @@ exports.createStripeCharge = async (req, res) => {
 
 exports.getAllPaymentsHistory = async (req, res) => {
     let {customer, ...created} = req.query;
-    console.log(req.query)
+
     const paymentIntents = await stripe.paymentIntents.list({
         created,
-        customer
+        customer,
+        limit: 20
     });
+    console.log(paymentIntents.data.length)
     res.json(paymentIntents.data)
 };
 
