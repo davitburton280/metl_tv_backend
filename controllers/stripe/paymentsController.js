@@ -1,5 +1,6 @@
 const db = require('../../models');
 const UsersCards = db.users_cards;
+const UsersCoins = db.users_coins;
 const Channel = db.channels;
 
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
@@ -81,7 +82,10 @@ exports.getAccountTransfers = async (req, res) => {
 
 
 exports.createPaymentIntent = async (req, res) => {
-    let {customer_id, currency, card, purchase} = req.body;
+    let data = req.body;
+    let {customer_id, currency, purchase} = data;
+    let coinWorth = 0.0199;
+    let purchasedCoins = (purchase.unit_amount / 100) / coinWorth;
     const intent = await to(stripe.paymentIntents.create({
         amount: purchase.unit_amount,
         currency,
@@ -90,6 +94,19 @@ exports.createPaymentIntent = async (req, res) => {
         metadata: {name: purchase.name, price: purchase.unit_amount}, // temporary unit_amount, maybe will be changed after currencies converter implemented
         transfer_group: 'purchases'
     }), res)
+
+    let foundRecord = await UsersCoins.findOne({where: {user_id: data.user_id}});
+    if (foundRecord) {
+
+        let i = await UsersCoins.increment('purchased', {by: purchasedCoins, where: {user_id: data.user_id}});
+    } else {
+        let us = await UsersCoins.create({
+            user_id: data.user_id,
+            stripe_account_id: data.stripe_account_id,
+            purchased: purchasedCoins
+        })
+    }
+
 
     res.json(intent.client_secret)
 };
@@ -116,15 +133,16 @@ exports.createStripeCharge = async (req, res) => {
 };
 
 exports.getAllPaymentsHistory = async (req, res) => {
-    let {customer, ...created} = req.query;
+    let {customer, user_id, ...created} = req.query;
 
     const paymentIntents = await stripe.paymentIntents.list({
         created,
         customer,
         limit: 20
     });
-    console.log(paymentIntents.data.length)
-    res.json(paymentIntents.data)
+
+    let userCoins = await UsersCoins.findOne({where: {user_id: user_id}, attributes: ['purchased','received']});
+    res.json({payment_intents: paymentIntents.data, user_coins: userCoins})
 };
 
 exports.getPurchasesHistory = async (req, res) => {

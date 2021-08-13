@@ -1,5 +1,6 @@
 const db = require('../../models');
 const UsersCards = db.users_cards;
+const UsersCoins = db.users_coins;
 
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
@@ -145,6 +146,7 @@ exports.removeStripeCard = async (req, res) => {
         if (userCards.length === 0) {
             await this.removeCustomer(data);
             await accountsController.removeAccount(data);
+            await UsersCoins.update({purchased: 0, received: 0}, {where: {user_id: data.user_id}})
         }
         await this.getCustomerCards(req, res);
     }
@@ -155,5 +157,6 @@ exports.removeCustomer = async (data) => {
     const deleted = await to(stripe.customers.del(
         data.stripe_customer_id
     ));
+
     return deleted;
 };
