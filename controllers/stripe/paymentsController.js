@@ -108,7 +108,7 @@ exports.createPaymentIntent = async (req, res) => {
     }
 
 
-    res.json(intent.client_secret)
+    res.json(intent?.client_secret)
 };
 
 exports.createStripeCharge = async (req, res) => {
