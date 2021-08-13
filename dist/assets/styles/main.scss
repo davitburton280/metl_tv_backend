@@ -23,6 +23,7 @@
 html, body, p, h1, h2, h3, h4, ul {
     margin: 0;
     padding: 0;
+    margin-bottom: 0 !important;
 }
 
 
@@ -1067,7 +1068,6 @@ mat-optgroup {
 }
 
 
-
 .StripeElement {
     padding: 10px 12px;
     /* border-radius: 4px; */
@@ -1081,13 +1081,17 @@ mat-optgroup {
     }
 
     .arrow-down, .defaultCountry {
-        display: none!important;
+        display: none !important;
     }
 }
 
-#user-cards-list{
-    .mat-progress-spinner circle, .mat-spinner circle{
-        stroke: $white!important;
+#user-cards-list {
+    .actions {
+
+        .mat-progress-spinner circle, .mat-spinner circle {
+            stroke: $white !important;
+        }
     }
 }
+
 @import "responsive";
