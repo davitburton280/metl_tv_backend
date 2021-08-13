@@ -127,7 +127,7 @@ exports.getAllPaymentsHistory = async (req, res) => {
 
 exports.getPurchasesHistory = async (req, res) => {
     let {customer, ...created} = req.query;
-    const charges = await stripe.charges.list({created, customer, transfer_group: 'purchases'});
+    const charges = await to(stripe.charges.list({created, customer, transfer_group: 'purchases'}), res);
     res.json(charges.data)
 };
 
