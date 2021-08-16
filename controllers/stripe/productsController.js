@@ -6,9 +6,11 @@ exports.getProducts = async (req, res) => {
     let merged = [];
 
     for (let i = 0; i < products.data.length; i++) {
+        let productMetadata = products.data[i].metadata;
         merged.push({
                 ...products.data[i],
-                ...(prices.data.find((itmInner) => itmInner.product === products.data[i].id))
+                ...(prices.data.find((itmInner) => itmInner.product === products.data[i].id)),
+                metadata: productMetadata
             }
         );
     }
