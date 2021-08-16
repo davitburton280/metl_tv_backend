@@ -17,7 +17,9 @@ module.exports = (sequelize, DataTypes) => {
     user_id: DataTypes.INTEGER,
     stripe_account_id: DataTypes.INTEGER,
     purchased: DataTypes.INTEGER,
-    received: DataTypes.INTEGER
+    purchased_worth: DataTypes.FLOAT,
+    received: DataTypes.INTEGER,
+    received_worth: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'users_coins',

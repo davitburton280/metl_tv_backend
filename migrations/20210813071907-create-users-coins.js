@@ -18,8 +18,16 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 defaultValue: 0
             },
+            purchased_worth: {
+                type: Sequelize.FLOAT,
+                defaultValue: 0
+            },
             received: {
                 type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
+            received_worth: {
+                type: Sequelize.FLOAT,
                 defaultValue: 0
             },
             created_at: {

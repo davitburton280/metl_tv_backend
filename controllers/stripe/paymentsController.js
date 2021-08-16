@@ -85,7 +85,9 @@ exports.createPaymentIntent = async (req, res) => {
     let data = req.body;
     let {customer_id, currency, purchase} = data;
     let coinWorth = 0.0199;
-    let purchasedCoins = (purchase.unit_amount / 100) / coinWorth;
+    let unitAmount = purchase.unit_amount / 100;
+    let purchasedCoins = unitAmount / coinWorth;
+    let purchasedWorth = ((unitAmount - (purchase.discount / 100 || 0) * unitAmount)).toFixed(6).slice(0, -4);
     const intent = await to(stripe.paymentIntents.create({
         amount: purchase.unit_amount,
         currency,
@@ -98,12 +100,14 @@ exports.createPaymentIntent = async (req, res) => {
     let foundRecord = await UsersCoins.findOne({where: {user_id: data.user_id}});
     if (foundRecord) {
 
-        let i = await UsersCoins.increment('purchased', {by: purchasedCoins, where: {user_id: data.user_id}});
+        await to(UsersCoins.increment('purchased', {by: purchasedCoins, where: {user_id: data.user_id}}));
+        await to(UsersCoins.increment('purchased_worth', {by: purchasedWorth, where: {user_id: data.user_id}}));
     } else {
         let us = await UsersCoins.create({
             user_id: data.user_id,
             stripe_account_id: data.stripe_account_id,
-            purchased: purchasedCoins
+            purchased: purchasedCoins,
+            purchased_worth: purchasedWorth
         })
     }
 
@@ -141,7 +145,10 @@ exports.getAllPaymentsHistory = async (req, res) => {
         limit: 20
     });
 
-    let userCoins = await UsersCoins.findOne({where: {user_id: user_id}, attributes: ['purchased','received']});
+    let userCoins = await UsersCoins.findOne({
+        where: {user_id: user_id},
+        attributes: ['purchased', 'purchased_worth', 'received', 'received_worth']
+    });
     res.json({payment_intents: paymentIntents.data, user_coins: userCoins})
 };
 
