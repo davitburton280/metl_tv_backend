@@ -115,27 +115,6 @@ exports.createPaymentIntent = async (req, res) => {
     res.json(intent?.client_secret)
 };
 
-exports.createStripeCharge = async (req, res) => {
-    let data = req.body;
-    let {card, purchase, email} = req.body;
-    // console.log('card', card)
-
-
-    const charge = await stripe.charges.create({
-        amount: purchase.unit_amount,
-        currency: purchase.currency,
-        source: card.id,
-        customer: card.stripe_customer_id,
-        description: `${purchase.name} Metl Coins Bundle`,
-        metadata: {name: purchase.name},
-        transfer_group: 'purchases'
-    }).catch(e => {
-        res.status(500).json({msg: e?.raw?.message})
-    });
-
-    res.json(charge);
-};
-
 exports.getAllPaymentsHistory = async (req, res) => {
     let {customer, user_id, ...created} = req.query;
 
