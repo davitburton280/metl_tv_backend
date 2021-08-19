@@ -146,7 +146,7 @@ exports.removeStripeCard = async (req, res) => {
         if (userCards.length === 0) {
             await this.removeCustomer(data);
             await accountsController.removeAccount(data);
-            await UsersCoins.update({purchased: 0, received: 0}, {where: {user_id: data.user_id}})
+            await UsersCoins.update({purchased: 0, received: 0, purchased_worth: 0, received_worth: 0}, {where: {user_id: data.user_id}})
         }
         await this.getCustomerCards(req, res);
     }
