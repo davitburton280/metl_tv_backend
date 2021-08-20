@@ -455,6 +455,7 @@ exports.removeVideo = async (req, res) => {
             await to(UsersVideos.destroy({where: {video_id: id}}));
             await to(Videos.destroy({where: {id: id}}));
             await to(ChatMessages.destroy({where: {video_id: id}}));
+            await to(VideosComments.destroy({where: {video_id: id}}))
             if (data.bigFileDetected) {
                 res.status(423).json({msg: 'File size exceeds maximum size of 3Mb'})
             } else {
