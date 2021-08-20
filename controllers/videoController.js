@@ -64,20 +64,19 @@ exports.getVideos = async (req, res) => {
                 where: whereTag,
                 required: !!tag
             },
-        // @todo this part was breaking when loading live videos, please check
+            // @todo this part was breaking when loading live videos, please check
             //  {model: PrivacyTypes, as: 'privacy', where: wherePrivacy},
             {
                 model: VideoCategories,
                 as: 'category',
                 where: whereCategory
             }
-        //
+            //
         ],
         order: trendingOption,
         where: whereFilters,
         limitOption
     });
-    console.log(v)
     ret['videos'] = v;
     // whereFilters = this.getVideoFiltersQuery(filters, '`videos->category`.`name`');
     // console.log(filters, whereFilters)
@@ -529,7 +528,7 @@ exports.getUserTags = async (req, res) => {
     console.log('get user tags!!!')
     let data = req.query;
     let {user_id} = data;
-    console.log(data)
+    // console.log(data)
     let userTags = await UsersTags.findAll({
         where: {user_id: user_id},
         order: [['popularity', 'desc']],
@@ -561,7 +560,7 @@ exports.addCommentForVideo = async (req, res) => {
 
 exports.getVideoComments = async (req, res) => {
     let {video_id, from_id, comment_id} = req.query;
-    console.log(req.query)
+    // console.log(req.query)
     let where = {video_id: video_id, is_reply: 0};
     if (from_id) {
         where.from_id = from_id;
@@ -571,12 +570,15 @@ exports.getVideoComments = async (req, res) => {
         where.id = comment_id;
     }
     console.log('get video comments!!!!')
-    console.log(where)
+    // console.log(where)
     let comments = await to(VideosComments.findAll({
         where: where,
         include: [
             {
-                model: Users, as: 'user', attributes: ['id', getFullName(), 'username', 'avatar'], include: [
+                model: Users,
+                as: 'user',
+                attributes: ['id', 'first_name', 'last_name', 'username', 'avatar'],
+                include: [
                     {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
                 ]
             },
@@ -584,39 +586,26 @@ exports.getVideoComments = async (req, res) => {
             {
                 model: VideosComments, as: 'replies', where: {is_reply: 1}, required: false, include: [
                     {
-                        model: Users, as: 'user', attributes: ['id', getFullName(), 'username', 'avatar'], include: [
+                        model: Users,
+                        as: 'user',
+                        attributes: ['id', 'first_name', 'last_name', 'username', 'avatar'],
+                        include: [
                             {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
                         ]
                     },
                     {
                         model: Users,
                         as: 'reactors',
-                        attributes: ['id', getFullName(), 'username'],
+                        attributes: ['id', 'first_name', 'last_name', 'username'],
                         through: {attributes: ['liked', 'disliked']},
                         required: false
                     },
-                    // {
-                    //     model: VideosComments, as: 'replies', where: {is_reply: 1}, required: false, include: [
-                    //         {
-                    //             model: Users, as: 'user', attributes: ['id', 'full_name', 'username', 'avatar'], include: [
-                    //                 {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
-                    //             ]
-                    //         },
-                    //         {
-                    //             model: Users,
-                    //             as: 'reactors',
-                    //             attributes: ['id', 'full_name', 'username'],
-                    //             through: {attributes: ['liked', 'disliked']},
-                    //             required: false
-                    //         },
-                    //     ]
-                    // },
                 ]
             },
             {
                 model: Users,
                 as: 'reactors',
-                attributes: ['id', getFullName(), 'username'],
+                attributes: ['id', 'first_name', 'last_name', 'username'],
                 through: {attributes: ['liked', 'disliked']},
                 required: false
             },
