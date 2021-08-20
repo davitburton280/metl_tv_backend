@@ -20,21 +20,21 @@ module.exports = {
                 created_at: new Date(),
                 updated_at: new Date()
             },
-            // {
-            //     first_name: process.env.CLIENT_FIRST_NAME,
-            //     last_name: process.env.CLIENT_LAST_NAME,
-            //     birthday: '1993-05-30',
-            //     gender: 'male',
-            //     email: process.env.CLIENT_EMAIL,
-            //     stocks_order_type_id: 1,
-            //     username: process.env.CLIENT_USERNAME,
-            //     password: bcrypt.hashSync(process.env.CLIENT_PASSWORD, 10),
-            //     avatar: '',
-            //     cover: '',
-            //     created_at: new Date(),
-            //     updated_at: new Date()
-            //
-            // }
+            {
+                first_name: process.env.CLIENT_FIRST_NAME,
+                last_name: process.env.CLIENT_LAST_NAME,
+                birthday: '1993-05-30',
+                gender: 'male',
+                email: process.env.CLIENT_EMAIL,
+                stocks_order_type_id: 1,
+                username: process.env.CLIENT_USERNAME,
+                password: bcrypt.hashSync(process.env.CLIENT_PASSWORD, 10),
+                avatar: '',
+                cover: '',
+                created_at: new Date(),
+                updated_at: new Date()
+
+            }
         ])
     },
 
