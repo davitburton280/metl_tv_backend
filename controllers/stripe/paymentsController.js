@@ -89,7 +89,7 @@ exports.createPaymentIntent = async (req, res) => {
     let purchasedCoins = unitAmount / coinWorth;
     let purchasedWorth = ((unitAmount - (purchase.discount / 100 || 0) * unitAmount)).toFixed(6).slice(0, -4);
     const intent = await to(stripe.paymentIntents.create({
-        amount: purchase.unit_amount,
+        amount: purchasedWorth * 100,
         currency,
         customer: customer_id,
         description: `${purchase.name} Metl Coins Bundle`,
@@ -148,9 +148,9 @@ exports.getAccountPayouts = async (req, res) => {
     ));
 
     // console.log("ACCOUNT EXTERNAL ACCOUNTS:", accountBankAccounts)
-    console.log("EXTERNAL ACCOUNT:"+accountBankAccounts.data?.find(ba => ba.object===type)?.id)
+    console.log("EXTERNAL ACCOUNT:" + accountBankAccounts.data?.find(ba => ba.object === type)?.id)
     const payouts = await stripe.payouts.list({
-            destination: accountBankAccounts.data?.find(ba => ba.object===type)?.id,
+            destination: accountBankAccounts.data?.find(ba => ba.object === type)?.id,
             created
         },
         {
