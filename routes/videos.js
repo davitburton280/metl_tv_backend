@@ -26,7 +26,7 @@ router.put('/update-privacy', isAuth, videoController.updatePrivacy);
 router.put('/update-views', isAuth, videoController.updateViews);
 router.put('/index-user-tags', isAuth, videoController.updateUserTags);
 router.put('/save-video', isAuth, videoController.saveVideo);
-router.put('/save-video-details', isAuth, validateVideoDetails.rules, videoController.saveVideoDetails);
+router.put('/save-video-details', isAuth, uploadVideoThumbFile,validateVideoDetails.rules, videoController.saveVideoDetails);
 router.delete('/remove', isAuth, uploadVideoThumbFile, videoController.removeVideo);
 router.delete('/remove-by-token', isAuth, uploadVideoThumbFile, videoController.removeVideo);
 router.post('/add-comment', isAuth, videoController.addCommentForVideo);

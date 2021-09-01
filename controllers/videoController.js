@@ -482,9 +482,9 @@ exports.saveVideoDetails = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
         console.log(data)
-        await Videos.update({name: data.name}, {where: {id: data.video_id}});
+        await Videos.update({name: data.name, thumbnail: data.thumbnail}, {where: {id: data.video_id}});
         await VideosTags.destroy({where: {video_id: data.video_id}});
-        let result = data.tags.map(async (t) => {
+        let result = JSON.parse(data.tags).map(async (t) => {
 
             let found = await Tags.findOne({where: {name: t.name}});
             console.log(!found)
