@@ -125,8 +125,12 @@ app.use(async (err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
         req.body.bigFileDetected = true;
         req.query = req.body;
-        console.log(req.body)
-        await videoController.removeVideo(req, res);
+        console.log(err)
+        if (err.field === 'video_stream_file') {
+            await videoController.removeVideo(req, res);
+        } else {
+            res.status(500).json({msg: 'The file size should not exceed 3Mb'})
+        }
     }
 
     // Handle any other errors

@@ -31,7 +31,7 @@ let storage = multer.diskStorage({
 
         cb(null, dir)
     },
-    filename: function (req, file, cb) {
+    filename: (req, file, cb) => {
         let dir = path.join(__dirname, '../public/uploads/videos');
         // console.log(req)
         // console.log(file)
