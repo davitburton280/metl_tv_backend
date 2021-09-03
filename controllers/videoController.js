@@ -525,6 +525,21 @@ exports.updateUserTags = async (req, res) => {
     res.json('OK')
 };
 
+exports.getVideoTags = async (req, res) => {
+    let videoTags = await Tags.findAll({
+        where: {
+            [Op.not]: {
+                name: 'All'
+            }
+        }
+        // include: [{
+        //     model: Users, as: 'tags_users',
+        // }],
+        // attributes: []
+    });
+    res.json(videoTags);
+}
+
 exports.getUserTags = async (req, res) => {
     console.log('get user tags!!!')
     let data = req.query;

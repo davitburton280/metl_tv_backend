@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 const {
   Model
 } = require('sequelize');
@@ -17,6 +17,13 @@ module.exports = (sequelize, DataTypes) => {
         through: models.video_tags,
         foreignKey: 'tag_id'
       });
+
+      tags.belongsTo(models.users, {
+        as: 'tags_users',
+        foreignKey: 'id'
+      });
+
+      // tags.belongsTo(models.users_tags, {as: 'tag_details', through: models.video_tags, foreignKey: 'tag_id'});
     }
   };
   tags.init({
