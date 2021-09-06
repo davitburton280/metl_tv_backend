@@ -526,18 +526,36 @@ exports.updateUserTags = async (req, res) => {
 };
 
 exports.getVideoTags = async (req, res) => {
-    let videoTags = await Tags.findAll({
-        where: {
-            [Op.not]: {
-                name: 'All'
+    let videoTags = await UsersTags.findAll({
+        include: [
+            {
+                model: Users,
+                as: 'user_details',
+                attributes: ['first_name', 'last_name']
+            },
+            {
+                model: Tags,
+                as: 'tag_details',
             }
-        }
-        // include: [{
-        //     model: Users, as: 'tags_users',
-        // }],
-        // attributes: []
+        ],
+        order: [['popularity', 'desc']],
+        attributes: ['id', 'tag_id', 'popularity']
     });
-    res.json(videoTags);
+
+
+    let ret = [{name: 'Most used', values: []}, {name: 'Trending', values: []}, {name: 'Previously used', values: []}];
+
+    videoTags.map((vt, index) => {
+        if (index < 5) {
+            ret.find(r => r.name === 'Most used')['values'].push(vt)
+        } else if (vt.popularity > 10) {
+            ret.find(r => r.name === 'Trending')['values'].push(vt)
+        } else {
+            ret.find(r => r.name === 'Previously used')['values'].push(vt)
+        }
+    });
+
+    res.json(ret);
 }
 
 exports.getUserTags = async (req, res) => {
