@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
             users_tags.belongsTo(models.tags, {as: 'tag_details', through: models.video_tags, foreignKey: 'tag_id'});
+            users_tags.belongsTo(models.users, {as: 'user_details', foreignKey: 'user_id'});
         }
     };
     users_tags.init({

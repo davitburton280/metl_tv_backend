@@ -16,11 +16,11 @@ exports.checkIfUserHasStripeAccount = async (req, res) => {
 
 
 exports.createStripeAccount = async (req, res) => {
-    let {email, ret, user_id, ...accountData} = req.body;
-    console.log("CREATE STRIPE ACCOUNT" + email)
+    let {email, ret, user_id, customer_id, ...accountData} = req.body;
+    let extAccountType = accountData.external_account.object;
 
     let userCards = await UsersCards.findAll({where: {user_id}});
-
+    console.log('here!!!')
     if (userCards) {
         let stripeAccountId = userCards.filter(uc => uc.stripe_account_id)[0]?.stripe_account_id;
 
@@ -28,14 +28,15 @@ exports.createStripeAccount = async (req, res) => {
         // If user already created Stripe account, just adding external account for him
         if (stripeAccountId) {
 
-
             const externalAccountsList = await stripe.accounts.listExternalAccounts(
                 stripeAccountId, {});
 
+
             const bankAccountLen = externalAccountsList.data.filter(ea => ea.object === 'bank_account').length;
             const debitCardAccountLen = externalAccountsList.data.filter(ea => ea.object === 'card').length;
+            console.log(externalAccountsList, bankAccountLen, debitCardAccountLen)
 
-            if (bankAccountLen === 0 || debitCardAccountLen === 0) {
+            if ((bankAccountLen === 0 && extAccountType === 'bank_account') || (debitCardAccountLen === 0 && extAccountType === 'card')) {
 
                 const externalAccount = await to(stripe.accounts.createExternalAccount(
                     stripeAccountId,
@@ -43,10 +44,22 @@ exports.createStripeAccount = async (req, res) => {
                         external_account: accountData.external_account,
                     }
                 ));
+                // console.log('EXT!!!!')
+                // console.log(externalAccount)
+                //
+                // const bankAccountVerify = await stripe.customers.verifySource(
+                //     customer_id,
+                //     externalAccount.id,
+                //     {amounts: [32, 45]}
+                // );
+                // console.log(bankAccountVerify)
+                //
+                // if (bankAccountVerify) {
                 req.query.user_id = req.body.user_id;
                 await customersController.getCustomerCards(req, res);
+                // }
             } else {
-                res.status(500).json({msg: 'We support not more than 2 accounts for payouts'});
+                res.status(500).json({msg: 'We support not more than 2 accounts for payouts: 1 bank account and 1 debit card'});
             }
 
             // If user hasn't got Stripe account, adding it with external account
