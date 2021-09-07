@@ -34,7 +34,6 @@ exports.createStripeAccount = async (req, res) => {
 
             const bankAccountLen = externalAccountsList.data.filter(ea => ea.object === 'bank_account').length;
             const debitCardAccountLen = externalAccountsList.data.filter(ea => ea.object === 'card').length;
-            console.log(externalAccountsList, bankAccountLen, debitCardAccountLen)
 
             if ((bankAccountLen === 0 && extAccountType === 'bank_account') || (debitCardAccountLen === 0 && extAccountType === 'card')) {
 
