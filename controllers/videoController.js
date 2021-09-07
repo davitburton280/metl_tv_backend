@@ -29,6 +29,7 @@ const Op = sequelize.Op;
 const fse = require('fs-extra');
 const path = require('path');
 const moment = require('moment');
+const m = require('../helpers/multer');
 
 exports.getVideos = async (req, res) => {
     let data = req.query;
@@ -481,25 +482,37 @@ exports.removeVideoThumbnail = async (req, res) => {
 exports.saveVideoDetails = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
-        console.log(data)
-        await Videos.update({name: data.name, thumbnail: data.thumbnail}, {where: {id: data.video_id}});
-        await VideosTags.destroy({where: {video_id: data.video_id}});
-        let result = JSON.parse(data.tags).map(async (t) => {
 
-            let found = await Tags.findOne({where: {name: t.name}});
-            console.log(!found)
 
-            if (!found) {
-                let tag = await Tags.create({name: t.name});
-                await VideosTags.create({tag_id: tag.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
-            } else {
-                await VideosTags.create({tag_id: found.id, video_id: data.video_id}, {fields: ['tag_id', 'video_id']});
-            }
+        uploadVideoThumbFile(req, res, async (err) => {
 
-        });
-        await Promise.all(result);
-        req.query.id = data.video_id;
-        this.getVideoById(req, res);
+            await Videos.update({name: data.name, thumbnail: data.thumbnail}, {where: {id: data.video_id}});
+            await VideosTags.destroy({where: {video_id: data.video_id}});
+            let result = JSON.parse(data.tags).map(async (t) => {
+
+                let found = await Tags.findOne({where: {name: t.name}});
+                console.log(!found)
+
+                if (!found) {
+                    let tag = await Tags.create({name: t.name});
+                    await VideosTags.create({
+                        tag_id: tag.id,
+                        video_id: data.video_id
+                    }, {fields: ['tag_id', 'video_id']});
+                } else {
+                    await VideosTags.create({
+                        tag_id: found.id,
+                        video_id: data.video_id
+                    }, {fields: ['tag_id', 'video_id']});
+                }
+
+            });
+            await Promise.all(result);
+            req.query.id = data.video_id;
+            this.getVideoById(req, res);
+        })
+
+
     }
 };
 

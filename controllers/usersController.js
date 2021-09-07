@@ -230,7 +230,12 @@ exports.getUserInfo = async (req, res) => {
     let excludeFields = ['password', 'role_id', 'status_id', 'verification_code', 'phone']
     let user = await Users.findOne({
         where:
-            sequelize.where(sequelize.fn('BINARY', sequelize.col('username')), data.username)
+            [
+                sequelize.where(sequelize.fn('BINARY', sequelize.col('username')), data.username),
+                // {name: sequelize.col('videos->privacy.name')}
+                // {'$videos.privacy.name$': 'Public'}
+                // [{model: PrivacyTypes}, sequelize.col(`name`), 'Public']
+            ]
         ,
         attributes: {exclude: excludeFields},
         include: [
@@ -238,12 +243,23 @@ exports.getUserInfo = async (req, res) => {
             {
                 model: Videos,
                 as: 'videos',
-                include: [{model: Tags, as: 'tags'}, {model: PrivacyTypes, as: 'privacy'}]
+                include: [
+                    {model: Tags, as: 'tags'},
+                    {model: PrivacyTypes, as: 'privacy'}
+                ],
+                // where: sequelize.where(sequelize.col('`videos`.`privacy`.`name`'), 'Public')
             }],
         order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });
 
-    res.json(user);
+    let {videos, ...rest} = user.toJSON();
+    if (!+data.own_channel) {
+        console.log('not own channel')
+        let ret = {videos: videos.filter(t => t.privacy.name === 'Public'), ...rest};
+        res.json(ret);
+    } else {
+        res.json(user)
+    }
 };
 
 exports.saveProfileChanges = async (req, res) => {
