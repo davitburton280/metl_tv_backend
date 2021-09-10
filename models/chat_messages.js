@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
             chat_messages.belongsTo(models.videos, {foreignKey: 'video_id', as: 'video'});
-            chat_messages.belongsTo(models.users, {as: 'user', foreignKey: 'from_id'});
-            // chat_messages.belongsTo(models.users, {as: 'to_messages', foreignKey: 'to_id'});
+            chat_messages.belongsTo(models.users, {as: 'from_user', foreignKey: 'from_id'});
+            chat_messages.belongsTo(models.users, {as: 'to_user', foreignKey: 'to_id'});
         }
     };
     chat_messages.init({
