@@ -10,12 +10,24 @@ const server = require('http').createServer(app);
 const cors = require('cors');
 const path = require('path');
 
+
+
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const IN_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Listen
 // const session = require('express-session');
 const https = require('https');
+
+// Socket io
+// const http = require('http').Server(app);
+const io = require('socket.io')(server, {
+    cors: {
+        origin: '*'
+    }
+});
+const {socket} = require('./helpers/socket');
+socket(io);
 
 // Multer
 require('./helpers/multer');

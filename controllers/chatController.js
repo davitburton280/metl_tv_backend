@@ -24,7 +24,7 @@ exports.getVideoMessages = async (req, res) => {
 exports.saveMessage = async (req, res) => {
     let data = req.body;
     data.to_id = data.to_id ? data.to_id : 0;
-    console.log(data)
+    // console.log(data)
     await to(ChatMessages.create(data));
     req.query.video_id = data.video_id;
 
@@ -42,7 +42,7 @@ exports.saveMessage = async (req, res) => {
 
 exports.getChatMessages = async (req, res) => {
     const {from_id, to_id, personal} = req.query;
-    console.log(req.query)
+    // console.log(req.query)
     // let whereIds = ;
 
     let where = to_id ? {from_id: to_id} : {};
@@ -87,13 +87,13 @@ exports.getChatMessages = async (req, res) => {
 
         // // console.log(ms.toJSON())
         ms.map(m => {
-            console.log('!!!!!!!!')
-            console.log(m.to_user.id, +from_id)
-            console.log('!!!!!!!!')
+            // console.log('!!!!!!!!')
+            // console.log(m.to_user.id, +from_id)
+            // console.log('!!!!!!!!')
             let user = m.from_user.id === +from_id ? m.to_user : (m.to_user.id === +from_id ? m.from_user : m.from_user)
             let msg = m.toJSON();
             if (user) {
-                console.log(user.toJSON())
+                // console.log(user.toJSON())
                 let user_id = user.id;
                 if (!usersFiltered[user_id]) {
                     usersFiltered[user_id] = {messages: [], user: ''}
