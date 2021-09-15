@@ -130,6 +130,7 @@ app.get('*', (req, res, next) => {
     } else {
         res.status(404).send('Not found');
     }
+
 });
 
 const videoController = require('./controllers/videoController');

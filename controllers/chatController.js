@@ -75,7 +75,7 @@ exports.getChatMessages = async (req, res) => {
             }
         ],
         order: [
-            [sequelize.col('`chat_messages`.`created_at`'), 'asc']
+            [sequelize.col('`chat_messages`.`created_at`'), 'desc']
         ]
 
     })
@@ -110,7 +110,6 @@ exports.getChatMessages = async (req, res) => {
         });
 
         // console.log("USERS FILTERED!!!! ", Object.values(usersFiltered))
-
         res.json(Object.values(usersFiltered));
     } else {
         // console.log(ms)

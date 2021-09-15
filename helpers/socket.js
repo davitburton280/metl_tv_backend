@@ -10,6 +10,7 @@ exports.socket = (io) => {
             io.emit('userConnected', username)
         })
 
+
         socket.on('sendMessage', (data) => {
             console.log('MESSAGE!!!')
             console.log(data.to_user)
