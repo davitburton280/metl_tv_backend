@@ -75,7 +75,7 @@ exports.getChatMessages = async (req, res) => {
             }
         ],
         order: [
-            [sequelize.col('`chat_messages`.`created_at`'), 'desc']
+            [sequelize.col('`chat_messages`.`created_at`'), 'asc']
         ]
 
     })
