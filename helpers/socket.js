@@ -24,8 +24,12 @@ exports.socket = (io) => {
         });
 
 
-        socket.emit('event2', {
-            msg: 'Server to client, do you read me? Over.'
+        socket.on('setTyping', (data)=>{
+            console.log('typing')
+            let username = data.to_user.from;
+            let socketId = users[username];
+            console.log(socketId)
+            io.to(socketId).emit('getTyping', data)
         });
 
         socket.on('event3', (data) => {
