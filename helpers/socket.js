@@ -1,4 +1,5 @@
 let users = [];
+let chatController = require('../controllers/chatController');
 exports.socket = (io) => {
     io.on('connection', (socket) => {
         console.log('new connection made');
@@ -24,7 +25,7 @@ exports.socket = (io) => {
         });
 
 
-        socket.on('setTyping', (data)=>{
+        socket.on('setTyping', (data) => {
             console.log('typing')
             let username = data.to_user.from;
             let socketId = users[username];
@@ -32,11 +33,14 @@ exports.socket = (io) => {
             io.to(socketId).emit('getTyping', data)
         });
 
-        socket.on('event3', (data) => {
-            console.log(data.msg);
-            socket.emit('event4', {
-                msg: 'Loud and clear :)'
-            });
+        socket.on('setSeen', async (data) => {
+            let username = data.to_user.from;
+            let socketId = users[username];
+            console.log('seen')
+            let r = await chatController.updateSeen(data);
+            data.seen = +r;
+            console.log(socketId)
+            io.to(socketId).emit('getSeen', data)
         });
 
         socket.on('disconnect', () => {

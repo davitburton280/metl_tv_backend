@@ -20,7 +20,9 @@ module.exports = (sequelize, DataTypes) => {
         video_id: DataTypes.INTEGER,
         from_id: DataTypes.INTEGER,
         message: DataTypes.STRING,
-        to_id: DataTypes.INTEGER
+        to_id: DataTypes.INTEGER,
+        seen: DataTypes.INTEGER,
+        seen_at: DataTypes.DATE
     }, {
         sequelize,
         modelName: 'chat_messages',

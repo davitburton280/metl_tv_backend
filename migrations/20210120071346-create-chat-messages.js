@@ -20,6 +20,13 @@ module.exports = {
             to_id: {
                 type: Sequelize.INTEGER
             },
+            seen: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0,
+            },
+            seen_at: {
+                type: Sequelize.DATE,
+            },
             created_at: {
                 defaultValue: Sequelize.fn('NOW'),
                 allowNull: false,
