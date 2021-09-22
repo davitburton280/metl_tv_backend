@@ -27,10 +27,12 @@ exports.socket = (io) => {
 
         socket.on('setTyping', (data) => {
             console.log('typing')
-            let username = data.to_user.from;
+            let username = data.to_user?.from;
             let socketId = users[username];
             console.log(socketId)
-            io.to(socketId).emit('getTyping', data)
+            if (data.to_user) {
+                io.to(socketId).emit('getTyping', data)
+            }
         });
 
         socket.on('setSeen', async (data) => {
