@@ -78,7 +78,7 @@ exports.createStripeAccount = async (req, res) => {
                 ...accountData
             }), res);
 
-            await to(UsersCards.update({stripe_account_id: acc.id}, {where: {user_id}}));
+            await to(UsersCards.update({stripe_account_id: acc?.id}, {where: {user_id}}));
             if (!res.headersSent) {
                 req.query.user_id = req.body.user_id;
                 await customersController.getCustomerCards(req, res);

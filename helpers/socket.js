@@ -27,7 +27,7 @@ exports.socket = (io) => {
 
         socket.on('setTyping', (data) => {
             console.log('typing')
-            let username = data.to_user?.from;
+            let username = data.to_user?.from || data.to_user?.username;
             let socketId = users[username];
             console.log(socketId)
             if (data.to_user) {
