@@ -29,7 +29,7 @@ exports.socket = (io) => {
             console.log('typing')
             let username = data.to_user?.from || data.to_user?.username;
             let socketId = users[username];
-            console.log(socketId)
+            // console.log(socketId)
             if (data.to_user) {
                 io.to(socketId).emit('getTyping', data)
             }
@@ -41,8 +41,9 @@ exports.socket = (io) => {
             console.log('seen')
             let r = await chatController.updateSeen(data);
             data.seen = +r;
-            console.log(socketId)
+            console.log(data.from_user.username, users, socketId)
             io.to(socketId).emit('getSeen', data)
+            io.to(users[data.from_user.username]).emit('getSeen', data)
         });
 
         socket.on('disconnect', () => {
