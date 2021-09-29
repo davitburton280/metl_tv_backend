@@ -14,8 +14,7 @@ exports.socket = (io) => {
 
         socket.on('sendMessage', (data) => {
             console.log('MESSAGE!!!')
-            console.log(data.to_user)
-            let username = data.to_user.from;
+            let username = data.to_user.from || data.to_user.username;
             let socketId = users[username];
             console.log(username);
             console.log(socketId)
