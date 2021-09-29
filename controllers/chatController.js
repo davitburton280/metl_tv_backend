@@ -119,7 +119,6 @@ exports.getChatMessages = async (req, res) => {
 
 exports.updateSeen = async (data) => {
     let {seen, from_id, to_id} = data;
-    console.log({from_id: data.from_user.id, to_id: data.to_user.id})
 
     let arr = [
         to_id ? {from_id, to_id} : {from_id},
@@ -128,7 +127,6 @@ exports.updateSeen = async (data) => {
             to_id: from_id,
         }
     ]
-
 
     let updated = await to(ChatMessages.update({seen}, {
         where: {
