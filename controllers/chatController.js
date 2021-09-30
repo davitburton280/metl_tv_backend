@@ -121,13 +121,19 @@ exports.updateSeen = async (data) => {
     let {seen, from_id, to_id} = data;
 
     let arr = [
-        to_id ? {from_id, to_id} : {from_id},
+        // to_id ? {from_id, to_id} : {from_id},
+        // {
+        //
+        //     to_id: from_id,
+        // }
         {
-
             to_id: from_id,
-        }
+            from_id: to_id
+        },
+        {from_id, to_id}
     ]
 
+    console.log("FROM ID" + data.from_id)
     let updated = await to(ChatMessages.update({seen}, {
         where: {
             [Op.or]: arr
