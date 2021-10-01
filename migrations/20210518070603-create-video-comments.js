@@ -41,6 +41,14 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: true
             },
+            remove_initiator: {
+                type: Sequelize.INTEGER,
+                allowNull: true
+            },
+            scheduled_remove_at: {
+                type: Sequelize.DATE,
+                allowNull: true
+            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE,
