@@ -35,11 +35,11 @@ exports.socket = (io) => {
         });
 
         socket.on('setSeen', async (data) => {
-            let username = data.to_user.from;
+            let username = data.to_user.from || data.to_user.username;
             let socketId = users[username];
             console.log('seen')
             let r = await chatController.updateSeen(data);
-            data.seen = +r;
+            // data.seen = +r;
             console.log(data.from_user.username, users, socketId)
             io.to(socketId).emit('getSeen', data)
             io.to(users[data.from_user.username]).emit('getSeen', data)
