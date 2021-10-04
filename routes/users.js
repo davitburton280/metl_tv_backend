@@ -10,6 +10,7 @@ router.get('/get-user-info', isAuth, usersController.getUserInfo);
 router.put('/save-profile-changes', isAuth, uploadUserAvatar, usersController.saveProfileChanges);
 router.post('/change-profile-image', isAuth, uploadAvatar, usersController.changeAvatar);
 router.post('/change-cover-image', isAuth, uploadCover, usersController.changeCover);
+router.put('/block-user', isAuth, usersController.blockUser);
 
 
 module.exports = router;

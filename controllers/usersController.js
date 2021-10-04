@@ -42,6 +42,7 @@ const Tags = db.tags;
 const Channels = db.channels;
 const PrivacyTypes = db.privacy_types;
 const StocksOrderType = db.stocks_ordering_types;
+const UsersConnection = db.users_connection;
 
 const url = require('url');
 
@@ -57,6 +58,8 @@ const moment = require('moment');
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
 const to = require('../helpers/getPromiseResult');
+
+
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
     console.log('OK')
@@ -274,4 +277,88 @@ exports.saveProfileChanges = async (req, res) => {
 
     });
 };
+
+exports.createUsersConnection = async (data) => {
+
+    let {from_id, to_id} = data;
+
+    let where = [
+        {
+            user_id: from_id,
+            connection_id: to_id
+        },
+        {
+            user_id: to_id,
+            connection_id: from_id
+        },
+    ]
+    let found = await to(UsersConnection.findOne({
+        where: {
+            [Op.or]: where
+        }
+    }));
+
+    console.log("FOUND:", !found)
+
+    if (!found) {
+        await to(UsersConnection.create({
+            user_id: from_id,
+            connection_id: to_id
+        }))
+    }
+
+};
+
+exports.blockUser = async (req, res) => {
+    let {user_id, connection_id} = req.body;
+
+    let where = [
+        {
+            user_id,
+            connection_id
+        },
+        {
+            user_id: connection_id,
+            connection_id: user_id
+        },
+    ]
+
+    console.log(where)
+
+    let result = await UsersConnection.update({is_blocked: 1},
+        {
+            where: {
+                [Op.or]: where
+            }
+        });
+
+    res.json(result);
+};
+
+exports.getBlockedContacts = async (user_id) => {
+    let where = [
+        {
+            user_id
+        },
+        {
+            connection_id: user_id,
+        },
+    ]
+
+
+    let ids = await to(UsersConnection.findAll({
+        attributes: ['user_id','connection_id'],
+        raw: true,
+        where: {
+            is_blocked: 1,
+            [Op.or]: where,
+        }
+    }))
+        // .map(r => [r.user_id,r.connection_id]);
+
+    // console.log(ids)
+
+    return ids;
+
+}
 

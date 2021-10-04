@@ -7,6 +7,8 @@ const Videos = db.videos;
 const Users = db.users;
 const to = require('../helpers/getPromiseResult');
 
+const usersController = require('./usersController');
+
 exports.getVideoMessages = async (req, res) => {
     const {video_id} = req.query;
     console.log('get video chat messages!!!!')
@@ -24,8 +26,10 @@ exports.getVideoMessages = async (req, res) => {
 exports.saveMessage = async (req, res) => {
     let data = req.body;
     data.to_id = data.to_id ? data.to_id : 0;
-    // console.log(data)
     await to(ChatMessages.create(data));
+    if (!data.video_id) {
+        await to(usersController.createUsersConnection(data))
+    }
     req.query.video_id = data.video_id;
 
     if (!data.video_id) {
@@ -34,7 +38,7 @@ exports.saveMessage = async (req, res) => {
         req.query.personal = data.personal;
         this.getChatMessages(req, res);
     } else {
-        this.getVideoMessages(req, res);
+        await this.getVideoMessages(req, res);
     }
 
 };
@@ -71,7 +75,7 @@ exports.getChatMessages = async (req, res) => {
             {
                 model: Users,
                 as: 'to_user',
-                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
             }
         ],
         order: [
@@ -84,6 +88,8 @@ exports.getChatMessages = async (req, res) => {
     if (personal) {
 
         let usersFiltered = {};
+        let blockedUsers = await usersController.getBlockedContacts(from_id);
+        console.log(blockedUsers)
 
         // // console.log(ms.toJSON())
         ms.map(m => {
@@ -91,14 +97,21 @@ exports.getChatMessages = async (req, res) => {
             // console.log(m.to_user.id, +from_id)
             // console.log('!!!!!!!!')
             let user = m.from_user.id === +from_id ? m.to_user : (m.to_user.id === +from_id ? m.from_user : m.from_user)
+
+            // console.log('BLOCKED USER!!!')
+            // console.log(user)
             let msg = m.toJSON();
+            // console.log(blockedUsers.connection_id, user.id)
+            // console.log(blockedUsers.user_id, user.id)
             if (user) {
                 // console.log(user.toJSON())
                 let user_id = user.id;
                 if (!usersFiltered[user_id]) {
                     usersFiltered[user_id] = {messages: [], user: ''}
                     usersFiltered[user_id]['messages'] = [msg];
-                    usersFiltered[user_id]['user'] = user;
+                    let foundInBlocked = blockedUsers.find(bUser => user.id === bUser.user_id || user.id === bUser.connection_id)
+                    console.log("FOUND IN BLOCKED", foundInBlocked )
+                    usersFiltered[user_id]['user'] = foundInBlocked ? {blocked: 1, ...user.dataValues} : user;
                 } else {
                     if (!usersFiltered[user_id]['messages']) {
                         usersFiltered[user_id]['messages'] = []
