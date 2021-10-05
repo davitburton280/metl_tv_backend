@@ -310,7 +310,7 @@ exports.createUsersConnection = async (data) => {
 };
 
 exports.blockUser = async (req, res) => {
-    let {user_id, connection_id} = req.body;
+    let {user_id, connection_id, block} = req.body;
 
     let where = [
         {
@@ -323,9 +323,7 @@ exports.blockUser = async (req, res) => {
         },
     ]
 
-    console.log(where)
-
-    let result = await UsersConnection.update({is_blocked: 1},
+    let result = await UsersConnection.update({is_blocked: block},
         {
             where: {
                 [Op.or]: where
@@ -354,9 +352,6 @@ exports.getBlockedContacts = async (user_id) => {
             [Op.or]: where,
         }
     }))
-        // .map(r => [r.user_id,r.connection_id]);
-
-    // console.log(ids)
 
     return ids;
 

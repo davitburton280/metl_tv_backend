@@ -10,7 +10,7 @@ module.exports = {
         // dialectOptions: {
         //     useUTC: false, // for reading from database
         // },
-        logging: false
+        logging: true
     },
     "staging": {
         "username": process.env.STAGING_DB_USER,

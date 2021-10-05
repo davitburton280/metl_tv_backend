@@ -110,7 +110,6 @@ exports.getChatMessages = async (req, res) => {
                     usersFiltered[user_id] = {messages: [], user: ''}
                     usersFiltered[user_id]['messages'] = [msg];
                     let foundInBlocked = blockedUsers.find(bUser => user.id === bUser.user_id || user.id === bUser.connection_id)
-                    console.log("FOUND IN BLOCKED", foundInBlocked )
                     usersFiltered[user_id]['user'] = foundInBlocked ? {blocked: 1, ...user.dataValues} : user;
                 } else {
                     if (!usersFiltered[user_id]['messages']) {
@@ -134,11 +133,6 @@ exports.updateSeen = async (data) => {
     let {seen, from_id, to_id} = data;
 
     let arr = [
-        // to_id ? {from_id, to_id} : {from_id},
-        // {
-        //
-        //     to_id: from_id,
-        // }
         {
             to_id: from_id,
             from_id: to_id
