@@ -3,6 +3,7 @@ const Op = sequelize.Op;
 
 const db = require('../models');
 const ChatMessages = db.chat_messages;
+const ChatGroups = db.chat_groups;
 const Videos = db.videos;
 const Users = db.users;
 const to = require('../helpers/getPromiseResult');
@@ -127,7 +128,7 @@ exports.getChatMessages = async (req, res) => {
         // console.log(ms)
         res.json(ms);
     }
-}
+};
 
 exports.updateSeen = async (data) => {
     let {seen, from_id, to_id} = data;
@@ -138,14 +139,26 @@ exports.updateSeen = async (data) => {
             from_id: to_id
         },
         {from_id, to_id}
-    ]
-
+    ];
     console.log("FROM ID" + data.from_id)
     let updated = await to(ChatMessages.update({seen}, {
         where: {
             [Op.or]: arr
         },
-    }))
+    }));
     console.log(!!updated)
     return !!updated;
-}
+};
+
+exports.getChatGroups = async (req, res) => {
+    let {user_id} = req.query;
+    let groups = await ChatGroups.findAll({});
+    res.json(groups);
+};
+
+exports.createGroup = async (req, res) => {
+    let data = req.body;
+    await ChatGroups.create(data);
+    this.getChatGroups(req, res);
+};
+

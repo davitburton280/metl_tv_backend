@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         users.hasOne(models.channels, {foreignKey: 'user_id', as: 'channel'});
         users.belongsTo(models.stocks_ordering_types, {foreignKey: 'stocks_order_type_id', as: 'stocks_order_type'});
 
+
         users.belongsToMany(models.channels, {
             as: 'subscriptions',
             through: models.channel_subscribers,
@@ -45,6 +46,12 @@ module.exports = (sequelize, DataTypes) => {
         users.belongsToMany(models.video_comments, {
             as: 'users_with_comments',
             through: models.users_comments,
+            foreignKey: 'user_id'
+        });
+
+        users.belongsToMany(models.chat_groups, {
+            as: 'users_chat_groups',
+            through: models.user_chat_groups,
             foreignKey: 'user_id'
         });
 
