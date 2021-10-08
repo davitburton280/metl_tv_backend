@@ -59,7 +59,7 @@ exports.getChatMessages = async (req, res) => {
             to_id: from_id,
             ...where
         }
-    ]
+    ];
 
     let ms = await ChatMessages.findAll({
         // attributes : [{exclude: 'video_id'}],
@@ -83,13 +83,13 @@ exports.getChatMessages = async (req, res) => {
             [sequelize.col('`chat_messages`.`created_at`'), 'asc']
         ]
 
-    })
+    });
 
 
     if (personal) {
 
         let usersFiltered = {};
-        let blockedUsers = await usersController.getBlockedContacts(from_id);
+        let blockedUsers = await usersController.getBlockedContactsIds(from_id, 1);
         console.log(blockedUsers)
 
         // // console.log(ms.toJSON())

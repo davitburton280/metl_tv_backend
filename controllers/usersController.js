@@ -58,7 +58,7 @@ const moment = require('moment');
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
 const to = require('../helpers/getPromiseResult');
-
+const getFullName = require('../helpers/getFullNameCol');
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
@@ -333,7 +333,7 @@ exports.blockUser = async (req, res) => {
     res.json(result);
 };
 
-exports.getBlockedContacts = async (user_id) => {
+exports.getBlockedContactsIds = async (user_id, blocked = 0) => {
     let where = [
         {
             user_id
@@ -341,19 +341,58 @@ exports.getBlockedContacts = async (user_id) => {
         {
             connection_id: user_id,
         },
-    ]
+    ];
 
 
     let ids = await to(UsersConnection.findAll({
-        attributes: ['user_id','connection_id'],
+        attributes: ['user_id', 'connection_id'],
         raw: true,
         where: {
-            is_blocked: 1,
+            is_blocked: blocked,
             [Op.or]: where,
         }
-    }))
+    }));
 
     return ids;
+};
 
-}
+exports.getContacts = async (req, res) => {
+    console.log('get contacts!!!');
+    let {user_id, blocked} = req.query;
+    let where = [
+        {
+            user_id
+        },
+        {
+            connection_id: user_id,
+        },
+    ];
+
+
+    let contacts = await to(UsersConnection.findAll({
+        attributes: ['user_id', 'connection_id'],
+        // raw: true,
+        include: [
+            {model: Users, as: 'connection', attributes: ['id','first_name','last_name']},
+            {model: Users, as: 'user', attributes: ['id','first_name','last_name']}
+        ],
+        where: {
+            is_blocked: blocked,
+            [Op.or]: where,
+        }
+    }));
+
+    let ret = [];
+    contacts.map(c => {
+        if (c.user_id !== user_id) {
+            ret.push(c.user.toJSON())
+        } else if (c.connection_id !== user_id) {
+            ret.push(c.connection.toJSON())
+        }
+    });
+
+    console.log(ret)
+
+    res.json(ret);
+};
 
