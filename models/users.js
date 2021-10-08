@@ -51,10 +51,16 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'user_id'
         });
 
+        // users.belongsToMany(models.chat_groups, {
+        //     as: 'users_chat_groups',
+        //     through: models.user_chat_groups,
+        //     foreignKey: 'user_id'
+        // });
+
         users.belongsToMany(models.chat_groups, {
-            as: 'users_chat_groups',
+            as: 'chat_groups_members',
             through: models.chat_group_members,
-            foreignKey: 'user_id'
+            foreignKey: 'member_id'
         });
 
         // associations can be defined here
