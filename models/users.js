@@ -58,8 +58,8 @@ module.exports = (sequelize, DataTypes) => {
         // });
 
         users.belongsToMany(models.chat_groups, {
-            as: 'chat_groups_members',
-            through: models.chat_group_members,
+            as: 'chat_group_members',
+            through: models.chat_groups_members,
             foreignKey: 'member_id'
         });
 
