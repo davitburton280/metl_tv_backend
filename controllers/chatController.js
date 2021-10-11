@@ -4,6 +4,7 @@ const Op = sequelize.Op;
 const db = require('../models');
 const ChatMessages = db.chat_messages;
 const ChatGroups = db.chat_groups;
+const ChatGroupsMembers = db.chat_groups_members;
 const Videos = db.videos;
 const Users = db.users;
 const to = require('../helpers/getPromiseResult');
@@ -152,7 +153,15 @@ exports.updateSeen = async (data) => {
 
 exports.getChatGroups = async (req, res) => {
     let {user_id} = req.query;
-    let groups = await ChatGroups.findAll({});
+    let groups = await ChatGroups.findAll({
+        include: [
+            {
+                model: Users,
+                as: 'chat_group_members',
+                attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
+            }
+        ]
+    });
     res.json(groups);
 };
 
@@ -160,5 +169,35 @@ exports.createGroup = async (req, res) => {
     let data = req.body;
     await ChatGroups.create(data);
     this.getChatGroups(req, res);
+};
+
+exports.getGroupMembers = async (req, res) => {
+    console.log('get group members!!!')
+    const {group_id} = req.query;
+    let members = await ChatGroupsMembers.findAll({
+        include: [
+            {
+                model: Users, as: 'member', attributes:
+                    ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
+            }], where: {group_id}
+    });
+    res.json(members);
+};
+
+exports.addGroupMembers = async (req, res) => {
+    const {group_id, member_ids} = req.body;
+    let list = member_ids.map(async (member_id) => {
+        await to(ChatGroupsMembers.create({group_id, member_id}));
+    });
+
+    await Promise.all(list);
+    req.query.group_id = group_id;
+    this.getGroupMembers(req, res);
+};
+
+exports.removeGroupMember = async (req, res) => {
+    const {group_id, member_id} = req.query;
+    await ChatGroupsMembers.destroy({where: {group_id, member_id}});
+    this.getGroupMembers(req, res);
 };
 

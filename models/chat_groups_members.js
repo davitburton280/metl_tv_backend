@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+        chat_group_members.belongsTo(models.users, {foreignKey: 'member_id', as: 'member'});
     }
   };
   chat_group_members.init({
@@ -19,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'chat_groups_members',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
   return chat_group_members;
 };
