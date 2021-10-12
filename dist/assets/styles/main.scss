@@ -1139,4 +1139,18 @@ mat-error {
     color: $white!important;
 }
 
+.left-menu-main:not(.active){
+    .mat-badge-content
+    {
+        left: 130px !important;
+        top: -5px !important;
+    }
+}
+
+.mat-menu-content {
+    .active {
+        color: $metl-green!important;
+    }
+}
+
 @import "responsive";
