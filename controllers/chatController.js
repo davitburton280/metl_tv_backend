@@ -201,3 +201,10 @@ exports.removeGroupMember = async (req, res) => {
     this.getGroupMembers(req, res);
 };
 
+
+exports.removeGroup = async (req, res) => {
+    const {group_id} = req.query;
+    await ChatGroups.destroy({where: {id: group_id}});
+    this.getChatGroups(req, res);
+};
+
