@@ -12,5 +12,6 @@ router.post('/create-group', chatController.createGroup);
 router.post('/add-group-members', chatController.addGroupMembers);
 router.delete('/remove-group-member', chatController.removeGroupMember);
 router.delete('/remove-group', chatController.removeGroup);
+router.delete('/leave-group', chatController.leaveGroup);
 
 module.exports = router;

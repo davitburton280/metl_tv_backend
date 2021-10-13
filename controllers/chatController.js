@@ -153,6 +153,16 @@ exports.updateSeen = async (data) => {
 
 exports.getChatGroups = async (req, res) => {
     let {user_id} = req.query;
+
+    let arr = [
+        // {
+        //     to_id: from_id,
+        //     from_id: to_id
+        // },
+        {creator_id: user_id}
+    ];
+
+
     let groups = await ChatGroups.findAll({
         include: [
             {
@@ -160,14 +170,19 @@ exports.getChatGroups = async (req, res) => {
                 as: 'chat_group_members',
                 attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
             }
-        ]
+        ],
+        where: {
+            [Op.or]: arr
+        },
     });
     res.json(groups);
 };
 
 exports.createGroup = async (req, res) => {
     let data = req.body;
-    await ChatGroups.create(data);
+    let group = await ChatGroups.create(data);
+    console.log(group.id)
+    await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id}));
     this.getChatGroups(req, res);
 };
 
@@ -205,6 +220,14 @@ exports.removeGroupMember = async (req, res) => {
 exports.removeGroup = async (req, res) => {
     const {group_id} = req.query;
     await ChatGroups.destroy({where: {id: group_id}});
+    await ChatGroupsMembers.destroy({where: {group_id}});
+    this.getChatGroups(req, res);
+};
+
+exports.leaveGroup = async (req, res) => {
+    const {group_id, member_id} = req.query;
+    await ChatGroups.destroy({where: {id: group_id}});
+    await ChatGroupsMembers.destroy({where: {group_id, member_id}});
     this.getChatGroups(req, res);
 };
 
