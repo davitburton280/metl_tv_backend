@@ -155,13 +155,10 @@ exports.getChatGroups = async (req, res) => {
     let {user_id} = req.query;
 
     let arr = [
-        // {
-        //     to_id: from_id,
-        //     from_id: to_id
-        // },
+        sequelize.where(sequelize.col('`chat_group_members->chat_groups_members.member_id`'), user_id),
         {creator_id: user_id}
     ];
-
+    console.log('get chat groups!!!')
 
     let groups = await ChatGroups.findAll({
         include: [
@@ -181,8 +178,9 @@ exports.getChatGroups = async (req, res) => {
 exports.createGroup = async (req, res) => {
     let data = req.body;
     let group = await ChatGroups.create(data);
-    console.log(group.id)
+    console.log(data)
     await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id}));
+    req.query.user_id = data.creator_id;
     this.getChatGroups(req, res);
 };
 
@@ -226,8 +224,15 @@ exports.removeGroup = async (req, res) => {
 
 exports.leaveGroup = async (req, res) => {
     const {group_id, member_id} = req.query;
-    await ChatGroups.destroy({where: {id: group_id}});
-    await ChatGroupsMembers.destroy({where: {group_id, member_id}});
-    this.getChatGroups(req, res);
+    let group = await ChatGroups.findOne({where: {id: group_id}, attributes: ['creator_id']});
+    if (+member_id !== group.creator_id) {
+        await ChatGroups.destroy({where: {id: group_id}});
+        await ChatGroupsMembers.destroy({where: {group_id, member_id}});
+        req.query.user_id = member_id;
+        this.getChatGroups(req, res);
+    } else {
+        res.status(500).json({msg: 'The group owner cannot leave the group'});
+    }
+
 };
 
