@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     };
     chat_groups.init({
         creator_id: DataTypes.INTEGER,
+        avatar: DataTypes.STRING,
         name: DataTypes.STRING,
         description: DataTypes.TEXT
     }, {

@@ -10,6 +10,7 @@ const Users = db.users;
 const to = require('../helpers/getPromiseResult');
 
 const usersController = require('./usersController');
+const m = require('../helpers/multer');
 
 exports.getVideoMessages = async (req, res) => {
     const {video_id} = req.query;
@@ -175,11 +176,16 @@ exports.getChatGroups = async (req, res) => {
     res.json(groups);
 };
 
+exports.getOneChatGroup = async (req, res) => {
+    let groups = await ChatGroups.findOne({});
+};
+
+
 exports.createGroup = async (req, res) => {
     let data = req.body;
     let group = await ChatGroups.create(data);
     console.log(data)
-    await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id}));
+    await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id, confirmed: 1}));
     req.query.user_id = data.creator_id;
     this.getChatGroups(req, res);
 };
@@ -200,7 +206,7 @@ exports.getGroupMembers = async (req, res) => {
 exports.addGroupMembers = async (req, res) => {
     const {group_id, member_ids} = req.body;
     let list = member_ids.map(async (member_id) => {
-        await to(ChatGroupsMembers.create({group_id, member_id}));
+        await to(ChatGroupsMembers.create({group_id, member_id, ...{confirmed: 0}}));
     });
 
     await Promise.all(list);
@@ -234,5 +240,16 @@ exports.leaveGroup = async (req, res) => {
         res.status(500).json({msg: 'The group owner cannot leave the group'});
     }
 
+};
+
+exports.changeGroupAvatar = async (req, res) => {
+
+    uploadGroupAvatar(req, res, async (err) => {
+
+        const {avatar, group_id, member_id} = req.body;
+        let t = await to(ChatGroups.update({avatar: avatar}, {where: {id: group_id}}));
+        req.query.user_id = member_id;
+        this.getChatGroups(req, res);
+    })
 };
 

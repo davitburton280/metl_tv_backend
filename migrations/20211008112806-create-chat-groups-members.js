@@ -14,6 +14,10 @@ module.exports = {
             group_id: {
                 type: Sequelize.INTEGER
             },
+            confirmed: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE,

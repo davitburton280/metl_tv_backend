@@ -1,5 +1,11 @@
 let users = [];
 let chatController = require('../controllers/chatController');
+
+
+const db = require('../models');
+const ChatGroups = db.chat_groups;
+
+
 exports.socket = (io) => {
     io.on('connection', (socket) => {
         console.log('new connection made');
@@ -9,7 +15,7 @@ exports.socket = (io) => {
             console.log('USERS CONNECTED!!!')
             console.log(users)
             io.emit('userConnected', username)
-        })
+        });
 
 
         socket.on('sendMessage', (data) => {
@@ -43,6 +49,19 @@ exports.socket = (io) => {
             console.log(data.from_user.username, users, socketId)
             io.to(socketId).emit('getSeen', data)
             io.to(users[data.from_user.username]).emit('getSeen', data)
+        });
+
+        socket.on('setNewGroup', async (data) => {
+            console.log(data)
+            socket.join(data.name);
+        });
+
+        socket.on('inviteToNewGroup', async (data) => {
+            console.log(data)
+            let group = await ChatGroups.findOne({where: {id: data.group_id}, attributes: ['name']});
+            if (group) {
+                io.sockets.in(group.name).broadcast('inviteToGroupSent', data);
+            }
         });
 
         socket.on('disconnect', () => {
