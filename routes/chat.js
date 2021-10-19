@@ -14,5 +14,7 @@ router.delete('/remove-group-member', chatController.removeGroupMember);
 router.delete('/remove-group', chatController.removeGroup);
 router.delete('/leave-group', chatController.leaveGroup);
 router.post('/change-group-avatar', chatController.changeGroupAvatar);
+router.put('/accept-join-group', chatController.acceptGroupJoin);
+router.put('/decline-join-group', chatController.declineGroupJoin);
 
 module.exports = router;

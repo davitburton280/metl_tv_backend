@@ -1,4 +1,5 @@
 let users = [];
+let groupsUsers = [];
 let chatController = require('../controllers/chatController');
 
 
@@ -52,15 +53,32 @@ exports.socket = (io) => {
         });
 
         socket.on('setNewGroup', async (data) => {
+            console.log('set new group')
             console.log(data)
+            // groupsUsers.push({id: socket.id, username: data.username, group: data.name});
             socket.join(data.name);
         });
 
         socket.on('inviteToNewGroup', async (data) => {
+            console.log('invite to new group!!!')
             console.log(data)
+
             let group = await ChatGroups.findOne({where: {id: data.group_id}, attributes: ['name']});
             if (group) {
-                io.sockets.in(group.name).broadcast('inviteToGroupSent', data);
+                console.log(group.name)
+                console.log(users)
+                // socket.join(group.name);
+
+                data.members.map(member => {
+                    let username = member.username;
+                    let socketId = users[username];
+                    console.log(username);
+                    console.log(socketId)
+                    io.to(socketId).emit('inviteToGroupSent', {msg:`You are invited to join the ${group.name} group`, group_id: data.group_id})
+                })
+
+
+                // io.sockets.in(group.name).emit('inviteToGroupSent', data);
             }
         });
 

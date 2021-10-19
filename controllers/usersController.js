@@ -373,8 +373,8 @@ exports.getContacts = async (req, res) => {
         attributes: ['user_id', 'connection_id'],
         // raw: true,
         include: [
-            {model: Users, as: 'connection', attributes: ['id','first_name','last_name']},
-            {model: Users, as: 'user', attributes: ['id','first_name','last_name']}
+            {model: Users, as: 'connection', attributes: ['id','first_name','last_name', 'username']},
+            {model: Users, as: 'user', attributes: ['id','first_name','last_name', 'username']}
         ],
         where: {
             is_blocked: blocked,

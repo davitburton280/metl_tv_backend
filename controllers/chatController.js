@@ -46,7 +46,6 @@ exports.saveMessage = async (req, res) => {
 
 };
 
-
 exports.getChatMessages = async (req, res) => {
     const {from_id, to_id, personal} = req.query;
     // console.log(req.query)
@@ -166,7 +165,8 @@ exports.getChatGroups = async (req, res) => {
             {
                 model: Users,
                 as: 'chat_group_members',
-                attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
+                attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']],
+                through: {attributes: ['confirmed']}
             }
         ],
         where: {
@@ -205,8 +205,8 @@ exports.getGroupMembers = async (req, res) => {
 
 exports.addGroupMembers = async (req, res) => {
     const {group_id, member_ids} = req.body;
-    let list = member_ids.map(async (member_id) => {
-        await to(ChatGroupsMembers.create({group_id, member_id, ...{confirmed: 0}}));
+    let list = member_ids.map(async (member) => {
+        await to(ChatGroupsMembers.create({group_id, member_id: member.id, ...{confirmed: 0}}));
     });
 
     await Promise.all(list);
@@ -223,8 +223,10 @@ exports.removeGroupMember = async (req, res) => {
 
 exports.removeGroup = async (req, res) => {
     const {group_id} = req.query;
-    await ChatGroups.destroy({where: {id: group_id}});
+    let group = await ChatGroups.findOne({where: {id: group_id}, attributes: ['creator_id']});
+    req.query.user_id = group.creator_id;
     await ChatGroupsMembers.destroy({where: {group_id}});
+    await ChatGroups.destroy({where: {id: group_id}});
     this.getChatGroups(req, res);
 };
 
@@ -251,5 +253,19 @@ exports.changeGroupAvatar = async (req, res) => {
         req.query.user_id = member_id;
         this.getChatGroups(req, res);
     })
+};
+
+exports.acceptGroupJoin = async (req, res) => {
+    const {group_id, member_id} = req.body;
+    await ChatGroupsMembers.update({confirmed: 1}, {where: {group_id, member_id}});
+    req.query.user_id = member_id;
+    this.getChatGroups(req, res);
+};
+
+exports.declineGroupJoin = async (req, res) => {
+    const {group_id, member_id} = req.body;
+    await ChatGroupsMembers.destroy({where: {group_id, member_id}});
+    req.query.user_id = member_id;
+    this.getChatGroups(req, res);
 };
 
