@@ -391,7 +391,7 @@ exports.getContacts = async (req, res) => {
         }
     });
 
-    console.log(ret)
+    // console.log(ret)
 
     res.json(ret);
 };

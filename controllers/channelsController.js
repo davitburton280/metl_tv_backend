@@ -15,7 +15,7 @@ const showIfErrors = require('../helpers/showIfErrors');
 const getFullName = require('../helpers/getFullNameCol');
 
 exports.get = async (req, res) => {
-    console.log('here!!!!!!!!!!!!!')
+    // console.log('here!!!!!!!!!!!!!')
     let channels = await Channels.findAll({include: [{model: Videos}, {model: Users, as: 'subscribers'}]});
     res.json(channels);
 };

@@ -152,7 +152,7 @@ exports.updateSeen = async (data) => {
 };
 
 exports.getChatGroups = async (req, res) => {
-    let {user_id} = req.query;
+    let {user_id} = req.query || req;
 
     let arr = [
         sequelize.where(sequelize.col('`chat_group_members->chat_groups_members.member_id`'), user_id),
@@ -173,7 +173,12 @@ exports.getChatGroups = async (req, res) => {
             [Op.or]: arr
         },
     });
-    res.json(groups);
+
+    if (res) {
+        res.json(groups);
+    } else {
+        return groups;
+    }
 };
 
 exports.getOneChatGroup = async (req, res) => {
@@ -191,14 +196,19 @@ exports.createGroup = async (req, res) => {
 };
 
 exports.getGroupMembers = async (req, res) => {
-    console.log('get group members!!!')
+    console.log('get group members!!!');
     const {group_id} = req.query;
     let members = await ChatGroupsMembers.findAll({
         include: [
             {
+                model: ChatGroups, as: 'group'
+            },
+            {
                 model: Users, as: 'member', attributes:
-                    ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
-            }], where: {group_id}
+                    ['id', 'avatar', 'username', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
+            }
+
+        ], where: {group_id}
     });
     res.json(members);
 };

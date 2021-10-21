@@ -46,7 +46,7 @@ exports.login = async (req, res) => {
             else {
                 // Cloning users object without password and saving user full name
                 let {password, ...details} = user.toJSON();
-                console.log("!!!!!!" , details , "!!!!");
+                // console.log("!!!!!!" , details , "!!!!");
                 // req.session.full_name = user.full_name;
                 // console.log(details)
                 res.status(200).json({
