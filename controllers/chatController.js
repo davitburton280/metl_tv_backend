@@ -39,15 +39,15 @@ exports.saveMessage = async (req, res) => {
         req.query.to_id = data.to_id;
         req.query.from_id = data.from_id;
         req.query.personal = data.personal;
-        this.getChatMessages(req, res);
+        this.getDirectChatMessages(req, res);
     } else {
         await this.getVideoMessages(req, res);
     }
 
 };
 
-exports.getChatMessages = async (req, res) => {
-    const {from_id, to_id, personal} = req.query;
+exports.getDirectChatMessages = async (req, res) => {
+    const {from_id, to_id, personal, group_id} = req.query;
     // console.log(req.query)
     // let whereIds = ;
 
@@ -66,6 +66,7 @@ exports.getChatMessages = async (req, res) => {
         // attributes : [{exclude: 'video_id'}],
         where: {
             video_id: null,
+            group_id: group_id || null,
             [Op.or]: arr
         },
         include: [
@@ -131,6 +132,10 @@ exports.getChatMessages = async (req, res) => {
     }
 };
 
+exports.getGroupChatMessages = async (req, res) => {
+  // this.getDirectChatMessages(req,res);
+};
+
 exports.updateSeen = async (data) => {
     let {seen, from_id, to_id} = data;
 
@@ -152,13 +157,18 @@ exports.updateSeen = async (data) => {
 };
 
 exports.getChatGroups = async (req, res) => {
-    let {user_id} = req.query || req;
+    let {user_id, from_id} = req.query || req;
+
+    console.log(req.query)
+
+    console.log('get chat groups!!!')
+    console.log(user_id, from_id)
 
     let arr = [
         sequelize.where(sequelize.col('`chat_group_members->chat_groups_members.member_id`'), user_id),
-        {creator_id: user_id}
+        {creator_id: user_id || from_id}
     ];
-    console.log('get chat groups!!!')
+
 
     let groups = await ChatGroups.findAll({
         include: [

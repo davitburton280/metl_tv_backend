@@ -17,27 +17,32 @@ exports.socket = (io) => {
             users[user.username] = socket.id;
             console.log('USERS CONNECTED!!!')
             console.log(users)
-            let groupsResults = await chatController.getChatGroups({user_id: user.id});
-            let groups = JSON.parse(JSON.stringify(groupsResults));
-            groups.map(g => {
-                socket.join(g.name);
 
-                if (!groupsUsers.find(gu => gu.username === user.username && gu.group === g.name)) {
-                    groupsUsers.push({id: socket.id, username: user.username, group: g.name});
-                    filteredGroupsUsers = groupsUsers;
-                }
+            if(user.group){
+                let groupsResults = await chatController.getChatGroups({user_id: user.id});
+                let groups = JSON.parse(JSON.stringify(groupsResults));
+                groups.map(g => {
+                    socket.join(g.name);
 
-                let data = {};
-                data.msg = `${user.username} has joined the chat`;
-                data.username = user.username;
-                data.groupUsers = groupsUsers;
-                data.group = g.name;
-                io.sockets.in(g.name).emit('chatNotification', data);
-            });
+                    if (!groupsUsers.find(gu => gu.username === user.username && gu.group === g.name)) {
+                        groupsUsers.push({id: socket.id, username: user.username, group: g.name});
+                        filteredGroupsUsers = groupsUsers;
+                    }
 
-            console.log('JOINED!!! GROUP USERS:')
-            console.log(groupsUsers)
-            console.log('END OF JOINED!!!')
+                    let data = {};
+                    data.msg = `${user.username} has joined the chat`;
+                    data.username = user.username;
+                    data.groupUsers = groupsUsers;
+                    data.group = g.name;
+                    io.sockets.in(g.name).emit('chatNotification', data);
+                });
+
+                console.log('JOINED!!! GROUP USERS:')
+                console.log(groupsUsers)
+                console.log('END OF JOINED!!!')
+            }
+
+
             io.emit('userConnected', user.username)
 
 
@@ -48,9 +53,15 @@ exports.socket = (io) => {
             console.log('MESSAGE!!!')
             let username = data.to_user.from || data.to_user.username;
             let socketId = users[username];
+            let group = data.group;
             console.log(username);
             console.log(socketId)
-            io.to(socketId).emit('newMessage', data)
+
+            if (data.group) {
+                io.to(group).emit('newMessage', data)
+            } else {
+                io.to(socketId).emit('newMessage', data)
+            }
             // socket.broadcast.emit('newMessage', data)
 
         });
