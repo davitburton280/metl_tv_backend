@@ -156,6 +156,7 @@ exports.updateSeen = async (data) => {
     return !!updated;
 };
 
+
 exports.getChatGroups = async (req, res) => {
     let {user_id, from_id} = req.query || req;
 
