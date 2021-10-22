@@ -51,24 +51,33 @@ exports.getDirectChatMessages = async (req, res) => {
     // console.log(req.query)
     // let whereIds = ;
 
-    let where = to_id ? {from_id: to_id} : {};
+    console.log('get direct chat messages!!!');
+    console.log(group_id)
+
+    let whereTo = to_id ? {from_id: to_id} : {};
 
     let arr = [
         to_id ? {from_id, to_id} : {from_id},
         {
 
             to_id: from_id,
-            ...where
+            ...whereTo
         }
     ];
 
+    let where = {
+        video_id: null,
+        group_id: group_id || null,
+    };
+
+    if(!group_id) {
+        where[Op.or] = arr
+    }
+
+
     let ms = await ChatMessages.findAll({
         // attributes : [{exclude: 'video_id'}],
-        where: {
-            video_id: null,
-            group_id: group_id || null,
-            [Op.or]: arr
-        },
+        where,
         include: [
             {
                 model: Users,
@@ -133,7 +142,7 @@ exports.getDirectChatMessages = async (req, res) => {
 };
 
 exports.getGroupChatMessages = async (req, res) => {
-  // this.getDirectChatMessages(req,res);
+    this.getDirectChatMessages(req, res);
 };
 
 exports.updateSeen = async (data) => {

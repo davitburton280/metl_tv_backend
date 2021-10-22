@@ -18,7 +18,7 @@ exports.socket = (io) => {
             console.log('USERS CONNECTED!!!')
             console.log(users)
 
-            if(user.group){
+            if (user.group) {
                 let groupsResults = await chatController.getChatGroups({user_id: user.id});
                 let groups = JSON.parse(JSON.stringify(groupsResults));
                 groups.map(g => {
@@ -51,15 +51,18 @@ exports.socket = (io) => {
 
         socket.on('sendMessage', (data) => {
             console.log('MESSAGE!!!')
-            let username = data.to_user.from || data.to_user.username;
-            let socketId = users[username];
-            let group = data.group;
-            console.log(username);
-            console.log(socketId)
 
-            if (data.group) {
+
+            let group = data.group;
+
+            if (group) {
+                console.log(data)
                 io.to(group).emit('newMessage', data)
             } else {
+                let username = data.to_user.from || data.to_user.username;
+                let socketId = users[username];
+                console.log(username);
+                console.log(socketId)
                 io.to(socketId).emit('newMessage', data)
             }
             // socket.broadcast.emit('newMessage', data)
