@@ -50,20 +50,21 @@ exports.socket = (io) => {
 
 
         socket.on('sendMessage', (data) => {
-            console.log('MESSAGE!!!')
 
 
             let group = data.group;
 
             if (group) {
-                console.log(data)
-                console.log(group)
+                console.log('DIRECT MESSAGE!!!')
+                // console.log(data)
+                // console.log(group)
                 io.to(group).emit('newMessage', data)
             } else {
                 let username = data.to_user.from || data.to_user.username;
                 let socketId = users[username];
-                console.log(username);
-                console.log(socketId)
+                // console.log(username);
+                // console.log(socketId)
+                console.log('GROUP MESSAGE!!!')
                 io.to(socketId).emit('newMessage', data)
             }
             // socket.broadcast.emit('newMessage', data)
