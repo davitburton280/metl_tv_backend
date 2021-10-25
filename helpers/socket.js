@@ -89,14 +89,22 @@ exports.socket = (io) => {
         });
 
         socket.on('setSeen', async (data) => {
-            let username = data.to_user.from || data.to_user.username;
-            let socketId = users[username];
-            console.log('seen')
-            let r = await chatController.updateSeen(data);
-            // data.seen = +r;
-            console.log(data.from_user.username, users, socketId)
-            io.to(socketId).emit('getSeen', data)
-            io.to(users[data.from_user.username]).emit('getSeen', data)
+            console.log('set seen')
+
+            if (!data.group) {
+                let username = data.to_user.from || data.to_user.username;
+                let socketId = users[username];
+                let r = await chatController.updateSeen(data);
+                // data.seen = +r;
+                console.log(data.from_user.username, users, socketId)
+                io.to(socketId).emit('getSeen', data)
+                io.to(users[data.from_user.username]).emit('getSeen', data)
+            } else {
+                console.log('seen in group!!!')
+                await chatController.updateSeen(data);
+                io.to(data.group).emit('getSeen', data)
+            }
+
         });
 
 

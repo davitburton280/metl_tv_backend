@@ -151,20 +151,26 @@ exports.getGroupChatMessages = async (req, res) => {
 };
 
 exports.updateSeen = async (data) => {
-    let {seen, from_id, to_id} = data;
+    let {seen, from_id, to_id, group_id} = data;
 
-    let arr = [
+    let arr =  [
         {
             to_id: from_id,
             from_id: to_id
         },
         {from_id, to_id}
     ];
+
+    let where = {group_id};
+
+    if (!group_id) {
+        where[Op.or] = arr
+    }
+
+
     console.log("FROM ID" + data.from_id)
     let updated = await to(ChatMessages.update({seen}, {
-        where: {
-            [Op.or]: arr
-        },
+        where
     }));
     console.log(!!updated)
     return !!updated;
