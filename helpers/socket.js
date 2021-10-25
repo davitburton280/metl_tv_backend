@@ -73,12 +73,19 @@ exports.socket = (io) => {
 
         socket.on('setTyping', (data) => {
             console.log('typing')
-            let username = data.to_user?.from || data.to_user?.username;
-            let socketId = users[username];
-            // console.log(socketId)
-            if (data.to_user) {
-                io.to(socketId).emit('getTyping', data)
+
+            if (!data.group) {
+                let username = data.to_user?.from || data.to_user?.username;
+                let socketId = users[username];
+                // console.log(socketId)
+                if (data.to_user) {
+                    io.to(socketId).emit('getTyping', data)
+                }
+            } else {
+                io.to(data.group).emit('getTyping', data)
             }
+
+
         });
 
         socket.on('setSeen', async (data) => {
