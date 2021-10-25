@@ -47,7 +47,7 @@ exports.saveMessage = async (req, res) => {
 };
 
 exports.getDirectChatMessages = async (req, res) => {
-    const {from_id, to_id, personal, group_id} = req.query;
+    const {from_id, to_id, personal, group_id, group} = req.query;
     // console.log(req.query)
     // let whereIds = ;
 
@@ -70,7 +70,7 @@ exports.getDirectChatMessages = async (req, res) => {
         group_id: group_id || null,
     };
 
-    if(!group_id) {
+    if (!group_id) {
         where[Op.or] = arr
     }
 
@@ -88,6 +88,11 @@ exports.getDirectChatMessages = async (req, res) => {
                 model: Users,
                 as: 'to_user',
                 attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+            },
+            {
+                model: ChatGroups,
+                as: 'chat_group',
+                attributes: ['id', 'name']
             }
         ],
         order: [
@@ -102,27 +107,24 @@ exports.getDirectChatMessages = async (req, res) => {
         let usersFiltered = {};
         let blockedUsers = await usersController.getBlockedContactsIds(from_id, 1);
         console.log(blockedUsers)
-
-        // // console.log(ms.toJSON())
         ms.map(m => {
             // console.log('!!!!!!!!')
             // console.log(m.to_user.id, +from_id)
             // console.log('!!!!!!!!')
             let user = m.from_user.id === +from_id ? m.to_user : (m.to_user.id === +from_id ? m.from_user : m.from_user)
 
-            // console.log('BLOCKED USER!!!')
-            // console.log(user)
             let msg = m.toJSON();
-            // console.log(blockedUsers.connection_id, user.id)
-            // console.log(blockedUsers.user_id, user.id)
             if (user) {
                 // console.log(user.toJSON())
                 let user_id = user.id;
                 if (!usersFiltered[user_id]) {
                     usersFiltered[user_id] = {messages: [], user: ''}
                     usersFiltered[user_id]['messages'] = [msg];
+
+
                     let foundInBlocked = blockedUsers.find(bUser => user.id === bUser.user_id || user.id === bUser.connection_id)
                     usersFiltered[user_id]['user'] = foundInBlocked ? {blocked: 1, ...user.dataValues} : user;
+
                 } else {
                     if (!usersFiltered[user_id]['messages']) {
                         usersFiltered[user_id]['messages'] = []
@@ -135,6 +137,9 @@ exports.getDirectChatMessages = async (req, res) => {
 
         // console.log("USERS FILTERED!!!! ", Object.values(usersFiltered))
         res.json(Object.values(usersFiltered));
+    } else if (group) {
+        console.log('OK!!!')
+        res.json(ms);
     } else {
         // console.log(ms)
         res.json(ms);

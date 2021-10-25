@@ -57,6 +57,7 @@ exports.socket = (io) => {
 
             if (group) {
                 console.log(data)
+                console.log(group)
                 io.to(group).emit('newMessage', data)
             } else {
                 let username = data.to_user.from || data.to_user.username;
