@@ -15,10 +15,14 @@ module.exports = (sequelize, DataTypes) => {
   };
   chat_messages_seen_by.init({
     message_id: DataTypes.INTEGER,
+    group_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'chat_messages_seen_by',
+    modelName: 'chat_messages_seen',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    freezeTableName: true
   });
   return chat_messages_seen_by;
 };

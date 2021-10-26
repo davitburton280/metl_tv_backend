@@ -7,6 +7,8 @@ let chatController = require('../controllers/chatController');
 const db = require('../models');
 const ChatGroups = db.chat_groups;
 
+const to = require('../helpers/getPromiseResult');
+
 
 exports.socket = (io) => {
     io.on('connection', (socket) => {
@@ -102,7 +104,9 @@ exports.socket = (io) => {
                 io.to(users[data.from_user.username]).emit('getSeen', data)
             } else {
                 console.log('seen in group!!!')
-                await chatController.updateSeen(data);
+                console.log(data)
+                let {message_id, from_user, group_id} = data;
+                await to(chatController.updateSeen(data));
                 io.to(data.group).emit('getSeen', data)
             }
 

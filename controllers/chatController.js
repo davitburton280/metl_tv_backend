@@ -5,6 +5,7 @@ const db = require('../models');
 const ChatMessages = db.chat_messages;
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
+const ChatMessagesSeen = db.chat_messages_seen;
 const Videos = db.videos;
 const Users = db.users;
 const to = require('../helpers/getPromiseResult');
@@ -29,8 +30,8 @@ exports.getVideoMessages = async (req, res) => {
 exports.saveMessage = async (req, res) => {
     let data = req.body;
     data.to_id = data.to_id ? data.to_id : 0;
-    await to(ChatMessages.create(data));
     if (!data.video_id) {
+        let msg = await to(ChatMessages.create(data));
         await to(usersController.createUsersConnection(data))
     }
     req.query.video_id = data.video_id;
@@ -93,6 +94,12 @@ exports.getDirectChatMessages = async (req, res) => {
                 model: ChatGroups,
                 as: 'chat_group',
                 attributes: ['id', 'name']
+            },
+            {
+                model: Users,
+                as: 'seen_by',
+                attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
+                through: {}
             }
         ],
         order: [
@@ -151,9 +158,9 @@ exports.getGroupChatMessages = async (req, res) => {
 };
 
 exports.updateSeen = async (data) => {
-    let {seen, from_id, to_id, group_id} = data;
+    let {seen, from_id, to_id, group_id, message_id} = data;
 
-    let arr =  [
+    let arr = [
         {
             to_id: from_id,
             from_id: to_id
@@ -165,6 +172,13 @@ exports.updateSeen = async (data) => {
 
     if (!group_id) {
         where[Op.or] = arr
+    } else {
+
+
+        let found = await to(ChatMessagesSeen.findOne({where: {message_id, user_id: from_id}}));
+        if (!found) {
+            await to(ChatMessagesSeen.create({message_id, group_id, user_id: from_id}))
+        }
     }
 
 

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('chat_messages_seen_bies', {
+    await queryInterface.createTable('chat_messages_seen', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,20 +11,23 @@ module.exports = {
       message_id: {
         type: Sequelize.INTEGER
       },
+      group_id: {
+        type: Sequelize.INTEGER
+      },
       user_id: {
         type: Sequelize.INTEGER
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('chat_messages_seen_bies');
+    await queryInterface.dropTable('chat_messages_seen');
   }
 };
