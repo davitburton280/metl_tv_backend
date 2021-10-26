@@ -153,14 +153,27 @@ exports.socket = (io) => {
             console.log(groupsUsers)
         });
 
+        socket.on('leaveGroup', (data) => {
+            console.log('leave group!!!')
+            filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username || u.group !== data.group);
+            groupsUsers = filteredGroupsUsers;
+            socket.leave(data.group)
+            data.msg = `${data.username} has left the group`;
+            data.groupUsers = filteredGroupsUsers;
+            io.sockets.in(data.group).emit('chatNotification', data);
+        });
+
         socket.on('forceDisconnect', (data) => {
             let socketId = users[data.username];
             // console.log(data.username)
             console.log('force disconnect!!!');
             delete users[data.username];
+
+            let disconnectedUserGroups = groupsUsers.filter(u => u.username === data.username)
+
             filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username);
 
-            filteredGroupsUsers.map(u => {
+            disconnectedUserGroups.map(u => {
                 data.msg = `${data.username} has left the chat`;
                 data.groupUsers = filteredGroupsUsers;
                 data.group = u.group;
@@ -170,13 +183,15 @@ exports.socket = (io) => {
             groupsUsers = filteredGroupsUsers;
 
 
-            console.log(users)
+            console.log('DISCONNECTED USER GROUPS!!!')
+            console.log(disconnectedUserGroups)
+            console.log('DISCONNECTED USER GROUPS!!!')
 
-            console.log('LEFT!!! GROUP USERS:')
-            console.log(groupsUsers)
-            console.log('FILTERED GROUP USERS:')
-            console.log(filteredGroupsUsers)
-            console.log('END OF LEFT!!!')
+            // console.log('LEFT!!! GROUP USERS:')
+            // console.log(groupsUsers)
+            // console.log('FILTERED GROUP USERS:')
+            // console.log(filteredGroupsUsers)
+            // console.log('END OF LEFT!!!')
 
             socket.disconnect();
         });

@@ -289,8 +289,9 @@ exports.leaveGroup = async (req, res) => {
     const {group_id, member_id} = req.query;
     let group = await ChatGroups.findOne({where: {id: group_id}, attributes: ['creator_id']});
     if (+member_id !== group.creator_id) {
-        await ChatGroups.destroy({where: {id: group_id}});
+        // await ChatGroups.destroy({where: {id: group_id}});
         await ChatGroupsMembers.destroy({where: {group_id, member_id}});
+        await ChatMessagesSeen.destroy({where: {group_id, user_id: member_id}});
         req.query.user_id = member_id;
         this.getChatGroups(req, res);
     } else {
