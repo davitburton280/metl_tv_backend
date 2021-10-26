@@ -149,8 +149,13 @@ exports.socket = (io) => {
         socket.on('acceptJoinGroup', (data) => {
             console.log('joining group');
             socket.join(data.name);
+
             groupsUsers.push({id: socket.id, username: data.username, group: data.name});
             console.log(groupsUsers)
+
+            data.msg = `${data.username} has joined the group`;
+            data.groupUsers = filteredGroupsUsers;
+            io.sockets.in(data.group).emit('chatNotification', data);
         });
 
         socket.on('leaveGroup', (data) => {
