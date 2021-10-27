@@ -28,6 +28,6 @@ module.exports = {
         "host": process.env.PRODUCTION_IP,
         "dialect": "mysql",
         "operatorsAliases": 0,
-        "logging": true
+        "logging": false
     }
 };

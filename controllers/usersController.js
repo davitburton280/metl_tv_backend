@@ -382,6 +382,8 @@ exports.getContacts = async (req, res) => {
         }
     }));
 
+    console.log(contacts)
+
     let ret = [];
     contacts.map(c => {
         if (c.user_id !== user_id) {
@@ -391,7 +393,7 @@ exports.getContacts = async (req, res) => {
         }
     });
 
-    // console.log(ret)
+    console.log(ret)
 
     res.json(ret);
 };
