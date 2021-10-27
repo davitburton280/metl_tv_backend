@@ -382,7 +382,7 @@ exports.getContacts = async (req, res) => {
         }
     }));
 
-    console.log(contacts)
+
 
     let ret = [];
     contacts.map(c => {
@@ -395,6 +395,6 @@ exports.getContacts = async (req, res) => {
 
     console.log(ret)
 
-    res.json(ret);
+    res.json(contacts);
 };
 
