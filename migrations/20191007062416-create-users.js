@@ -44,6 +44,9 @@ module.exports = {
             avatar: {
                 type: Sequelize.STRING
             },
+            cover: {
+                type: Sequelize.STRING
+            },
             license: {
                 type: Sequelize.STRING
             },
