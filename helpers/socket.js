@@ -103,9 +103,6 @@ exports.socket = (io) => {
                 io.to(socketId).emit('getSeen', data)
                 io.to(users[data.from_user.username]).emit('getSeen', data)
             } else {
-                console.log('seen in group!!!')
-                console.log(data)
-                let {message_id, from_user, group_id} = data;
                 await to(chatController.updateSeen(data));
                 io.to(data.group).emit('getSeen', data)
             }
@@ -121,15 +118,10 @@ exports.socket = (io) => {
         });
 
         socket.on('inviteToNewGroup', async (data) => {
-            console.log('invite to new group!!!')
-            console.log(data)
+            console.log('invite to new group!!!');
 
             let group = await ChatGroups.findOne({where: {id: data.group_id}, attributes: ['name']});
             if (group) {
-                // console.log(group.name)
-                // console.log(users)
-                // socket.join(group.name);
-
                 data.members.map(member => {
                     let username = member.username;
                     let socketId = users[username];
@@ -147,10 +139,10 @@ exports.socket = (io) => {
         });
 
         socket.on('acceptJoinGroup', (data) => {
-            console.log('joining group');
+            console.log('joining group!!!');
             socket.join(data.name);
 
-            groupsUsers.push({id: socket.id, username: data.username, group: data.name});
+            groupsUsers.push({id: socket.id, username: data.username, group: data.group});
             console.log(groupsUsers)
 
             data.msg = `${data.username} has joined the group`;
@@ -162,15 +154,13 @@ exports.socket = (io) => {
             console.log('leave group!!!')
             filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username || u.group !== data.group);
             groupsUsers = filteredGroupsUsers;
-            socket.leave(data.group)
+            socket.leave(data.group);
             data.msg = `${data.username} has left the group`;
             data.groupUsers = filteredGroupsUsers;
             io.sockets.in(data.group).emit('chatNotification', data);
         });
 
         socket.on('forceDisconnect', (data) => {
-            let socketId = users[data.username];
-            // console.log(data.username)
             console.log('force disconnect!!!');
             delete users[data.username];
 
