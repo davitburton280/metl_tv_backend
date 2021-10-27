@@ -47,12 +47,6 @@ module.exports = {
             cover: {
                 type: Sequelize.STRING
             },
-            license: {
-                type: Sequelize.STRING
-            },
-            paper: {
-                type: Sequelize.STRING
-            },
             verification_code : {
                 type: Sequelize.INTEGER
             },
