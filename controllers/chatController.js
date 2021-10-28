@@ -188,9 +188,21 @@ exports.updateSeen = async (data) => {
 
     console.log("FROM ID" + data.from_id)
     console.log(new Date());
-    let updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
-        where
+
+
+    let foundMessage = await to(ChatMessages.findOne({
+        where, attributes: ['seen']
     }));
+
+    let updated = false;
+    console.log("ALREADY SEEN", foundMessage.seen)
+    if(!foundMessage.seen){
+        updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
+            where
+        }));
+    }
+
+
     console.log(!!updated)
     return !!updated;
 };
