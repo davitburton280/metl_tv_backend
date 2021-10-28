@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   chat_messages_seen_by.init({
     message_id: DataTypes.INTEGER,
     group_id: DataTypes.INTEGER,
-    user_id: DataTypes.INTEGER
+    user_id: DataTypes.INTEGER,
+    to_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'chat_messages_seen',

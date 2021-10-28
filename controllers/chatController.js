@@ -13,6 +13,8 @@ const to = require('../helpers/getPromiseResult');
 const usersController = require('./usersController');
 const m = require('../helpers/multer');
 
+const moment = require('moment');
+
 exports.getVideoMessages = async (req, res) => {
     const {video_id} = req.query;
     console.log('get video chat messages!!!!')
@@ -168,12 +170,12 @@ exports.updateSeen = async (data) => {
         {from_id, to_id}
     ];
 
-    let where = {group_id};
+    let where = {};
 
     if (!group_id) {
         where[Op.or] = arr
     } else {
-
+        where.group_id = group_id;
 
         let found = await to(ChatMessagesSeen.findOne({where: {message_id, user_id: from_id}}));
         if (!found) {
@@ -182,8 +184,11 @@ exports.updateSeen = async (data) => {
     }
 
 
+
+
     console.log("FROM ID" + data.from_id)
-    let updated = await to(ChatMessages.update({seen}, {
+    console.log(new Date());
+    let updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
         where
     }));
     console.log(!!updated)
