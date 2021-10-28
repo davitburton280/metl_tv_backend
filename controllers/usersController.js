@@ -291,7 +291,7 @@ exports.createUsersConnection = async (data) => {
             user_id: to_id,
             connection_id: from_id
         },
-    ]
+    ];
     let found = await to(UsersConnection.findOne({
         where: {
             [Op.or]: where
@@ -321,7 +321,7 @@ exports.blockUser = async (req, res) => {
             user_id: connection_id,
             connection_id: user_id
         },
-    ]
+    ];
 
     let result = await UsersConnection.update({is_blocked: block},
         {
@@ -370,11 +370,11 @@ exports.getContacts = async (req, res) => {
 
 
     let contacts = await to(UsersConnection.findAll({
-        attributes: ['user_id', 'connection_id'],
+        attributes: [],
         // raw: true,
         include: [
-            {model: Users, as: 'connection', attributes: ['id','first_name','last_name', 'username']},
-            {model: Users, as: 'user', attributes: ['id','first_name','last_name', 'username']}
+            {model: Users, as: 'connection', attributes: ['id', 'first_name', 'last_name', 'username']},
+            {model: Users, as: 'user', attributes: ['id', 'first_name', 'last_name', 'username']}
         ],
         where: {
             is_blocked: blocked,
@@ -383,18 +383,17 @@ exports.getContacts = async (req, res) => {
     }));
 
 
-
     let ret = [];
     contacts.map(c => {
-        if (c.user_id !== user_id) {
+        if (c.user.id !== +user_id) {
             ret.push(c.user.toJSON())
-        } else if (c.connection_id !== user_id) {
+        } else if (c.connection.id !== +user_id) {
             ret.push(c.connection.toJSON())
         }
     });
 
     console.log(ret)
 
-    res.json(contacts);
+    res.json(ret);
 };
 

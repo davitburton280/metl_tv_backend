@@ -57,7 +57,8 @@ exports.socket = (io) => {
             let group = data.group;
 
             if (group) {
-                console.log('DIRECT MESSAGE!!!')
+
+                console.log('GROUP MESSAGE!!!')
                 // console.log(data)
                 // console.log(group)
                 io.to(group).emit('newMessage', data)
@@ -66,7 +67,7 @@ exports.socket = (io) => {
                 let socketId = users[username];
                 // console.log(username);
                 // console.log(socketId)
-                console.log('GROUP MESSAGE!!!')
+                console.log('DIRECT MESSAGE!!!')
                 io.to(socketId).emit('newMessage', data)
             }
             // socket.broadcast.emit('newMessage', data)

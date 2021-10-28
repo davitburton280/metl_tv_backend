@@ -53,7 +53,7 @@ exports.getDirectChatMessages = async (req, res) => {
     // let whereIds = ;
 
     console.log('get direct chat messages!!!');
-    console.log(group_id)
+    // console.log(group_id)
 
     let whereTo = to_id ? {from_id: to_id} : {};
 

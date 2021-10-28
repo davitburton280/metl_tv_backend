@@ -10,7 +10,7 @@ module.exports = {
         // dialectOptions: {
         //     useUTC: false, // for reading from database
         // },
-        logging: true
+        logging: false
     },
     "staging": {
         "username": process.env.STAGING_DB_USER,
@@ -19,7 +19,7 @@ module.exports = {
         "host": process.env.STAGING_IP,
         "dialect": "mysql",
         "operatorsAliases": 0,
-        "logging": true
+        "logging": false
     },
     "production": {
         "username": process.env.PRODUCTION_DB_USER,

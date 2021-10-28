@@ -28,7 +28,7 @@ module.exports = {
                 email: 'test@gmail.com',
                 password: bcrypt.hashSync(process.env.DEV_PASS, 10),
                 stocks_order_type_id: 1,
-                username: 'test',
+                username: 'jane',
                 avatar: '',
                 cover: '',
                 phone: '000 000 0000',
