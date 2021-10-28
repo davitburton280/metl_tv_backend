@@ -42,10 +42,13 @@ exports.socket = (io) => {
                 console.log('JOINED!!! GROUP USERS:')
                 console.log(groupsUsers)
                 console.log('END OF JOINED!!!')
+            } else {
+
             }
 
 
-            io.emit('userConnected', user.username)
+            let keys = Object.keys(users);
+            io.emit('userConnected', keys)
 
 
         });
@@ -163,32 +166,42 @@ exports.socket = (io) => {
 
         socket.on('forceDisconnect', (data) => {
             console.log('force disconnect!!!');
+
             delete users[data.username];
 
-            let disconnectedUserGroups = groupsUsers.filter(u => u.username === data.username)
-
-            filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username);
-
-            disconnectedUserGroups.map(u => {
-                data.msg = `${data.username} has left the chat`;
-                data.groupUsers = filteredGroupsUsers;
-                data.group = u.group;
-                io.sockets.in(u.group).emit('chatNotification', data);
-            });
-
-            groupsUsers = filteredGroupsUsers;
+            // if (data.leavingGroup) {
 
 
-            console.log('DISCONNECTED USER GROUPS!!!')
-            console.log(disconnectedUserGroups)
-            console.log('DISCONNECTED USER GROUPS!!!')
+                let disconnectedUserGroups = groupsUsers.filter(u => u.username === data.username)
+
+                filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username);
+
+                disconnectedUserGroups.map(u => {
+                    data.msg = `${data.username} has left the chat`;
+                    data.groupUsers = filteredGroupsUsers;
+
+                    data.group = u.group;
+                    io.sockets.in(u.group).emit('chatNotification', data);
+                });
+
+                groupsUsers = filteredGroupsUsers;
+
+                console.log('DISCONNECTED USER GROUPS!!!')
+                console.log(disconnectedUserGroups)
+                console.log('DISCONNECTED USER GROUPS!!!')
+
+            // } else {
+            //
+            // }
+
 
             // console.log('LEFT!!! GROUP USERS:')
             // console.log(groupsUsers)
             // console.log('FILTERED GROUP USERS:')
             // console.log(filteredGroupsUsers)
             // console.log('END OF LEFT!!!')
-
+            data.users = Object.keys(users);
+            io.sockets.emit('chatNotification', data);
             socket.disconnect();
         });
 
