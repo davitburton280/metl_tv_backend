@@ -116,13 +116,18 @@ exports.socket = (io) => {
 
         socket.on('setNewGroup', async (data) => {
             console.log('set new group')
-            console.log(data)
+            // console.log(data)
             groupsUsers.push({id: socket.id, username: data.username, group: data.name});
             socket.join(data.name);
+            console.log('NEW GROUP CREATED!!!JOINED!!! GROUP USERS:')
+            console.log(groupsUsers)
+            console.log('END OF JOINED!!!')
+            data.groupUsers = groupsUsers;
+            io.to(data.name).emit('chatNotification', {...data, group: data.name, groupCreated: 1})
         });
 
         socket.on('inviteToNewGroup', async (data) => {
-            console.log('invite to new group!!!');
+            console.log('invite to new group!!!', data);
 
             let group = await ChatGroups.findOne({where: {id: data.group_id}, attributes: ['name']});
             if (group) {
@@ -131,6 +136,7 @@ exports.socket = (io) => {
                     let socketId = users[username];
                     console.log(username);
                     console.log(socketId)
+                    console.log(groupsUsers)
                     io.to(socketId).emit('inviteToGroupSent', {
                         msg: `You are invited to join the ${group.name} group`,
                         group_id: data.group_id
@@ -142,15 +148,19 @@ exports.socket = (io) => {
             }
         });
 
-        socket.on('acceptJoinGroup', (data) => {
+        socket.on('acceptJoinGroup', async (data) => {
             console.log('joining group!!!');
-            socket.join(data.name);
-            let socketId = users[data.username];
-            groupsUsers.push({id: socket.id, username: data.username, group: data.group});
+            let socketId = users[data.username]; //socket.id
+            let theSocket = io.sockets.sockets.get(socketId)
+            theSocket.join(data.group);
+            console.log(await io.in(data.group).allSockets())
+            console.log(socketId, socket.id)
+            groupsUsers.push({id: socketId, username: data.username, group: data.group});
             console.log(groupsUsers)
+            console.log(socketId)
 
             data.msg = `${data.username} has joined the group`;
-            data.groupUsers = filteredGroupsUsers;
+            data.groupUsers = groupsUsers;
             io.sockets.in(data.group).emit('chatNotification', data);
             io.to(socketId).emit('chatNotification', data)
         });
@@ -165,16 +175,39 @@ exports.socket = (io) => {
             io.sockets.in(data.group).emit('chatNotification', data);
         });
 
-        socket.on('removeGroup', (data) => {
-            console.log('remove group!!!')
-            filteredGroupsUsers = groupsUsers.filter(u =>  u.group !== data.group);
+        socket.on('removeGroup', async (data) => {
+            console.log('remove group!!!', data.group)
+            let group = data.group;
+            console.log(groupsUsers)
+            filteredGroupsUsers = groupsUsers.filter(u => u.group !== data.group);
             groupsUsers = filteredGroupsUsers;
-            socket.leave(data.group);
             console.log(groupsUsers)
             data.msg = `${data.username} has removed the group`;
             data.groupRemoved = 1;
             data.groupUsers = filteredGroupsUsers;
-            io.sockets.in(data.group).emit('chatNotification', data);
+
+            // let roomUsers = await io.in(data.group).fetchSockets();
+
+            let clients = io.sockets;
+            let sockets = [];
+
+            console.log(await io.in(group).allSockets())
+            io.sockets.in(group).emit('chatNotification', data);
+            io.in(group).socketsLeave(group);
+            console.log('sockets leaved the group!!!')
+            console.log(await io.in(group).allSockets())
+
+            // clients.sockets.forEach(function (data, counter) {
+            //
+            //     let socketId = data.id;//log ids
+            //     let isConnected = data.connected//true,false;
+            //     if (groupsUsers.find(u => u.id === socketId)) {
+            //
+            //         // sockets.push(socketId)
+            //     }
+            // });
+
+
         });
 
         socket.on('forceDisconnect', (data) => {
@@ -185,23 +218,23 @@ exports.socket = (io) => {
             // if (data.leavingGroup) {
 
 
-                let disconnectedUserGroups = groupsUsers.filter(u => u.username === data.username)
+            let disconnectedUserGroups = groupsUsers.filter(u => u.username === data.username)
 
-                filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username);
+            filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username);
 
-                disconnectedUserGroups.map(u => {
-                    data.msg = `${data.username} has left the chat`;
-                    data.groupUsers = filteredGroupsUsers;
+            disconnectedUserGroups.map(u => {
+                data.msg = `${data.username} has left the chat`;
+                data.groupUsers = filteredGroupsUsers;
 
-                    data.group = u.group;
-                    io.sockets.in(u.group).emit('chatNotification', data);
-                });
+                data.group = u.group;
+                io.sockets.in(u.group).emit('chatNotification', data);
+            });
 
-                groupsUsers = filteredGroupsUsers;
+            groupsUsers = filteredGroupsUsers;
 
-                console.log('DISCONNECTED USER GROUPS!!!')
-                console.log(disconnectedUserGroups)
-                console.log('DISCONNECTED USER GROUPS!!!')
+            console.log('DISCONNECTED USER GROUPS!!!')
+            console.log(disconnectedUserGroups)
+            console.log('DISCONNECTED USER GROUPS!!!')
 
             // } else {
             //
