@@ -145,13 +145,14 @@ exports.socket = (io) => {
         socket.on('acceptJoinGroup', (data) => {
             console.log('joining group!!!');
             socket.join(data.name);
-
+            let socketId = users[data.username];
             groupsUsers.push({id: socket.id, username: data.username, group: data.group});
             console.log(groupsUsers)
 
             data.msg = `${data.username} has joined the group`;
             data.groupUsers = filteredGroupsUsers;
             io.sockets.in(data.group).emit('chatNotification', data);
+            io.to(socketId).emit('chatNotification', data)
         });
 
         socket.on('leaveGroup', (data) => {
@@ -160,6 +161,18 @@ exports.socket = (io) => {
             groupsUsers = filteredGroupsUsers;
             socket.leave(data.group);
             data.msg = `${data.username} has left the group`;
+            data.groupUsers = filteredGroupsUsers;
+            io.sockets.in(data.group).emit('chatNotification', data);
+        });
+
+        socket.on('removeGroup', (data) => {
+            console.log('remove group!!!')
+            filteredGroupsUsers = groupsUsers.filter(u =>  u.group !== data.group);
+            groupsUsers = filteredGroupsUsers;
+            socket.leave(data.group);
+            console.log(groupsUsers)
+            data.msg = `${data.username} has removed the group`;
+            data.groupRemoved = 1;
             data.groupUsers = filteredGroupsUsers;
             io.sockets.in(data.group).emit('chatNotification', data);
         });
