@@ -387,8 +387,8 @@ exports.getContacts = async (req, res) => {
     contacts.map(c => {
         if (c.user.id !== +user_id) {
             ret.push(c.user.toJSON())
-        } else if (c.connection.id !== +user_id) {
-            ret.push(c.connection.toJSON())
+        } else if (c?.connection?.id !== +user_id) {
+            ret.push(c?.connection?.toJSON())
         }
     });
 
