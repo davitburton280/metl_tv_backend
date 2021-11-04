@@ -210,11 +210,7 @@ exports.updateSeen = async (data) => {
 
 exports.getChatGroups = async (req, res) => {
     let {user_id, from_id} = req.query || req;
-
-    console.log(req.query)
-
     console.log('get chat groups!!!')
-    console.log(user_id, from_id)
 
     let arr = [
         sequelize.where(sequelize.col('`chat_group_members->chat_groups_members.member_id`'), user_id),
@@ -239,7 +235,7 @@ exports.getChatGroups = async (req, res) => {
     if (res) {
         res.json(groups);
     } else {
-        return groups;
+        return JSON.parse(JSON.stringify(groups));
     }
 };
 
