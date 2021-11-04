@@ -184,8 +184,6 @@ exports.updateSeen = async (data) => {
     }
 
 
-
-
     console.log("FROM ID" + data.from_id)
     console.log(new Date());
 
@@ -196,7 +194,7 @@ exports.updateSeen = async (data) => {
 
     let updated = false;
     console.log("ALREADY SEEN", foundMessage.seen)
-    if(!foundMessage.seen){
+    if (!foundMessage.seen) {
         updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
             where
         }));
@@ -205,6 +203,67 @@ exports.updateSeen = async (data) => {
 
     console.log(!!updated)
     return !!updated;
+};
+
+
+exports.getGroupsMessages = async (req, res) => {
+    let {user_id} = req.query;
+
+    let chatGroupsResult = await ChatGroupsMembers.findAll({where:{member_id: user_id}, attributes: ['group_id']});
+
+    let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t=>t.group_id);
+
+    let where = {group_id: {[Op.in]:chatGroups}};
+    let groupsMessages = await ChatMessages.findAll({
+        // attributes : [{exclude: 'video_id'}],
+        where,
+        include: [
+            {
+                model: Users,
+                as: 'from_user',
+                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+            },
+            {
+                model: Users,
+                as: 'to_user',
+                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+            },
+            {
+                model: ChatGroups,
+                as: 'chat_group',
+                attributes: ['id', 'name']
+            },
+            {
+                model: Users,
+                as: 'seen_by',
+                attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
+                through: {}
+            }
+        ],
+        order: [
+            [sequelize.col('`chat_messages`.`created_at`'), 'asc']
+        ]
+
+    });
+
+    let groupsFiltered = {};
+    groupsMessages.map(gm=>{
+        let msg = gm.toJSON();
+        let group = gm.chat_group;
+        let group_id = group.id;
+        if (!groupsFiltered[group_id]) {
+            groupsFiltered[group_id] = {messages: [], group: ''}
+            groupsFiltered[group_id]['messages'] = [msg];
+            groupsFiltered[group_id]['group'] =  group;
+        } else {
+            if (!groupsFiltered[group_id]['messages']) {
+                groupsFiltered[group_id]['messages'] = []
+            }
+            groupsFiltered[group_id]['messages'].push(msg);
+        }
+    });
+
+    res.json(Object.values(groupsFiltered));
 };
 
 
