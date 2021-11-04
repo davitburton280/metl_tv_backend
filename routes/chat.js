@@ -9,6 +9,7 @@ router.get('/get-direct-chat-messages', chatController.getDirectChatMessages);
 router.get('/get-group-chat-messages', chatController.getGroupChatMessages);
 router.get('/get-chat-groups', chatController.getChatGroups);
 router.get('/get-group-members', chatController.getGroupMembers);
+router.get('/get-groups-messages', chatController.getGroupsMessages);
 router.post('/create-group', chatController.createGroup);
 router.post('/add-group-members', chatController.addGroupMembers);
 router.delete('/remove-group-member', chatController.removeGroupMember);

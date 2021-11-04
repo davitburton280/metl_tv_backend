@@ -174,6 +174,7 @@ exports.updateSeen = async (data) => {
 
     if (!group_id) {
         where[Op.or] = arr
+        where.id = message_id;
     } else {
         where.group_id = group_id;
 
@@ -183,17 +184,17 @@ exports.updateSeen = async (data) => {
         }
     }
 
+    // console.log("FROM ID" + data.from_id)
+    // console.log(new Date());
 
-    console.log("FROM ID" + data.from_id)
-    console.log(new Date());
 
-
+    console.log(message_id)
     let foundMessage = await to(ChatMessages.findOne({
-        where, attributes: ['seen']
+        where
     }));
 
     let updated = false;
-    console.log("ALREADY SEEN", foundMessage.seen)
+    console.log("ALREADY SEEN", where, JSON.parse(JSON.stringify(foundMessage)))
     if (!foundMessage.seen) {
         updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
             where
