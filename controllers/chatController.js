@@ -115,6 +115,7 @@ exports.getDirectChatMessages = async (req, res) => {
 
         let usersFiltered = {};
         let blockedUsers = await usersController.getBlockedContactsIds(from_id, 1);
+        let unseenMessagesSendersCount = 0;
         console.log(blockedUsers)
         ms.map(m => {
             // console.log('!!!!!!!!')
@@ -127,8 +128,12 @@ exports.getDirectChatMessages = async (req, res) => {
                 // console.log(user.toJSON())
                 let user_id = user.id;
                 if (!usersFiltered[user_id]) {
-                    usersFiltered[user_id] = {messages: [], user: ''}
+                    usersFiltered[user_id] = {messages: [], user: '', unseens: 0};
                     usersFiltered[user_id]['messages'] = [msg];
+
+                    if (msg.seen === 0) {
+                        ++usersFiltered[user_id].unseens;
+                    }
 
 
                     let foundInBlocked = blockedUsers.find(bUser => user.id === bUser.user_id || user.id === bUser.connection_id)
@@ -138,6 +143,11 @@ exports.getDirectChatMessages = async (req, res) => {
                     if (!usersFiltered[user_id]['messages']) {
                         usersFiltered[user_id]['messages'] = []
                     }
+
+                    if (msg.seen === 0) {
+                        ++usersFiltered[user_id].unseens;
+                    }
+
                     usersFiltered[user_id]['messages'].push(msg);
                 }
             }
@@ -173,8 +183,8 @@ exports.updateSeen = async (data) => {
     let where = {};
 
     if (!group_id) {
-        where[Op.or] = arr
-        where.id = message_id;
+        where[Op.or] = arr;
+        // where.id = message_id;
     } else {
         where.group_id = group_id;
 
@@ -189,13 +199,13 @@ exports.updateSeen = async (data) => {
 
 
     console.log(message_id)
-    let foundMessage = await to(ChatMessages.findOne({
+    let foundMessages = await to(ChatMessages.findAll({
         where
     }));
 
     let updated = false;
-    console.log("ALREADY SEEN", where, JSON.parse(JSON.stringify(foundMessage)))
-    if (!foundMessage.seen) {
+    console.log("ALREADY SEEN", JSON.parse(JSON.stringify(foundMessages)), foundMessages.find(fm => fm.seen === 0))
+    if (foundMessages.find(fm => fm.seen === 0)) {
         updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
             where
         }));
@@ -210,11 +220,11 @@ exports.updateSeen = async (data) => {
 exports.getGroupsMessages = async (req, res) => {
     let {user_id} = req.query;
 
-    let chatGroupsResult = await ChatGroupsMembers.findAll({where:{member_id: user_id}, attributes: ['group_id']});
+    let chatGroupsResult = await ChatGroupsMembers.findAll({where: {member_id: user_id}, attributes: ['group_id']});
 
-    let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t=>t.group_id);
+    let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t => t.group_id);
 
-    let where = {group_id: {[Op.in]:chatGroups}};
+    let where = {group_id: {[Op.in]: chatGroups}};
     let groupsMessages = await ChatMessages.findAll({
         // attributes : [{exclude: 'video_id'}],
         where,
@@ -248,17 +258,25 @@ exports.getGroupsMessages = async (req, res) => {
     });
 
     let groupsFiltered = {};
-    groupsMessages.map(gm=>{
+    groupsMessages.map(gm => {
         let msg = gm.toJSON();
         let group = gm.chat_group;
         let group_id = group.id;
         if (!groupsFiltered[group_id]) {
-            groupsFiltered[group_id] = {messages: [], group: ''}
+            groupsFiltered[group_id] = {messages: [], group: '', unseens: 0}
             groupsFiltered[group_id]['messages'] = [msg];
-            groupsFiltered[group_id]['group'] =  group;
+            groupsFiltered[group_id]['group'] = group;
+
+            if (msg.seen === 0) {
+                ++groupsFiltered[group_id].unseens;
+            }
+
         } else {
             if (!groupsFiltered[group_id]['messages']) {
                 groupsFiltered[group_id]['messages'] = []
+            }
+            if (msg.seen === 0) {
+                ++groupsFiltered[group_id].unseens;
             }
             groupsFiltered[group_id]['messages'].push(msg);
         }
