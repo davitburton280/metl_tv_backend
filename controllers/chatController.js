@@ -224,65 +224,92 @@ exports.getGroupsMessages = async (req, res) => {
 
     let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t => t.group_id);
 
-    let where = {group_id: {[Op.in]: chatGroups}};
-    let groupsMessages = await ChatMessages.findAll({
+    let where = {id: {[Op.in]: chatGroups}};
+    // let groupsMessages = await ChatMessages.findAll({
+    //     // attributes : [{exclude: 'video_id'}],
+    //     where,
+    //     include: [
+    //         {
+    //             model: Users,
+    //             as: 'from_user',
+    //             attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+    //         },
+    //         {
+    //             model: Users,
+    //             as: 'to_user',
+    //             attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+    //         },
+    //         {
+    //             model: ChatGroups,
+    //             as: 'chat_group',
+    //             attributes: ['id', 'name']
+    //         },
+    //         {
+    //             model: Users,
+    //             as: 'seen_by',
+    //             attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
+    //             through: {}
+    //         }
+    //     ],
+    //     order: [
+    //         [sequelize.col('`chat_messages`.`created_at`'), 'asc']
+    //     ]
+    //
+    // });
+
+
+    let groupsMessages = await ChatGroups.findAll({
         // attributes : [{exclude: 'video_id'}],
         where,
+        attributes: ['id', 'name'],
         include: [
+
             {
-                model: Users,
-                as: 'from_user',
-                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+                model: ChatMessages,
+                as: 'chat_group_messages',
+                include: [
+                    {
+                        model: Users,
+                        as: 'from_user',
+                        attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+                    },
+                    {
+                        model: Users,
+                        as: 'to_user',
+                        attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+                    },
+                    {
+                        model: Users,
+                        as: 'seen_by',
+                        attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
+                        through: {}
+                    }
+                ],
+                order: [
+                    [sequelize.col('`chat_messages`.`created_at`'), 'asc']
+                ]
             },
-            {
-                model: Users,
-                as: 'to_user',
-                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
-            },
-            {
-                model: ChatGroups,
-                as: 'chat_group',
-                attributes: ['id', 'name']
-            },
-            {
-                model: Users,
-                as: 'seen_by',
-                attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
-                through: {}
-            }
+
         ],
-        order: [
-            [sequelize.col('`chat_messages`.`created_at`'), 'asc']
-        ]
+
 
     });
 
-    let groupsFiltered = {};
+
+    let groupsFiltered = [];
     groupsMessages.map(gm => {
-        let msg = gm.toJSON();
-        let group = gm.chat_group;
-        let group_id = group.id;
-        if (!groupsFiltered[group_id]) {
-            groupsFiltered[group_id] = {messages: [], group: '', unseens: 0}
-            groupsFiltered[group_id]['messages'] = [msg];
-            groupsFiltered[group_id]['group'] = group;
+        let groupDetails = gm.toJSON();
+        groupDetails.unseens = 0;
 
-            if (msg.seen === 0) {
-                ++groupsFiltered[group_id].unseens;
+        gm.chat_group_messages.map(m => {
+            if (m.seen === 0) {
+                ++groupDetails.unseens;
             }
-
-        } else {
-            if (!groupsFiltered[group_id]['messages']) {
-                groupsFiltered[group_id]['messages'] = []
-            }
-            if (msg.seen === 0) {
-                ++groupsFiltered[group_id].unseens;
-            }
-            groupsFiltered[group_id]['messages'].push(msg);
-        }
+        })
+        groupsFiltered.push(groupDetails);
     });
-
-    res.json(Object.values(groupsFiltered));
+    // console.log(groupsMessages)
+    res.json(groupsFiltered);
 };
 
 
