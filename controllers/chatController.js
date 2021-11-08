@@ -280,7 +280,6 @@ exports.getGroupsMessages = async (req, res) => {
 
     });
 
-
     let groupsFiltered = [];
     groupsMessages.map(gm => {
         let groupDetails = gm.toJSON();
@@ -292,8 +291,7 @@ exports.getGroupsMessages = async (req, res) => {
         });
         groupsFiltered.push(groupDetails);
     });
-    // console.log(JSON.parse(JSON.stringify(groupsMessages[0].chat_group_messages)))
-    // console.log(groupsFiltered[0].chat_group_messages)
+
     res.json(groupsFiltered);
 };
 
@@ -311,9 +309,33 @@ exports.getChatGroups = async (req, res) => {
     let groups = await ChatGroups.findAll({
         include: [
             {
+                model: ChatMessages,
+                attributes: {exclude: ['video_id', 'to_id', 'to_user', 'updated_at']},
+                as: 'chat_group_messages',
+                include: [
+                    {
+                        model: Users,
+                        as: 'from_user',
+                        attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+                    },
+                    {
+                        model: Users,
+                        as: 'to_user',
+                        attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+                    },
+                    {
+                        model: Users,
+                        as: 'seen_by',
+                        attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
+                        through: {}
+                    }
+                ],
+
+            },
+            {
                 model: Users,
                 as: 'chat_group_members',
-                attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']],
+                attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('chat_group_members.first_name'), ' ', sequelize.col('chat_group_members.last_name')), 'name'], 'username'],
                 through: {attributes: ['confirmed']}
             }
         ],
@@ -347,18 +369,40 @@ exports.createGroup = async (req, res) => {
 exports.getGroupMembers = async (req, res) => {
     console.log('get group members!!!');
     const {group_id} = req.query;
-    let members = await ChatGroupsMembers.findAll({
+
+    let members = await ChatGroups.findOne({
         include: [
             {
-                model: ChatGroups, as: 'group'
-            },
-            {
-                model: Users, as: 'member', attributes:
-                    ['id', 'avatar', 'username', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
+                model: Users,
+                as: 'chat_group_members',
+                attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name'], 'username'],
+                // through: {attributes: ['confirmed']}
             }
-
-        ], where: {group_id}
+        ],
+        where: {id: group_id}
     });
+
+
+    // let members = await ChatGroupsMembers.findAll({
+    //     include: [
+    //         {
+    //             model: ChatGroups, as: 'group',
+    //             include: [
+    //                 {
+    //                     model: Users,
+    //                     as: 'chat_group_members',
+    //                     attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']],
+    //                     through: {attributes: ['confirmed']}
+    //                 }
+    //             ]
+    //         },
+    //         // {
+    //         //     model: Users, as: 'member', attributes:
+    //         //         ['id', 'avatar', 'username', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name']]
+    //         // }
+    //
+    //     ], where: {group_id}
+    // });
     res.json(members);
 };
 
@@ -386,7 +430,7 @@ exports.removeGroup = async (req, res) => {
     req.query.user_id = group.creator_id;
     await ChatGroupsMembers.destroy({where: {group_id}});
     await ChatGroups.destroy({where: {id: group_id}});
-    this.getChatGroups(req, res);
+    this.getGroupsMessages(req, res);
 };
 
 exports.leaveGroup = async (req, res) => {
@@ -397,7 +441,7 @@ exports.leaveGroup = async (req, res) => {
         await ChatGroupsMembers.destroy({where: {group_id, member_id}});
         await ChatMessagesSeen.destroy({where: {group_id, user_id: member_id}});
         req.query.user_id = member_id;
-        this.getChatGroups(req, res);
+        this.getGroupsMessages(req, res);
     } else {
         res.status(500).json({msg: 'The group owner cannot leave the group'});
     }
