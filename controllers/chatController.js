@@ -224,48 +224,19 @@ exports.getGroupsMessages = async (req, res) => {
 
     let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t => t.group_id);
 
-    let where = {id: {[Op.in]: chatGroups}};
-    // let groupsMessages = await ChatMessages.findAll({
-    //     // attributes : [{exclude: 'video_id'}],
-    //     where,
-    //     include: [
-    //         {
-    //             model: Users,
-    //             as: 'from_user',
-    //             attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
-    //         },
-    //         {
-    //             model: Users,
-    //             as: 'to_user',
-    //             attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
-    //         },
-    //         {
-    //             model: ChatGroups,
-    //             as: 'chat_group',
-    //             attributes: ['id', 'name']
-    //         },
-    //         {
-    //             model: Users,
-    //             as: 'seen_by',
-    //             attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
-    //             through: {}
-    //         }
-    //     ],
-    //     order: [
-    //         [sequelize.col('`chat_messages`.`created_at`'), 'asc']
-    //     ]
-    //
-    // });
-
+    let where = {
+        id: {[Op.in]: chatGroups}
+    };
 
     let groupsMessages = await ChatGroups.findAll({
-        // attributes : [{exclude: 'video_id'}],
+
         where,
-        attributes: ['id', 'name'],
+        attributes: ['id', 'name', 'avatar', 'creator_id'],
         include: [
 
             {
                 model: ChatMessages,
+                attributes: {exclude: ['video_id', 'to_id', 'to_user', 'updated_at']},
                 as: 'chat_group_messages',
                 include: [
                     {
@@ -285,12 +256,26 @@ exports.getGroupsMessages = async (req, res) => {
                         through: {}
                     }
                 ],
-                order: [
-                    [sequelize.col('`chat_messages`.`created_at`'), 'asc']
-                ]
+
             },
 
+            {
+                model: Users,
+                as: 'chat_group_members',
+                attributes: ['id', 'avatar', 'username',
+                    [
+                        sequelize.fn('concat', sequelize.col('`chat_group_members.first_name`'), ' ', sequelize.col('`chat_group_members.last_name`')), 'name'
+                    ]
+                ],
+                // through: {attributes: ['confirmed']}
+            },
+
+
         ],
+        order: [
+            ['name', 'asc'],
+            [sequelize.col('`chat_group_messages`.`created_at`'), 'asc'],
+        ]
 
 
     });
@@ -300,15 +285,15 @@ exports.getGroupsMessages = async (req, res) => {
     groupsMessages.map(gm => {
         let groupDetails = gm.toJSON();
         groupDetails.unseens = 0;
-
-        gm.chat_group_messages.map(m => {
+        groupDetails.chat_group_messages.map(m => {
             if (m.seen === 0) {
                 ++groupDetails.unseens;
             }
-        })
+        });
         groupsFiltered.push(groupDetails);
     });
-    // console.log(groupsMessages)
+    // console.log(JSON.parse(JSON.stringify(groupsMessages[0].chat_group_messages)))
+    // console.log(groupsFiltered[0].chat_group_messages)
     res.json(groupsFiltered);
 };
 
@@ -355,7 +340,8 @@ exports.createGroup = async (req, res) => {
     console.log(data)
     await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id, confirmed: 1}));
     req.query.user_id = data.creator_id;
-    this.getChatGroups(req, res);
+    // this.getChatGroups(req, res);
+    this.getGroupsMessages(req, res);
 };
 
 exports.getGroupMembers = async (req, res) => {
