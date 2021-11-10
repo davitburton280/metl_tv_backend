@@ -133,6 +133,7 @@ exports.getDirectChatMessages = async (req, res) => {
 
                     if (msg.seen === 0) {
                         ++usersFiltered[user_id].unseens;
+                        usersFiltered[user_id].unseen_sender = m.from_id;
                     }
 
 
@@ -154,7 +155,7 @@ exports.getDirectChatMessages = async (req, res) => {
 
         });
 
-        // console.log("USERS FILTERED!!!! ", Object.values(usersFiltered))
+        console.log("USERS FILTERED!!!! ", Object.values(JSON.parse(JSON.stringify(usersFiltered))))
         res.json(Object.values(usersFiltered));
     } else if (group) {
         console.log('OK!!!')
@@ -188,7 +189,9 @@ exports.updateSeen = async (data) => {
     } else {
         where.group_id = group_id;
 
-        let found = await to(ChatMessagesSeen.findOne({where: {message_id, user_id: from_id}}));
+        let found = await to(ChatMessagesSeen.findAll({
+            where: {message_id, user_id: from_id}
+        }));
         if (!found) {
             await to(ChatMessagesSeen.create({message_id, group_id, user_id: from_id}))
         }
@@ -205,10 +208,12 @@ exports.updateSeen = async (data) => {
 
     let updated = false;
     console.log("ALREADY SEEN", JSON.parse(JSON.stringify(foundMessages)), foundMessages.find(fm => fm.seen === 0))
-    if (foundMessages.find(fm => fm.seen === 0)) {
-        updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
-            where
-        }));
+    if (!group_id) {
+        if (foundMessages.find(fm => fm.seen === 0)) {
+            updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
+                where
+            }));
+        }
     }
 
 
@@ -286,7 +291,9 @@ exports.getGroupsMessages = async (req, res) => {
         groupDetails.unseens = 0;
         groupDetails.chat_group_messages.map(m => {
             if (m.seen === 0) {
+                groupDetails.unseen_sender = m.from_id;
                 ++groupDetails.unseens;
+
             }
         });
         groupsFiltered.push(groupDetails);
