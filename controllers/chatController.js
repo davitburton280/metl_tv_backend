@@ -155,7 +155,7 @@ exports.getDirectChatMessages = async (req, res) => {
 
         });
 
-        console.log("USERS FILTERED!!!! ", Object.values(JSON.parse(JSON.stringify(usersFiltered))))
+        // console.log("USERS FILTERED!!!! ", Object.values(usersFiltered))
         res.json(Object.values(usersFiltered));
     } else if (group) {
         console.log('OK!!!')
@@ -172,6 +172,7 @@ exports.getGroupChatMessages = async (req, res) => {
 
 exports.updateSeen = async (data) => {
     let {seen, from_id, to_id, group_id, message_id} = data;
+    console.log('UPDATE SEEN!!!', group_id);
 
     let arr = [
         {
@@ -187,14 +188,28 @@ exports.updateSeen = async (data) => {
         where[Op.or] = arr;
         // where.id = message_id;
     } else {
-        where.group_id = group_id;
+        // where.group_id = group_id;
+        console.log('GROUP!!!', from_id)
+        let foundMessages = await ChatMessages.findAll({
+            where: {
+                group_id,
+                [Op.not]:
+                    {
+                        from_id
+                    }
 
-        let found = await to(ChatMessagesSeen.findAll({
-            where: {message_id, user_id: from_id}
-        }));
-        if (!found) {
-            await to(ChatMessagesSeen.create({message_id, group_id, user_id: from_id}))
-        }
+            }
+        });
+
+        foundMessages.map(async (m) => {
+            let found = await to(ChatMessagesSeen.findAll({
+                where: {message_id: m.id, user_id: from_id}
+            }));
+            if (found.length === 0) {
+                console.log(found)
+                await to(ChatMessagesSeen.create({message_id: m.id, group_id, user_id: from_id}))
+            }
+        });
     }
 
     // console.log("FROM ID" + data.from_id)
@@ -207,7 +222,7 @@ exports.updateSeen = async (data) => {
     }));
 
     let updated = false;
-    console.log("ALREADY SEEN", JSON.parse(JSON.stringify(foundMessages)), foundMessages.find(fm => fm.seen === 0))
+    // console.log("ALREADY SEEN", JSON.parse(JSON.stringify(foundMessages)), foundMessages.find(fm => fm.seen === 0))
     if (!group_id) {
         if (foundMessages.find(fm => fm.seen === 0)) {
             updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
