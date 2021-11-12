@@ -145,7 +145,6 @@ app.use(async (err, req, res, next) => {
             res.status(500).json({msg: 'The file size should not exceed 3Mb'})
         }
     }
-
     // Handle any other errors
 });
 

@@ -131,9 +131,9 @@ exports.getDirectChatMessages = async (req, res) => {
                     usersFiltered[user_id] = {messages: [], user: '', unseens: 0};
                     usersFiltered[user_id]['messages'] = [msg];
 
-                    if (msg.seen === 0) {
+                    if (msg.seen === 0 && user_id!== m.from_id) {
                         ++usersFiltered[user_id].unseens;
-                        usersFiltered[user_id].unseen_sender = m.from_id;
+                        // usersFiltered[user_id].unseen_sender = m.from_id;
                     }
 
 
@@ -240,6 +240,8 @@ exports.updateSeen = async (data) => {
 exports.getGroupsMessages = async (req, res) => {
     let {user_id} = req.query;
 
+    console.log('get groups messages!!!')
+
     let chatGroupsResult = await ChatGroupsMembers.findAll({where: {member_id: user_id}, attributes: ['group_id']});
 
     let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t => t.group_id);
@@ -304,13 +306,15 @@ exports.getGroupsMessages = async (req, res) => {
     groupsMessages.map(gm => {
         let groupDetails = gm.toJSON();
         groupDetails.unseens = 0;
-        groupDetails.chat_group_messages.map(m => {
-            if (m.seen === 0) {
-                groupDetails.unseen_sender = m.from_id;
-                ++groupDetails.unseens;
-
+        const f = groupDetails.chat_group_messages.filter(m => {
+            let found = false;
+            if (m.from_id !== +user_id) {
+                console.log(m.from_id, user_id)
+                found = !m.seen_by.find(sb => sb.id === +user_id);
             }
+            return found;
         });
+        groupDetails.new_messages_count = f.length;
         groupsFiltered.push(groupDetails);
     });
 
