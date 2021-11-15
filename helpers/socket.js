@@ -154,6 +154,30 @@ exports.socket = (io) => {
             // io.to(socketId).emit('chatNotification', data)
         });
 
+        socket.on('declineJoinGroup', async (data) => {
+            console.log('decline joining group!!!');
+            let socketId = users[data.username]; //socket.id
+            let theSocket = io.sockets.sockets.get(socketId)
+            theSocket.join(data.group);
+            console.log(await io.in(data.group).allSockets())
+            console.log(socketId, socket.id)
+            if (!groupsUsers.find(gu => gu.username === data.username && gu.group === data.group)) {
+                filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username || u.group !== data.group);
+                // groupsUsers.push({id: socketId, username: data.username, group: data.group});
+            }
+            console.log(filteredGroupsUsers)
+            console.log(socketId)
+
+            data.msg = `${data.username} has declined joining the group`;
+            data.groupsUsers = filteredGroupsUsers;
+            data.decliningJoinGroup = 1;
+            io.sockets.in(data.group).emit('chatNotification', data);
+            // io.to(socketId).emit('chatNotification', data)
+        });
+
+
+
+
         socket.on('leaveGroup', (data) => {
             console.log('leave group!!!')
             filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username || u.group !== data.group);

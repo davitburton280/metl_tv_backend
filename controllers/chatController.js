@@ -117,14 +117,11 @@ exports.getDirectChatMessages = async (req, res) => {
         let blockedUsers = await usersController.getBlockedContactsIds(from_id, 1);
         console.log(blockedUsers)
         ms.map(m => {
-            // console.log('!!!!!!!!')
-            // console.log(m.to_user.id, +from_id)
-            // console.log('!!!!!!!!')
-            let user = m.from_user.id === +from_id ? m.to_user : (m.to_user.id === +from_id ? m.from_user : m.from_user)
 
+            let user = m.from_user.id === +from_id ? m.to_user : (m.to_user.id === +from_id ? m.from_user : m.from_user)
             let msg = m.toJSON();
+
             if (user) {
-                // console.log(user.toJSON())
                 let user_id = user.id;
                 if (!usersFiltered[user_id]) {
                     usersFiltered[user_id] = {messages: [], user: '', unseens: 0};
@@ -132,7 +129,6 @@ exports.getDirectChatMessages = async (req, res) => {
 
                     if (msg.seen === 0 && user_id!== m.from_id) {
                         ++usersFiltered[user_id].unseens;
-                        // usersFiltered[user_id].unseen_sender = m.from_id;
                     }
 
 
@@ -154,13 +150,10 @@ exports.getDirectChatMessages = async (req, res) => {
 
         });
 
-        let finalUsers =   Object.values(usersFiltered).sort((a, b) => {
+        let finalUsers = Object.values(usersFiltered).sort((a, b) => {
             return +(+moment(b.messages[b.messages.length - 1].created_at) - (+moment(a.messages[a.messages.length - 1].created_at)));
         });
 
-
-
-        // console.log("USERS FILTERED!!!! ", Object.values(usersFiltered))
         res.json(finalUsers);
     } else if (group) {
         console.log('OK!!!')
