@@ -115,7 +115,6 @@ exports.getDirectChatMessages = async (req, res) => {
 
         let usersFiltered = {};
         let blockedUsers = await usersController.getBlockedContactsIds(from_id, 1);
-        let unseenMessagesSendersCount = 0;
         console.log(blockedUsers)
         ms.map(m => {
             // console.log('!!!!!!!!')
@@ -155,8 +154,14 @@ exports.getDirectChatMessages = async (req, res) => {
 
         });
 
+        let finalUsers =   Object.values(usersFiltered).sort((a, b) => {
+            return +(+moment(b.messages[b.messages.length - 1].created_at) - (+moment(a.messages[a.messages.length - 1].created_at)));
+        });
+
+
+
         // console.log("USERS FILTERED!!!! ", Object.values(usersFiltered))
-        res.json(Object.values(usersFiltered));
+        res.json(finalUsers);
     } else if (group) {
         console.log('OK!!!')
         res.json(ms);
@@ -309,7 +314,6 @@ exports.getGroupsMessages = async (req, res) => {
         const f = groupDetails.chat_group_messages.filter(m => {
             let found = false;
             if (m.from_id !== +user_id) {
-                console.log(m.from_id, user_id)
                 found = !m.seen_by.find(sb => sb.id === +user_id);
             }
             return found;
