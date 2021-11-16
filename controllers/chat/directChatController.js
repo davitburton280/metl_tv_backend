@@ -76,6 +76,7 @@ exports.getDirectMessages = async (req, res) => {
     let blockedUsers = [];
     // console.log(blockedUsers)
     usersMessages.map(um => {
+        let connectionId = um.users_connections[0]?.id;
         um.users_connections[0]?.users_messages.map(m => {
             let user = m.from_user.id === +user_id ? m.to_user : (m.to_user.id === +user_id ? m.from_user : m.from_user)
             let msg = m.toJSON();
@@ -83,7 +84,7 @@ exports.getDirectMessages = async (req, res) => {
             if (user) {
                 let user_id = user.id;
                 if (!usersFiltered[user_id]) {
-                    usersFiltered[user_id] = {messages: [], user: '', unseens: 0};
+                    usersFiltered[user_id] = {messages: [], user: '', unseens: 0, connection_id: connectionId};
                     usersFiltered[user_id]['messages'] = [msg];
 
                     if (msg.seen === 0 && user_id !== m.from_id) {
@@ -115,12 +116,12 @@ exports.getDirectMessages = async (req, res) => {
 
     res.json(finalUsers);
 
-    res.json(usersMessages)
+    // res.json(usersMessages)
 };
 
 exports.saveDirectMessage = async (req, res) => {
     let data = req.body;
-    let msg = await to(ChatMessages.create(data));
-    req.query.user_id = data.user_id;
+    let msg = await to(DirectChatMessages.create(data));
+    req.query.user_id = data.from_id;
     this.getDirectMessages(req, res);
 };
