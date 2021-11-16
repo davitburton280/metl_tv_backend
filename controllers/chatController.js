@@ -9,6 +9,7 @@ const ChatMessagesSeen = db.chat_messages_seen;
 const Videos = db.videos;
 const Users = db.users;
 const UsersConnection = db.users_connection;
+const UsersConnectionMembers = db.users_connection_members;
 const to = require('../helpers/getPromiseResult');
 
 const usersController = require('./usersController');
@@ -167,36 +168,70 @@ exports.getDirectChatMessages = async (req, res) => {
 
 exports.getDirectMessages = async (req, res) => {
     let {user_id, blocked} = req.query;
-    let where = [
-        {
-            user_id
-        },
-        {
-            connection_id: user_id,
-        },
-    ];
 
+    let directConnectionsResult = await UsersConnectionMembers.findAll({
+        where: {member_id: user_id},
+        attributes: ['connection_id']
+    });
 
-    let contacts = await to(UsersConnection.findAll({
-        // attributes: [],
-        // raw: true,
-        include: [
-            {
-                model: ChatMessages,
-                as: 'users_messages',
-                attributes: ['from_id', 'message', 'to_id', 'created_at'],
-                where: {group_id: {[Op.eq]: null}}
-            }
-        ],
+    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+
+    let where = {
+        id: {[Op.in]: directConnectionIds}
+    };
+
+    // let directMessages = await UsersConnection.findAll({
+    //
+    //     where,
+    //
+    //     include: [
+    //         {
+    //             model: Users, as: 'connection_users',
+    //             attributes: ['id', 'first_name', 'last_name', 'avatar'],
+    //             through: {attributes: []},
+    //             where: {
+    //                 [Op.not]: {
+    //                     id: user_id
+    //                 }
+    //             }
+    //         },
+    //         {
+    //             model: ChatMessages,
+    //             attributes: {exclude: ['video_id', 'to_id', 'to_user', 'updated_at']},
+    //             as: 'users_messages',
+    //         }
+    //     ]
+    // });
+    let usersMessages = await Users.findAll({
+        attributes: ['id', 'first_name', 'last_name', 'avatar'],
         where: {
-            is_blocked: blocked,
-            [Op.or]: where,
+            [Op.not]: {
+                id: user_id
+            }
         },
         order: [
-            [sequelize.col('`users_messages`.`created_at`'), 'asc']
+            [sequelize.col('`users_connections->users_messages`.`created_at`'), 'asc'],
+        ],
+        include: [
+            {
+                model: UsersConnection, as: 'users_connections',
+                attributes: ['id','is_blocked','confirmed'],
+                where: {
+                    id: {[Op.in]: directConnectionIds}
+                },
+                through: {attributes: []},
+                include: [
+                    {
+                        model: ChatMessages,
+                        attributes: {exclude: ['group_id','video_id','connection_id', 'to_user', 'updated_at']},
+                        as: 'users_messages',
+                    }
+                ]
+            }
         ]
-    }));
-    res.json(contacts);
+    });
+
+    res.json(usersMessages)
 };
 
 exports.getGroupChatMessages = async (req, res) => {

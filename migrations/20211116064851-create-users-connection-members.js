@@ -1,20 +1,18 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users_connections', {
+    await queryInterface.createTable('users_connection_members', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      confirmed: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
+      member_id: {
+        type: Sequelize.INTEGER
       },
-      is_blocked: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
+      connection_id: {
+        type: Sequelize.INTEGER
       },
       created_at: {
         allowNull: false,
@@ -27,6 +25,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('users_connections');
+    await queryInterface.dropTable('users_connection_members');
   }
 };

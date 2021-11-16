@@ -22,8 +22,8 @@ module.exports = (sequelize, DataTypes) => {
         users.hasMany(models.users_cards, {foreignKey: 'user_id'});
         users.hasMany(models.chat_messages, {as: 'from_messages', foreignKey: 'from_id'});
         users.hasMany(models.chat_messages, {as: 'to_messages', foreignKey: 'to_id'});
-        users.hasMany(models.users_connection, {as: 'connection', foreignKey: 'connection_id'});
-        users.hasMany(models.users_connection, {as: 'user', foreignKey: 'user_id'});
+        // users.hasMany(models.users_connection, {as: 'connection', foreignKey: 'connection_id'});
+        // users.hasMany(models.users_connection, {as: 'user', foreignKey: 'user_id'});
         users.hasMany(models.users_tags, {as: 'tags_users', foreignKey: 'tag_id'}); // ?
         users.hasOne(models.channels, {foreignKey: 'user_id', as: 'channel'});
         users.belongsTo(models.stocks_ordering_types, {foreignKey: 'stocks_order_type_id', as: 'stocks_order_type'});
@@ -51,11 +51,11 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'user_id'
         });
 
-        // users.belongsToMany(models.chat_groups, {
-        //     as: 'users_chat_groups',
-        //     through: models.user_chat_groups,
-        //     foreignKey: 'user_id'
-        // });
+        users.belongsToMany(models.users_connection, {
+            as: 'users_connections',
+            through: models.users_connection_members,
+            foreignKey: 'member_id'
+        });
 
         users.belongsToMany(models.chat_groups, {
             as: 'chat_group_members',
