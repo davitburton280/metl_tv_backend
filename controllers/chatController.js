@@ -3,6 +3,7 @@ const Op = sequelize.Op;
 
 const db = require('../models');
 const ChatMessages = db.chat_messages;
+const DirectChatMessages = db.direct_chat_messages;
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
 const ChatMessagesSeen = db.chat_messages_seen;
@@ -51,192 +52,126 @@ exports.saveMessage = async (req, res) => {
 
 };
 
-exports.getDirectChatMessages = async (req, res) => {
-    const {from_id, to_id, personal, group_id, group} = req.query;
-    // console.log(req.query)
-    // let whereIds = ;
+// exports.getDirectChatMessages = async (req, res) => {
+//     const {from_id, to_id, personal, group_id, group} = req.query;
+//     // console.log(req.query)
+//     // let whereIds = ;
+//
+//     console.log('get direct chat messages!!!');
+//     // console.log(group_id)
+//
+//     let whereTo = to_id ? {from_id: to_id} : {};
+//
+//     let arr = [
+//         to_id ? {from_id, to_id} : {from_id},
+//         {
+//
+//             to_id: from_id,
+//             ...whereTo
+//         }
+//     ];
+//
+//     let where = {
+//         video_id: null,
+//         group_id: group_id || null,
+//     };
+//
+//     if (!group_id) {
+//         where[Op.or] = arr
+//     }
+//
+//
+//     let ms = await ChatMessages.findAll({
+//         // attributes : [{exclude: 'video_id'}],
+//         where,
+//         include: [
+//             {
+//                 model: Users,
+//                 as: 'from_user',
+//                 attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+//             },
+//             {
+//                 model: Users,
+//                 as: 'to_user',
+//                 attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+//             },
+//             {
+//                 model: ChatGroups,
+//                 as: 'chat_group',
+//                 attributes: ['id', 'name']
+//             },
+//             {
+//                 model: Users,
+//                 as: 'seen_by',
+//                 attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
+//                 through: {}
+//             }
+//         ],
+//         order: [
+//             [sequelize.col('`chat_messages`.`created_at`'), 'asc']
+//         ]
+//
+//     });
+//
+//
+//     if (personal) {
+//
+//         let usersFiltered = {};
+//         let blockedUsers = await usersController.getBlockedContactsIds(from_id, 1);
+//         console.log(blockedUsers)
+//         ms.map(m => {
+//
+//             let user = m.from_user.id === +from_id ? m.to_user : (m.to_user.id === +from_id ? m.from_user : m.from_user)
+//             let msg = m.toJSON();
+//
+//             if (user) {
+//                 let user_id = user.id;
+//                 if (!usersFiltered[user_id]) {
+//                     usersFiltered[user_id] = {messages: [], user: '', unseens: 0};
+//                     usersFiltered[user_id]['messages'] = [msg];
+//
+//                     if (msg.seen === 0 && user_id !== m.from_id) {
+//                         ++usersFiltered[user_id].unseens;
+//                     }
+//
+//
+//                     let foundInBlocked = blockedUsers.find(bUser => user.id === bUser.user_id || user.id === bUser.connection_id)
+//                     usersFiltered[user_id]['user'] = foundInBlocked ? {blocked: 1, ...user.dataValues} : user;
+//
+//                 } else {
+//                     if (!usersFiltered[user_id]['messages']) {
+//                         usersFiltered[user_id]['messages'] = []
+//                     }
+//
+//                     if (msg.seen === 0) {
+//                         ++usersFiltered[user_id].unseens;
+//                     }
+//
+//                     usersFiltered[user_id]['messages'].push(msg);
+//                 }
+//             }
+//
+//         });
+//
+//         let finalUsers = Object.values(usersFiltered).sort((a, b) => {
+//             return +(+moment(b.messages[b.messages.length - 1].created_at) - (+moment(a.messages[a.messages.length - 1].created_at)));
+//         });
+//
+//         res.json(finalUsers);
+//     } else if (group) {
+//         console.log('OK!!!')
+//         res.json(ms);
+//     } else {
+//         // console.log(ms)
+//         res.json(ms);
+//     }
+// };
 
-    console.log('get direct chat messages!!!');
-    // console.log(group_id)
-
-    let whereTo = to_id ? {from_id: to_id} : {};
-
-    let arr = [
-        to_id ? {from_id, to_id} : {from_id},
-        {
-
-            to_id: from_id,
-            ...whereTo
-        }
-    ];
-
-    let where = {
-        video_id: null,
-        group_id: group_id || null,
-    };
-
-    if (!group_id) {
-        where[Op.or] = arr
-    }
 
 
-    let ms = await ChatMessages.findAll({
-        // attributes : [{exclude: 'video_id'}],
-        where,
-        include: [
-            {
-                model: Users,
-                as: 'from_user',
-                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
-            },
-            {
-                model: Users,
-                as: 'to_user',
-                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
-            },
-            {
-                model: ChatGroups,
-                as: 'chat_group',
-                attributes: ['id', 'name']
-            },
-            {
-                model: Users,
-                as: 'seen_by',
-                attributes: ['username', 'id', 'avatar', 'first_name', 'last_name'],
-                through: {}
-            }
-        ],
-        order: [
-            [sequelize.col('`chat_messages`.`created_at`'), 'asc']
-        ]
-
-    });
-
-
-    if (personal) {
-
-        let usersFiltered = {};
-        let blockedUsers = await usersController.getBlockedContactsIds(from_id, 1);
-        console.log(blockedUsers)
-        ms.map(m => {
-
-            let user = m.from_user.id === +from_id ? m.to_user : (m.to_user.id === +from_id ? m.from_user : m.from_user)
-            let msg = m.toJSON();
-
-            if (user) {
-                let user_id = user.id;
-                if (!usersFiltered[user_id]) {
-                    usersFiltered[user_id] = {messages: [], user: '', unseens: 0};
-                    usersFiltered[user_id]['messages'] = [msg];
-
-                    if (msg.seen === 0 && user_id !== m.from_id) {
-                        ++usersFiltered[user_id].unseens;
-                    }
-
-
-                    let foundInBlocked = blockedUsers.find(bUser => user.id === bUser.user_id || user.id === bUser.connection_id)
-                    usersFiltered[user_id]['user'] = foundInBlocked ? {blocked: 1, ...user.dataValues} : user;
-
-                } else {
-                    if (!usersFiltered[user_id]['messages']) {
-                        usersFiltered[user_id]['messages'] = []
-                    }
-
-                    if (msg.seen === 0) {
-                        ++usersFiltered[user_id].unseens;
-                    }
-
-                    usersFiltered[user_id]['messages'].push(msg);
-                }
-            }
-
-        });
-
-        let finalUsers = Object.values(usersFiltered).sort((a, b) => {
-            return +(+moment(b.messages[b.messages.length - 1].created_at) - (+moment(a.messages[a.messages.length - 1].created_at)));
-        });
-
-        res.json(finalUsers);
-    } else if (group) {
-        console.log('OK!!!')
-        res.json(ms);
-    } else {
-        // console.log(ms)
-        res.json(ms);
-    }
-};
-
-exports.getDirectMessages = async (req, res) => {
-    let {user_id, blocked} = req.query;
-
-    let directConnectionsResult = await UsersConnectionMembers.findAll({
-        where: {member_id: user_id},
-        attributes: ['connection_id']
-    });
-
-    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
-
-    let where = {
-        id: {[Op.in]: directConnectionIds}
-    };
-
-    // let directMessages = await UsersConnection.findAll({
-    //
-    //     where,
-    //
-    //     include: [
-    //         {
-    //             model: Users, as: 'connection_users',
-    //             attributes: ['id', 'first_name', 'last_name', 'avatar'],
-    //             through: {attributes: []},
-    //             where: {
-    //                 [Op.not]: {
-    //                     id: user_id
-    //                 }
-    //             }
-    //         },
-    //         {
-    //             model: ChatMessages,
-    //             attributes: {exclude: ['video_id', 'to_id', 'to_user', 'updated_at']},
-    //             as: 'users_messages',
-    //         }
-    //     ]
-    // });
-    let usersMessages = await Users.findAll({
-        attributes: ['id', 'first_name', 'last_name', 'avatar'],
-        where: {
-            [Op.not]: {
-                id: user_id
-            }
-        },
-        order: [
-            [sequelize.col('`users_connections->users_messages`.`created_at`'), 'asc'],
-        ],
-        include: [
-            {
-                model: UsersConnection, as: 'users_connections',
-                attributes: ['id','is_blocked','confirmed'],
-                where: {
-                    id: {[Op.in]: directConnectionIds}
-                },
-                through: {attributes: []},
-                include: [
-                    {
-                        model: ChatMessages,
-                        attributes: {exclude: ['group_id','video_id','connection_id', 'to_user', 'updated_at']},
-                        as: 'users_messages',
-                    }
-                ]
-            }
-        ]
-    });
-
-    res.json(usersMessages)
-};
-
-exports.getGroupChatMessages = async (req, res) => {
-    this.getDirectChatMessages(req, res);
-};
+// exports.getGroupChatMessages = async (req, res) => {
+//     this.getDirectChatMessages(req, res);
+// };
 
 exports.updateSeen = async (data) => {
     let {seen, from_id, to_id, group_id, message_id} = data;
@@ -303,6 +238,10 @@ exports.updateSeen = async (data) => {
     console.log(!!updated)
     return !!updated;
 };
+
+
+
+/******* GROUP CHAT*****/
 
 
 exports.getGroupsMessages = async (req, res) => {
@@ -444,11 +383,6 @@ exports.getChatGroups = async (req, res) => {
     }
 };
 
-exports.getOneChatGroup = async (req, res) => {
-    let groups = await ChatGroups.findOne({});
-};
-
-
 exports.createGroup = async (req, res) => {
     let data = req.body;
     let group = await ChatGroups.create(data);
@@ -515,7 +449,6 @@ exports.removeGroupMember = async (req, res) => {
     await ChatGroupsMembers.destroy({where: {group_id, member_id}});
     this.getGroupMembers(req, res);
 };
-
 
 exports.removeGroup = async (req, res) => {
     const {group_id} = req.query;

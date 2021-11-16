@@ -106,6 +106,7 @@ app.use('/stripe/customers', require('./routes/stripe/customers'));
 app.use('/stripe/accounts', require('./routes/stripe/accounts'));
 app.use('/stripe/payments', require('./routes/stripe/payments'));
 app.use('/stripe/products', require('./routes/stripe/products'));
+app.use('/chat/direct', require('./routes/chat/direct'));
 
 
 let dist = path.join(__dirname, 'dist/');

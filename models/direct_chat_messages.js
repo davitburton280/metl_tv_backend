@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      direct_chat_messages.belongsTo(models.users, {as: 'from_user', foreignKey: 'from_id'});
+      direct_chat_messages.belongsTo(models.users, {as: 'to_user', foreignKey: 'to_id'});
     }
   };
   direct_chat_messages.init({
@@ -23,6 +24,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'direct_chat_messages',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
   return direct_chat_messages;
 };
