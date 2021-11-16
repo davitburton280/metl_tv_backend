@@ -21,9 +21,9 @@ module.exports = (sequelize, DataTypes) => {
         users.hasMany(models.videos, {as: 'videos', foreignKey: 'author_id'});
         users.hasMany(models.users_cards, {foreignKey: 'user_id'});
         users.hasMany(models.chat_messages, {as: 'from_messages', foreignKey: 'from_id'});
+        users.hasMany(models.chat_messages, {as: 'to_messages', foreignKey: 'to_id'});
         users.hasMany(models.users_connection, {as: 'connection', foreignKey: 'connection_id'});
         users.hasMany(models.users_connection, {as: 'user', foreignKey: 'user_id'});
-        users.hasMany(models.chat_messages, {as: 'to_messages', foreignKey: 'to_id'});
         users.hasMany(models.users_tags, {as: 'tags_users', foreignKey: 'tag_id'}); // ?
         users.hasOne(models.channels, {foreignKey: 'user_id', as: 'channel'});
         users.belongsTo(models.stocks_ordering_types, {foreignKey: 'stocks_order_type_id', as: 'stocks_order_type'});

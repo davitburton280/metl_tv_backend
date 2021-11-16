@@ -11,6 +11,9 @@ module.exports = {
             video_id: {
                 type: Sequelize.INTEGER
             },
+            connection_id: {
+                type: Sequelize.INTEGER
+            },
             group_id: {
                 type: Sequelize.INTEGER
             },

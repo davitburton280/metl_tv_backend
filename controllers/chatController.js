@@ -8,6 +8,7 @@ const ChatGroupsMembers = db.chat_groups_members;
 const ChatMessagesSeen = db.chat_messages_seen;
 const Videos = db.videos;
 const Users = db.users;
+const UsersConnection = db.users_connection;
 const to = require('../helpers/getPromiseResult');
 
 const usersController = require('./usersController');
@@ -127,7 +128,7 @@ exports.getDirectChatMessages = async (req, res) => {
                     usersFiltered[user_id] = {messages: [], user: '', unseens: 0};
                     usersFiltered[user_id]['messages'] = [msg];
 
-                    if (msg.seen === 0 && user_id!== m.from_id) {
+                    if (msg.seen === 0 && user_id !== m.from_id) {
                         ++usersFiltered[user_id].unseens;
                     }
 
@@ -162,6 +163,40 @@ exports.getDirectChatMessages = async (req, res) => {
         // console.log(ms)
         res.json(ms);
     }
+};
+
+exports.getDirectMessages = async (req, res) => {
+    let {user_id, blocked} = req.query;
+    let where = [
+        {
+            user_id
+        },
+        {
+            connection_id: user_id,
+        },
+    ];
+
+
+    let contacts = await to(UsersConnection.findAll({
+        // attributes: [],
+        // raw: true,
+        include: [
+            {
+                model: ChatMessages,
+                as: 'users_messages',
+                attributes: ['from_id', 'message', 'to_id', 'created_at'],
+                where: {group_id: {[Op.eq]: null}}
+            }
+        ],
+        where: {
+            is_blocked: blocked,
+            [Op.or]: where,
+        },
+        order: [
+            [sequelize.col('`users_messages`.`created_at`'), 'asc']
+        ]
+    }));
+    res.json(contacts);
 };
 
 exports.getGroupChatMessages = async (req, res) => {

@@ -359,6 +359,7 @@ exports.getBlockedContactsIds = async (user_id, blocked = 0) => {
 exports.getContacts = async (req, res) => {
     console.log('get contacts!!!');
     let {user_id, blocked} = req.query;
+    console.log(req.query)
     let where = [
         {
             user_id
@@ -384,6 +385,7 @@ exports.getContacts = async (req, res) => {
 
 
     let ret = [];
+
     contacts.map(c => {
         if (c.user.id !== +user_id) {
             ret.push(c.user.toJSON())
