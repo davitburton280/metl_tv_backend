@@ -220,7 +220,7 @@ exports.updateSeen = async (data) => {
 
 
     console.log(message_id)
-    let foundMessages = await to(ChatMessages.findAll({
+    let foundMessages = await to(DirectChatMessages.findAll({
         where
     }));
 
@@ -228,7 +228,7 @@ exports.updateSeen = async (data) => {
     // console.log("ALREADY SEEN", JSON.parse(JSON.stringify(foundMessages)), foundMessages.find(fm => fm.seen === 0))
     if (!group_id) {
         if (foundMessages.find(fm => fm.seen === 0)) {
-            updated = await to(ChatMessages.update({seen, seen_at: new Date()}, {
+            updated = await to(DirectChatMessages.update({seen, seen_at: new Date()}, {
                 where
             }));
         }
@@ -303,7 +303,7 @@ exports.getGroupsMessages = async (req, res) => {
         ],
         order: [
             ['name', 'asc'],
-            [sequelize.col('`chat_group_messages`.`created_at`'), 'asc'],
+            // [sequelize.col('`chat_group_messages`.`created_at`'), 'asc'],
         ]
 
 
@@ -313,14 +313,14 @@ exports.getGroupsMessages = async (req, res) => {
     groupsMessages.map(gm => {
         let groupDetails = gm.toJSON();
         groupDetails.unseens = 0;
-        const f = groupDetails.chat_group_messages.filter(m => {
+        const f = groupDetails?.chat_group_messages?.filter(m => {
             let found = false;
             if (m.from_id !== +user_id) {
                 found = !m.seen_by.find(sb => sb.id === +user_id);
             }
             return found;
         });
-        groupDetails.new_messages_count = f.length;
+        groupDetails.new_messages_count = f?.length;
         groupsFiltered.push(groupDetails);
     });
 
