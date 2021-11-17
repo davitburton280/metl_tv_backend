@@ -73,7 +73,7 @@ exports.socket = (io) => {
                 let username = data.to_user?.from || data.to_user?.username;
                 let socketId = users[username];
                 if (data.to_user) {
-                console.log(username, users, socketId)
+                    console.log(username, users, socketId)
                     io.to(socketId).emit('getTyping', data)
                 }
             } else {
@@ -86,8 +86,11 @@ exports.socket = (io) => {
         socket.on('setSeen', async (data) => {
             console.log('set seen')
 
+
             if (!data.group) {
+                console.log('direct seen!!!', data.to_user)
                 let username = data.to_user.from || data.to_user.username;
+                console.log(username)
                 let socketId = users[username];
                 let r = await chatController.updateSeen(data);
                 // data.seen = +r;
@@ -174,8 +177,6 @@ exports.socket = (io) => {
             io.sockets.in(data.group).emit('chatNotification', data);
             // io.to(socketId).emit('chatNotification', data)
         });
-
-
 
 
         socket.on('leaveGroup', (data) => {
