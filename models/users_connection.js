@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         });
       // users_connection.hasMany(models.chat_messages, {as: 'users_messages', foreignKey: 'connection_id'});
       users_connection.hasMany(models.direct_chat_messages, {as: 'users_messages', foreignKey: 'connection_id'});
+      users_connection.hasMany(models.direct_chat_messages, {as: 'users_messages_count', foreignKey: 'connection_id'});
     }
   };
   users_connection.init({

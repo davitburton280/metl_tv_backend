@@ -35,7 +35,6 @@ exports.getDirectMessages = async (req, res) => {
                 id: user_id
             }
         },
-        // attributes: [[sequelize.fn('count','seen'),'unseens']],
         order: [
             [sequelize.col('`users_connections->users_messages`.`created_at`'), 'asc'],
         ],
@@ -45,8 +44,10 @@ exports.getDirectMessages = async (req, res) => {
                 attributes: ['id', 'is_blocked', 'confirmed'],
 
                 where: {
-                    id: {[Op.in]: directConnectionIds}
+                    id: {[Op.in]: directConnectionIds},
+                    confirmed: 1
                 },
+
                 through: {attributes: []},
                 include: [
                     {
@@ -71,52 +72,30 @@ exports.getDirectMessages = async (req, res) => {
         ]
     });
 
-    let usersFiltered = {};
+    let usersFiltered = [];
     // let blockedUsers = await usersController.getBlockedContactsIds(user_id, 1);
     let blockedUsers = [];
-    // console.log(blockedUsers)
+
     usersMessages.map(um => {
-        let connectionId = um.users_connections[0]?.id;
-        um.users_connections[0]?.users_messages.map(m => {
-            let user = m.from_user.id === +user_id ? m.to_user : (m.to_user.id === +user_id ? m.from_user : m.from_user)
+        let unseens = 0;
+
+        um.users_connections[0]?.users_messages?.map(m => {
             let msg = m.toJSON();
-
-            if (user) {
-                let user_id = user.id;
-                if (!usersFiltered[user_id]) {
-                    usersFiltered[user_id] = {messages: [], user: '', unseens: 0, connection_id: connectionId};
-                    usersFiltered[user_id]['messages'] = [msg];
-
-                    if (msg.seen === 0 && user_id !== m.from_id) {
-                        ++usersFiltered[user_id].unseens;
-                    }
-
-
-                    let foundInBlocked = blockedUsers.find(bUser => user.id === bUser.user_id || user.id === bUser.connection_id)
-                    usersFiltered[user_id]['user'] = foundInBlocked ? {blocked: 1, ...user.dataValues} : user;
-
-                } else {
-                    if (!usersFiltered[user_id]['messages']) {
-                        usersFiltered[user_id]['messages'] = []
-                    }
-
-                    if (msg.seen === 0) {
-                        ++usersFiltered[user_id].unseens;
-                    }
-
-                    usersFiltered[user_id]['messages'].push(msg);
-                }
+            if (msg.seen === 0 && +user_id !== +m.from_id) {
+                ++unseens;
             }
-        })
+        });
+        usersFiltered.push({unseens, ...um.toJSON()});
     });
 
-    let finalUsers = Object.values(usersFiltered).sort((a, b) => {
-        return +(+moment(b.messages[b.messages.length - 1].created_at) - (+moment(a.messages[a.messages.length - 1].created_at)));
-    });
+     let ret = usersFiltered.sort((a, b) => {
+         let aMessages = a.users_connections[0]?.users_messages;
+         let bMessages = b.users_connections[0]?.users_messages;
+        return +(+moment(bMessages[bMessages.length - 1]?.created_at) - (+moment(aMessages[aMessages.length - 1]?.created_at)));
+     });
 
-    res.json(finalUsers);
+    res.json(ret);
 
-    // res.json(usersMessages)
 };
 
 exports.saveDirectMessage = async (req, res) => {
