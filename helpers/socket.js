@@ -2,6 +2,7 @@ let users = [];
 let groupsUsers = [];
 let filteredGroupsUsers = [];
 let chatController = require('../controllers/chatController');
+let directChatController = require('../controllers/chat/directChatController');
 
 
 const db = require('../models');
@@ -84,24 +85,37 @@ exports.socket = (io) => {
         });
 
         socket.on('setSeen', async (data) => {
-            console.log('set seen')
+            console.log('set seen', data)
 
 
             if (!data.group) {
-                console.log('direct seen!!!', data.to_user)
+                console.log('direct seen!!!', data.connection_id)
                 let username = data.to_user.from || data.to_user.username;
                 console.log(username)
                 let socketId = users[username];
-                let r = await chatController.updateSeen(data);
+                let r = await directChatController.updateSeen(data);
                 // data.seen = +r;
                 console.log(data.from_user.username, users, socketId)
                 io.to(socketId).emit('getSeen', data)
                 io.to(users[data.from_user.username]).emit('getSeen', data)
             } else {
-                await to(chatController.updateSeen(data));
+                await to(directChatController.updateSeen(data));
                 io.to(data.group).emit('getSeen', data)
             }
 
+        });
+
+        socket.on('unreadLastMessages', async (data) => {
+            console.log('unread messages!!!')
+            if (!data.group) {
+                let toSocketId = users[data.to_user];
+                let fromSocketId = users[data.from_user];
+                console.log(toSocketId, fromSocketId)
+                io.to(toSocketId).emit('getSeen', data)
+                io.to(fromSocketId).emit('getSeen', data)
+
+                 await directChatController.unreadMessages(data);
+            }
         });
 
 

@@ -88,11 +88,11 @@ exports.getDirectMessages = async (req, res) => {
         usersFiltered.push({unseens, ...um.toJSON()});
     });
 
-     let ret = usersFiltered.sort((a, b) => {
-         let aMessages = a.users_connections[0]?.users_messages;
-         let bMessages = b.users_connections[0]?.users_messages;
+    let ret = usersFiltered.sort((a, b) => {
+        let aMessages = a.users_connections[0]?.users_messages;
+        let bMessages = b.users_connections[0]?.users_messages;
         return +(+moment(bMessages[bMessages.length - 1]?.created_at) - (+moment(aMessages[aMessages.length - 1]?.created_at)));
-     });
+    });
 
     res.json(ret);
 
@@ -103,4 +103,37 @@ exports.saveDirectMessage = async (req, res) => {
     let msg = await to(DirectChatMessages.create(data));
     req.query.user_id = data.from_id;
     this.getDirectMessages(req, res);
+};
+
+exports.updateSeen = async (data) => {
+
+    let {connection_id} = data;
+
+    let updated = await to(DirectChatMessages.update({seen: 1, seen_at: new Date()}, {
+        where: {connection_id, seen: 0}
+    }));
+
+    return !!updated;
+};
+
+exports.unreadMessages = async (data) => {
+    let {message_ids} = data;
+    console.log('unread messages controller!!!', {
+        where: {
+            [Op.in]: {
+                id: message_ids
+            }
+        }
+    })
+
+    let updated = await DirectChatMessages.update({seen: 0, seen_at: null}, {
+        where: {
+            id: {
+                [Op.in]: message_ids
+            }
+        }
+    });
+
+    console.log(updated)
+    return !!updated;
 };
