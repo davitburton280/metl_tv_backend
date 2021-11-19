@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
             chat_messages.belongsTo(models.users, {as: 'from_user', foreignKey: 'from_id'});
             chat_messages.belongsTo(models.users, {as: 'to_user', foreignKey: 'to_id'});
             chat_messages.belongsTo(models.chat_groups, {as: 'chat_group', foreignKey: 'group_id'});
-            chat_messages.belongsToMany(models.users, {as: 'seen_by', foreignKey: 'message_id', through: models.chat_messages_seen});
+            chat_messages.belongsToMany(models.users, {as: 'seen_by', foreignKey: 'message_id', through: models.group_chat_messages_seen});
         }
     };
     chat_messages.init({

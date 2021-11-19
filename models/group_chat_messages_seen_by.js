@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     to_id: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'chat_messages_seen',
+    modelName: 'group_chat_messages_seen',
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     freezeTableName: true

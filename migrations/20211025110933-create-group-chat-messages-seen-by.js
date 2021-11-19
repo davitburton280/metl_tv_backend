@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('chat_messages_seen', {
+    await queryInterface.createTable('group_chat_messages_seen', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -31,6 +31,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('chat_messages_seen');
+    await queryInterface.dropTable('group_chat_messages_seen');
   }
 };
