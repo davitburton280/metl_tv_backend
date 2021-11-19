@@ -43,6 +43,7 @@ const Channels = db.channels;
 const PrivacyTypes = db.privacy_types;
 const StocksOrderType = db.stocks_ordering_types;
 const UsersConnection = db.users_connection;
+const UsersConnectionMembers = db.users_connection_members;
 
 const url = require('url');
 
@@ -370,32 +371,56 @@ exports.getContacts = async (req, res) => {
     ];
 
 
-    let contacts = await to(UsersConnection.findAll({
-        attributes: [],
-        // raw: true,
-        include: [
-            {model: Users, as: 'connection', attributes: ['id', 'first_name', 'last_name', 'username']},
-            {model: Users, as: 'user', attributes: ['id', 'first_name', 'last_name', 'username']}
-        ],
+    // let contacts = await to(UsersConnectionMembers.findAll({
+    //     attributes: [],
+    //     // raw: true,
+    //     include: [
+    //         {model: Users, as: 'connection', attributes: ['id', 'first_name', 'last_name', 'username']},
+    //         // {model: Users, as: 'user', attributes: ['id', 'first_name', 'last_name', 'username']}
+    //     ],
+    //     where: {
+    //         is_blocked: blocked,
+    //         [Op.or]: where,
+    //     }
+    // }));
+
+    let directConnectionsResult = await UsersConnectionMembers.findAll({
+        where: {member_id: user_id},
+        attributes: ['connection_id']
+    });
+
+    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+
+    let contacts = await (Users.findAll({
+        attributes: ['id', 'first_name', 'last_name', 'avatar', 'username'],
         where: {
-            is_blocked: blocked,
-            [Op.or]: where,
-        }
+            [Op.not]: {
+                id: user_id
+            }
+        },
+        include: [
+            {
+                model: UsersConnection, as: 'users_connections',
+                where: {
+                    id: {[Op.in]: directConnectionIds},
+                    // confirmed: 1
+                },
+            }]
     }));
 
 
-    let ret = [];
+    // let ret = [];
+    //
+    // contacts.map(c => {
+    //     if (c.user.id !== +user_id) {
+    //         ret.push(c.user.toJSON())
+    //     } else if (c.connection && c.connection.id !== +user_id) {
+    //         ret.push(c.connection?.toJSON())
+    //     }
+    // });
+    //
+    // console.log(ret)
 
-    contacts.map(c => {
-        if (c.user.id !== +user_id) {
-            ret.push(c.user.toJSON())
-        } else if (c.connection && c.connection.id !== +user_id) {
-            ret.push(c.connection?.toJSON())
-        }
-    });
-
-    console.log(ret)
-
-    res.json(ret);
+    res.json(contacts);
 };
 

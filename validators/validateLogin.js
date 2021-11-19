@@ -10,7 +10,7 @@ const rules = [
     body().custom(async (req) => {
         let email = req.email;
         let pass = req.password;
-
+// console.log(Users.rawAttributes)
         // Checking email existence & passwords match
         let found = await Users.findOne({where: {email}});
         if (!found) throw new Error('A user with such email doesn\'t exist');

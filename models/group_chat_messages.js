@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      group_chat_messages.belongsTo(models.users, {as: 'from_user', foreignKey: 'from_id'});
+      group_chat_messages.belongsTo(models.users, {as: 'to_user', foreignKey: 'to_id'});
+      group_chat_messages.belongsToMany(models.users, {as: 'seen_by', foreignKey: 'message_id', through: models.group_chat_messages_seen});
     }
   };
   group_chat_messages.init({
@@ -23,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'group_chat_messages',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
   return group_chat_messages;
 };

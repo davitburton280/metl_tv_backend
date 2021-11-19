@@ -1,7 +1,7 @@
 let users = [];
 let groupsUsers = [];
 let filteredGroupsUsers = [];
-let chatController = require('../controllers/chatController');
+let groupChatController = require('../controllers/chat/groupChatController');
 let directChatController = require('../controllers/chat/directChatController');
 
 
@@ -23,7 +23,7 @@ exports.socket = (io) => {
             console.log(users)
 
             if (user.group) {
-                let groups = await chatController.getChatGroups({user_id: user.id});
+                let groups = await groupChatController.getChatGroups({user_id: user.id});
                 groups.map(g => {
                     let group = g.name;
                     socket.join(g.name);

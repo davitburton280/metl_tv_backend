@@ -1,7 +1,7 @@
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
-const db = require('../models');
+const db = require('../../models');
 const GroupChatMessages = db.group_chat_messages;
 const DirectChatMessages = db.direct_chat_messages;
 const ChatGroups = db.chat_groups;
@@ -11,10 +11,10 @@ const Videos = db.videos;
 const Users = db.users;
 const UsersConnection = db.users_connection;
 const UsersConnectionMembers = db.users_connection_members;
-const to = require('../helpers/getPromiseResult');
+const to = require('../../helpers/getPromiseResult');
 
-const usersController = require('./usersController');
-const m = require('../helpers/multer');
+const usersController = require('../usersController');
+const m = require('../../helpers/multer');
 
 const moment = require('moment');
 
