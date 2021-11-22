@@ -17,6 +17,7 @@ const usersController = require('../usersController');
 const m = require('../../helpers/multer');
 
 const moment = require('moment');
+const nl2br = require('../../helpers/nl2br');
 
 
 exports.getGroupsMessages = async (req, res) => {
@@ -343,6 +344,7 @@ exports.updateSeen = async (data) => {
 exports.saveGroupMessage = async (req, res) => {
     let data = req.body;
     data.to_id = data.to_id ? data.to_id : 0;
+    data.message = nl2br(data.message, false);
 
     let msg = await to(GroupChatMessages.create(data));
     req.query.user_id = req.body.from_id;

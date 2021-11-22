@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   direct_chat_messages.init({
     connection_id: DataTypes.INTEGER,
     from_id: DataTypes.INTEGER,
-    message: DataTypes.STRING,
+    message: DataTypes.TEXT,
     to_id: DataTypes.INTEGER,
     seen: DataTypes.INTEGER,
     seen_at: DataTypes.DATE

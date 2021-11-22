@@ -15,7 +15,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       message: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       to_id: {
         type: Sequelize.INTEGER

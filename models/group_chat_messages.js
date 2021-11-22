@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   group_chat_messages.init({
     group_id: DataTypes.INTEGER,
     from_id: DataTypes.INTEGER,
-    message: DataTypes.STRING,
+    message: DataTypes.TEXT,
     to_id: DataTypes.INTEGER,
   }, {
     sequelize,
