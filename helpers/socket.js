@@ -85,7 +85,7 @@ exports.socket = (io) => {
         });
 
         socket.on('setSeen', async (data) => {
-            console.log('set seen', data)
+            console.log('set seen')
 
 
             if (!data.group) {
@@ -99,7 +99,8 @@ exports.socket = (io) => {
                 io.to(socketId).emit('getSeen', data)
                 io.to(users[data.from_user.username]).emit('getSeen', data)
             } else {
-                await to(directChatController.updateSeen(data));
+                console.log('group seen!!!')
+                await to(groupChatController.updateSeen(data));
                 io.to(data.group).emit('getSeen', data)
             }
 

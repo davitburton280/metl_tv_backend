@@ -6,7 +6,7 @@ const ChatMessages = db.chat_messages;
 const DirectChatMessages = db.direct_chat_messages;
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
-const ChatMessagesSeen = db.chat_messages_seen;
+
 const Videos = db.videos;
 const Users = db.users;
 const UsersConnection = db.users_connection;

@@ -6,7 +6,7 @@ const GroupChatMessages = db.group_chat_messages;
 const DirectChatMessages = db.direct_chat_messages;
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
-const GroupChatMessagesSeen = db.chat_messages_seen;
+const GroupChatMessagesSeen = db.group_chat_messages_seen;
 const Videos = db.videos;
 const Users = db.users;
 const UsersConnection = db.users_connection;
@@ -32,7 +32,7 @@ exports.getGroupsMessages = async (req, res) => {
         id: {[Op.in]: chatGroups}
     };
 
-    let groupsMessages = await ChatGroups.findAll({
+    let groupsMessages = await ChatGroups. findAll({
 
         where,
         attributes: ['id', 'name', 'avatar', 'creator_id'],
@@ -78,7 +78,7 @@ exports.getGroupsMessages = async (req, res) => {
         ],
         order: [
             ['name', 'asc'],
-            // [sequelize.col('`chat_group_messages`.`created_at`'), 'asc'],
+            [sequelize.col('`chat_group_messages`.`created_at`'), 'asc'],
         ]
 
 
@@ -305,12 +305,13 @@ exports.updateSeen = async (data) => {
         });
 
         foundMessages.map(async (m) => {
-            let found = await to(ChatMessagesSeen.findAll({
+            let found = await to(GroupChatMessagesSeen.findAll({
                 where: {message_id: m.id, user_id: from_id}
             }));
             if (found.length === 0) {
-                console.log(found)
-                await to(ChatMessagesSeen.create({message_id: m.id, group_id, user_id: from_id}))
+                // console.log("FOUND:",found)
+                let t = await to(GroupChatMessagesSeen.create({message_id: m.id, group_id, user_id: from_id}));
+                // console.log(t)
             }
         });
     }
@@ -339,9 +340,11 @@ exports.updateSeen = async (data) => {
     return !!updated;
 };
 
-exports.saveMessage = async (req, res) => {
+exports.saveGroupMessage = async (req, res) => {
     let data = req.body;
     data.to_id = data.to_id ? data.to_id : 0;
 
     let msg = await to(GroupChatMessages.create(data));
+    req.query.user_id = req.body.from_id;
+    this.getGroupsMessages(req,res);
 };
