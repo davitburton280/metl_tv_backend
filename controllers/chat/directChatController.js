@@ -12,6 +12,7 @@ const Users = db.users;
 const UsersConnection = db.users_connection;
 const UsersConnectionMembers = db.users_connection_members;
 const to = require('../../helpers/getPromiseResult');
+const nl2br = require('../../helpers/nl2br');
 
 const usersController = require('../usersController');
 const m = require('../../helpers/multer');
@@ -100,6 +101,7 @@ exports.getDirectMessages = async (req, res) => {
 
 exports.saveDirectMessage = async (req, res) => {
     let data = req.body;
+    data.message = nl2br(data.message, false);
     let msg = await to(DirectChatMessages.create(data));
     req.query.user_id = data.from_id;
     this.getDirectMessages(req, res);
