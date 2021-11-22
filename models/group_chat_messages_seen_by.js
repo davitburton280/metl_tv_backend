@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     message_id: DataTypes.INTEGER,
     group_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
-    to_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'group_chat_messages_seen',
