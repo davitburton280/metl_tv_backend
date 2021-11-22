@@ -21,7 +21,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       seen: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       seen_at: {
         type: Sequelize.DATE
