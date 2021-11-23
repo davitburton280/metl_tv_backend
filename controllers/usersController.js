@@ -311,23 +311,12 @@ exports.createUsersConnection = async (data) => {
 };
 
 exports.blockUser = async (req, res) => {
-    let {user_id, connection_id, block} = req.body;
-
-    let where = [
-        {
-            user_id,
-            connection_id
-        },
-        {
-            user_id: connection_id,
-            connection_id: user_id
-        },
-    ];
+    let {connection_id, block} = req.body;
 
     let result = await UsersConnection.update({is_blocked: block},
         {
             where: {
-                [Op.or]: where
+                id: connection_id
             }
         });
 

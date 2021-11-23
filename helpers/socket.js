@@ -74,7 +74,7 @@ exports.socket = (io) => {
                 let username = data.to_user?.from || data.to_user?.username;
                 let socketId = users[username];
                 if (data.to_user) {
-                    console.log(username, users, socketId)
+                    // console.log(username, users, socketId)
                     io.to(socketId).emit('getTyping', data)
                 }
             } else {
