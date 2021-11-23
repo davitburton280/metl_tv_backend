@@ -112,11 +112,17 @@ exports.socket = (io) => {
                 let toSocketId = users[data.to_user];
                 let fromSocketId = users[data.from_user];
                 console.log(toSocketId, fromSocketId)
+                await directChatController.unreadMessages(data);
                 io.to(toSocketId).emit('getSeen', data)
                 io.to(fromSocketId).emit('getSeen', data)
 
-                 await directChatController.unreadMessages(data);
             }
+        });
+
+        socket.on('blockUnblockUser', async (data) => {
+            console.log('block/unblock user!!!', data)
+            let toSocketId = users[data.contact_username];
+            io.to(toSocketId).emit('getBlockUnblockUser', data)
         });
 
 
