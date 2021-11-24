@@ -51,11 +51,11 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'user_id'
         });
 
-        users.belongsToMany(models.users_connection, {
-            as: 'users_connections',
-            through: models.users_connection_members,
-            foreignKey: 'member_id'
-        });
+        // users.belongsToMany(models.users_connection, {
+        //     as: 'users_connections',
+        //     through: models.users_connection_members,
+        //     foreignKey: 'member_id'
+        // });
 
         users.belongsToMany(models.chat_groups, {
             as: 'chat_group_members',

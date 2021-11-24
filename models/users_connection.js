@@ -12,11 +12,11 @@ module.exports = (sequelize, DataTypes) => {
         static associate(models) {
             // define association here
 
-            users_connection.belongsToMany(models.users, {
-                as: 'connection_users',
-                through: models.users_connection_members,
-                foreignKey: 'connection_id'
-            });
+            // users_connection.belongsToMany(models.users, {
+            //     as: 'connection_users',
+            //     through: models.users_connection_members,
+            //     foreignKey: 'connection_id'
+            // });
             // users_connection.hasMany(models.chat_messages, {as: 'users_messages', foreignKey: 'connection_id'});
             // users_connection.hasMany(models.chat_messages, {as: 'users_messages', foreignKey: 'connection_id'});
             users_connection.hasMany(models.direct_chat_messages, {as: 'users_messages', foreignKey: 'connection_id'});
@@ -24,6 +24,12 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     users_connection.init({
+        from_id: {
+            type: DataTypes.INTEGER,
+        },
+        to_id: {
+            type: DataTypes.INTEGER,
+        },
         confirmed: DataTypes.INTEGER,
         is_blocked: DataTypes.INTEGER
     }, {

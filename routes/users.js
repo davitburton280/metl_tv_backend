@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/usersController');
+const usersConnectionController = require('../controllers/usersConnectionController');
 const isAuth = require('../helpers/isAuth');
 
 // router.get('/session/:room', usersController.getOpentokParams);
@@ -8,11 +9,11 @@ router.get('/session/get-token', usersController.getSession);
 router.get('/session/leave', usersController.leaveSession);
 router.get('/get-user-info', isAuth, usersController.getUserInfo);
 router.get('/get-contacts', isAuth, usersController.getContacts);
-router.get('/check-connection', isAuth, usersController.checkIfUsersConnected);
 router.put('/save-profile-changes', isAuth, uploadUserAvatar, usersController.saveProfileChanges);
 router.post('/change-profile-image', isAuth, uploadAvatar, usersController.changeAvatar);
 router.post('/change-cover-image', isAuth, uploadCover, usersController.changeCover);
 router.put('/block-user', isAuth, usersController.blockUser);
 
+router.get('/check-connection', isAuth, usersConnectionController.checkUsersConnection);
 
 module.exports = router;

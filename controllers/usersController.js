@@ -284,7 +284,7 @@ exports.createUsersConnection = async (data) => {
     let {authUser, channelUser} = data;
     let params = {
         channel_user_id: channelUser.id,
-        a
+
     }
 
     // if(this.checkIfUsersConnected())
@@ -411,32 +411,32 @@ exports.getContacts = async (req, res) => {
 
 exports.checkIfUsersConnected = async (req, res = null) => {
 
-    let {user_id, channel_user_id, returnValue} = req.query;
-
-    let directConnectionsResult = await UsersConnectionMembers.findAll({
-        where: {member_id: user_id},
-        attributes: ['connection_id']
-    });
-
-
-    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
-
-    let usersConnection = await UsersConnection.findAll({
-        where: {
-            id: {[Op.in]: directConnectionIds},
-        },
-        include: [
-            {model: Users, as: 'connection_users', attributes: ['id', 'first_name', 'last_name', 'avatar', 'username']}
-        ]
-    });
-
-    let ret = usersConnection.find(t => t.connection_users.every(elem => {
-        return [+user_id, +channel_user_id].includes(elem.id)
-    }));
-
-    if (returnValue) {
-        return ret;
-    } else {
-        res.json(ret)
-    }
+    // let {user_id, channel_user_id, returnValue} = req.query;
+    //
+    // let directConnectionsResult = await UsersConnectionMembers.findAll({
+    //     where: {member_id: user_id},
+    //     attributes: ['connection_id']
+    // });
+    //
+    //
+    // let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+    //
+    // let usersConnection = await UsersConnection.findAll({
+    //     where: {
+    //         id: {[Op.in]: directConnectionIds},
+    //     },
+    //     include: [
+    //         {model: Users, as: 'connection_users', attributes: ['id', 'first_name', 'last_name', 'avatar', 'username']}
+    //     ]
+    // });
+    //
+    // let ret = usersConnection.find(t => t.connection_users.every(elem => {
+    //     return [+user_id, +channel_user_id].includes(elem.id)
+    // }));
+    //
+    // if (returnValue) {
+    //     return ret;
+    // } else {
+    //     res.json(ret)
+    // }
 };

@@ -3,7 +3,8 @@ let groupsUsers = [];
 let filteredGroupsUsers = [];
 let groupChatController = require('../controllers/chat/groupChatController');
 let usersController = require('../controllers/usersController');
-let directChatController = require('../controllers/chat/directChatController');
+let usersConnectionController = require('../controllers/usersConnectionController');
+let directChatController = require('../controllers/chat/directChatController_old');
 
 
 const db = require('../models');
@@ -58,8 +59,8 @@ exports.socket = (io) => {
             let socketId = users[username];
             console.log(users)
             console.log('connect!!!', username, socketId)
-            await to(usersController.createUsersConnection(data));
-            io.to(socketId).emit('getConnectWithUser', data)
+            let c = await to(usersConnectionController.createUsersConnection(data));
+            io.to(socketId).emit('getConnectWithUser', c)
         });
 
 
