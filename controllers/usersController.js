@@ -281,39 +281,35 @@ exports.saveProfileChanges = async (req, res) => {
 
 exports.createUsersConnection = async (data) => {
 
-    let {from_id, to_id} = data;
-
-    let where = [
-        {
-            user_id: from_id,
-            connection_id: to_id
-        },
-        {
-            user_id: to_id,
-            connection_id: from_id
-        },
-    ];
-    let found = await to(UsersConnection.findOne({
-        where: {
-            [Op.or]: where
-        }
-    }));
-
-    console.log("FOUND:", !found)
-
-    if (!found) {
-        await to(UsersConnection.create({
-            user_id: from_id,
-            connection_id: to_id
-        }))
+    let {authUser, channelUser} = data;
+    let params = {
+        channel_user_id: channelUser.id,
+        a
     }
+
+    // if(this.checkIfUsersConnected())
+
+
+    // let connection = await to(UsersConnection.create());
+    //
+    //
+    // await UsersConnectionMembers.create({
+    //     member_id: authUser.id,
+    //     connection_id: connection.id
+    // });
+    // await UsersConnectionMembers.create({
+    //     member_id: channelUser.id,
+    //     connection_id: connection.id
+    // });
+    //
+    // return data;
 
 };
 
 exports.blockUser = async (req, res) => {
     let {connection_id, block} = req.body;
 
-    let result = await UsersConnection.update({is_blocked: block},
+    let result = await UsersConnection.update({is_blocked: block, confirmed: 0},
         {
             where: {
                 id: connection_id
@@ -413,3 +409,34 @@ exports.getContacts = async (req, res) => {
     res.json(contacts);
 };
 
+exports.checkIfUsersConnected = async (req, res = null) => {
+
+    let {user_id, channel_user_id, returnValue} = req.query;
+
+    let directConnectionsResult = await UsersConnectionMembers.findAll({
+        where: {member_id: user_id},
+        attributes: ['connection_id']
+    });
+
+
+    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+
+    let usersConnection = await UsersConnection.findAll({
+        where: {
+            id: {[Op.in]: directConnectionIds},
+        },
+        include: [
+            {model: Users, as: 'connection_users', attributes: ['id', 'first_name', 'last_name', 'avatar', 'username']}
+        ]
+    });
+
+    let ret = usersConnection.find(t => t.connection_users.every(elem => {
+        return [+user_id, +channel_user_id].includes(elem.id)
+    }));
+
+    if (returnValue) {
+        return ret;
+    } else {
+        res.json(ret)
+    }
+};

@@ -2,6 +2,7 @@ let users = [];
 let groupsUsers = [];
 let filteredGroupsUsers = [];
 let groupChatController = require('../controllers/chat/groupChatController');
+let usersController = require('../controllers/usersController');
 let directChatController = require('../controllers/chat/directChatController');
 
 
@@ -50,6 +51,15 @@ exports.socket = (io) => {
                 let keys = Object.keys(users);
                 io.emit('userConnected', keys)
             }
+        });
+
+        socket.on('connectWithUser',async (data) => {
+            let username = data.channelUser.username;
+            let socketId = users[username];
+            console.log(users)
+            console.log('connect!!!', username, socketId)
+            await to(usersController.createUsersConnection(data));
+            io.to(socketId).emit('getConnectWithUser', data)
         });
 
 
