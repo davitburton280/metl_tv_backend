@@ -100,7 +100,6 @@ app.use('/playlists', require('./routes/playlists'));
 app.use('/channels', require('./routes/channels'));
 app.use('/stocks', require('./routes/stocks'));
 app.use('/cards', require('./routes/cards'));
-app.use('/chat', require('./routes/chat'));
 app.use('/webhooks', require('./routes/webhooks'));
 app.use('/stripe/customers', require('./routes/stripe/customers'));
 app.use('/stripe/accounts', require('./routes/stripe/accounts'));
@@ -108,6 +107,7 @@ app.use('/stripe/payments', require('./routes/stripe/payments'));
 app.use('/stripe/products', require('./routes/stripe/products'));
 app.use('/chat/direct', require('./routes/chat/direct'));
 app.use('/chat/group', require('./routes/chat/group'));
+app.use('/chat/video', require('./routes/chat/video'));
 
 
 let dist = path.join(__dirname, 'dist/');
