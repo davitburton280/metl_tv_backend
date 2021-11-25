@@ -29,6 +29,8 @@ exports.getDirectMessages = async (req, res) => {
 
     let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
 
+    console.log('aaaaa',directConnectionIds)
+
     let usersMessages = await Users.findAll({
         attributes: ['id', 'first_name', 'last_name', 'avatar', 'username'],
         where: {

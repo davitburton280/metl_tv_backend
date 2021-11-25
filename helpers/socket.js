@@ -4,6 +4,7 @@ let filteredGroupsUsers = [];
 let groupChatController = require('../controllers/chat/groupChatController');
 let usersController = require('../controllers/usersController');
 let directChatController = require('../controllers/chat/directChatController');
+let usersConnectionNotificationsController = require('../controllers/notifications/usersConnectionNotificationsController');
 
 
 const db = require('../models');
@@ -59,6 +60,7 @@ exports.socket = (io) => {
             console.log(users)
             console.log('connect!!!', username, socketId)
             let connection = await to(usersController.createUsersConnection(data));
+            await usersConnectionNotificationsController.saveNotification(connection);
             io.to(socketId).emit('getConnectWithUser', connection)
         });
 

@@ -442,7 +442,8 @@ exports.createUsersConnection = async (data) => {
         let checkAgain = await this.checkIfUsersConnected(params)
         let returnData = {
             initiator_id: authUser.id,
-            msg: `${authUser.first_name+ ' '+ authUser.last_name} has sent a connection request to you`,
+            receiver_id: channelUser.id,
+            msg: `<strong>${authUser.first_name+ ' '+ authUser.last_name}</strong> has sent a connection request to you`,
             ...checkAgain.toJSON(),
         };
         return returnData;
