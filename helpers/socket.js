@@ -58,8 +58,8 @@ exports.socket = (io) => {
             let socketId = users[username];
             console.log(users)
             console.log('connect!!!', username, socketId)
-            await to(usersController.createUsersConnection(data));
-            io.to(socketId).emit('getConnectWithUser', data)
+            let connection = await to(usersController.createUsersConnection(data));
+            io.to(socketId).emit('getConnectWithUser', connection)
         });
 
 

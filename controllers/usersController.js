@@ -279,32 +279,6 @@ exports.saveProfileChanges = async (req, res) => {
     });
 };
 
-exports.createUsersConnection = async (data) => {
-
-    let {authUser, channelUser} = data;
-    let params = {
-        channel_user_id: channelUser.id,
-        a
-    }
-
-    // if(this.checkIfUsersConnected())
-
-
-    // let connection = await to(UsersConnection.create());
-    //
-    //
-    // await UsersConnectionMembers.create({
-    //     member_id: authUser.id,
-    //     connection_id: connection.id
-    // });
-    // await UsersConnectionMembers.create({
-    //     member_id: channelUser.id,
-    //     connection_id: connection.id
-    // });
-    //
-    // return data;
-
-};
 
 exports.blockUser = async (req, res) => {
     let {connection_id, block} = req.body;
@@ -411,7 +385,7 @@ exports.getContacts = async (req, res) => {
 
 exports.checkIfUsersConnected = async (req, res = null) => {
 
-    let {user_id, channel_user_id, returnValue} = req.query;
+    let {user_id, channel_user_id} = req.query || req;
 
     let directConnectionsResult = await UsersConnectionMembers.findAll({
         where: {member_id: user_id},
@@ -434,9 +408,47 @@ exports.checkIfUsersConnected = async (req, res = null) => {
         return [+user_id, +channel_user_id].includes(elem.id)
     }));
 
-    if (returnValue) {
+    if (res === null) {
         return ret;
     } else {
         res.json(ret)
     }
+};
+
+exports.createUsersConnection = async (data) => {
+
+    let {authUser, channelUser} = data;
+    let params = {
+        channel_user_id: channelUser.id,
+        user_id: authUser.id
+    };
+
+    let checkIfConnected = await this.checkIfUsersConnected(params);
+
+    if (!checkIfConnected) {
+        let connection = await to(UsersConnection.create());
+
+        if (connection) {
+            await UsersConnectionMembers.create({
+                member_id: authUser.id,
+                connection_id: connection.id
+            });
+            await UsersConnectionMembers.create({
+                member_id: channelUser.id,
+                connection_id: connection.id
+            });
+        }
+
+        let checkAgain = await this.checkIfUsersConnected(params)
+        let returnData = {
+            initiator_id: authUser.id,
+            msg: `${authUser.first_name+ ' '+ authUser.last_name} has sent a connection request to you`,
+            ...checkAgain.toJSON(),
+        };
+        return returnData;
+    }
+
+    return null;
+
+
 };
