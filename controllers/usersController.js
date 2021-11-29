@@ -44,6 +44,7 @@ const PrivacyTypes = db.privacy_types;
 const StocksOrderType = db.stocks_ordering_types;
 const UsersConnection = db.users_connection;
 const UsersConnectionMembers = db.users_connection_members;
+const UserConnectionNots = db.users_connection_notifications;
 
 const url = require('url');
 
@@ -60,6 +61,8 @@ const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
 const to = require('../helpers/getPromiseResult');
 const getFullName = require('../helpers/getFullNameCol');
+
+const usersConnectionNotifsController = require('../controllers/notifications/usersConnectionNotificationsController');
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
@@ -387,6 +390,25 @@ exports.checkIfUsersConnected = async (req, res = null) => {
 
     let {user_id, channel_user_id} = req.query || req;
 
+
+    // let t = await UsersConnection.findAll({
+    //     attributes: ['id', 'confirmed', 'is_blocked'],
+    //     include: [
+    //         {
+    //             model: Users, attributes: ['id', 'avatar'], as: 'connection_users', where: {
+    //                 id: {
+    //                     [Op.in]: [user_id, channel_user_id]
+    //                 }
+    //             }
+    //         }
+    //     ],
+    //     // group: ['connection_id'],
+    //     where: sequelize.where(sequelize.fn('count', sequelize.col('member_id')), 2)
+    // });
+    //
+    // res.json(t);
+
+
     let directConnectionsResult = await UsersConnectionMembers.findAll({
         where: {member_id: user_id},
         attributes: ['connection_id']
@@ -443,13 +465,49 @@ exports.createUsersConnection = async (data) => {
         let returnData = {
             initiator_id: authUser.id,
             receiver_id: channelUser.id,
-            msg: `<strong>${authUser.first_name+ ' '+ authUser.last_name}</strong> has sent a connection request to you`,
+            from_user: authUser,
+            to_user: channelUser,
+            connection_id: connection.id,
+            type: 'connection_request',
+            msg: `<strong>${authUser.first_name + ' ' + authUser.last_name}</strong> has sent a connection request to you`,
             ...checkAgain.toJSON(),
         };
         return returnData;
     }
 
     return null;
+};
+
+exports.confirmConnection = async (data) => {
+
+    await UsersConnection.update({confirmed: 1}, {
+        where: {
+            id: data.connection_id
+        }
+    });
+
+    await UserConnectionNots.destroy({
+        where: {
+            id: data.notification_id
+        }
+    });
 
 
+    // return JSON.parse(JSON.stringify(t[0]));
+    return 'OK';
+};
+
+exports.declineConnection = async (data) => {
+
+    await UsersConnectionMembers.destroy({
+        where: {
+            connection_id: data.connection_id
+        }
+    });
+
+    await UsersConnection.destroy({
+        where: {
+            id: data.connection_id
+        }
+    })
 };

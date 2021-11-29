@@ -10,6 +10,7 @@ exports.saveNotification = async (data) => {
     let fields = {
         from_id: data.initiator_id,
         to_id: data.receiver_id,
+        connection_id: data.connection_id,
         msg: data.msg
     };
     // console.log(fields)
@@ -32,4 +33,8 @@ exports.getCurrentUserNotifications = async (data) => {
         return n;
     });
     return notifications;
+};
+
+exports.removeNotification = async (req,res) =>{
+    // await UserConnectionNots.destroy({id: data.notification_id});
 };

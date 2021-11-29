@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   users_connection_notifications.init({
     from_id: DataTypes.INTEGER,
     to_id: DataTypes.INTEGER,
+    connection_id: DataTypes.INTEGER,
     msg: DataTypes.STRING
   }, {
     sequelize,

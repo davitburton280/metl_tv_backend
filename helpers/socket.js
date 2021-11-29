@@ -54,7 +54,7 @@ exports.socket = (io) => {
             }
         });
 
-        socket.on('connectWithUser',async (data) => {
+        socket.on('connectWithUser', async (data) => {
             let username = data.channelUser.username;
             let socketId = users[username];
             console.log(users)
@@ -62,6 +62,30 @@ exports.socket = (io) => {
             let connection = await to(usersController.createUsersConnection(data));
             await usersConnectionNotificationsController.saveNotification(connection);
             io.to(socketId).emit('getConnectWithUser', connection)
+        });
+
+        socket.on('acceptConnection', async (data) => {
+            let username = data.to_user.username;
+            let socketId = users[username];
+            let d = await usersController.confirmConnection(data);
+            let notificationData = {
+                connection_id: data.connection_id,
+                initiator_id: data.from_user.id,
+                receiver_id: data.to_user.id,
+                msg: `<strong>${data.from_user.first_name} ${data.from_user.last_name}</strong> has accepted your connection request`,
+            };
+            await usersConnectionNotificationsController.saveNotification(notificationData);
+            io.to(socketId).emit('acceptedConnection', {
+                ...notificationData, from_user: data.from_user,
+                to_user: data.to_user,
+                type: 'accepted_connection_request'
+            })
+        });
+
+        socket.on('declineConnection', async (data) => {
+            let username = data.to_user.username;
+            let socketId = users[username];
+            io.to(socketId).emit('declinedConnection', data)
         });
 
 
