@@ -509,5 +509,11 @@ exports.declineConnection = async (data) => {
         where: {
             id: data.connection_id
         }
-    })
+    });
+
+    await UserConnectionNots.destroy({
+        where: {
+            id: data.notification_id
+        }
+    });
 };

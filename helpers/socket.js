@@ -85,7 +85,19 @@ exports.socket = (io) => {
         socket.on('declineConnection', async (data) => {
             let username = data.to_user.username;
             let socketId = users[username];
-            io.to(socketId).emit('declinedConnection', data)
+            let d = await usersController.declineConnection(data);
+            let notificationData = {
+                connection_id: data.connection_id,
+                initiator_id: data.from_user.id,
+                receiver_id: data.to_user.id,
+                msg: `<strong>${data.from_user.first_name} ${data.from_user.last_name}</strong> has declined your connection request`,
+            };
+
+            io.to(socketId).emit('declinedConnection', {
+                ...notificationData, from_user: data.from_user,
+                to_user: data.to_user,
+                type: 'declined_connection_request'
+            })
         });
 
 
