@@ -58,9 +58,9 @@ exports.socket = (io) => {
             let username = data.channelUser.username;
             let socketId = users[username];
             console.log(users)
-            console.log('connect!!!', username, socketId)
             let connection = await to(usersController.createUsersConnection(data));
-            await usersConnectionNotificationsController.saveNotification(connection);
+            await usersConnectionNotificationsController.saveNotification({...connection,type: 'users_connection_request'});
+            console.log('connect!!!', username, socketId)
             io.to(socketId).emit('getConnectWithUser', connection)
         });
 
@@ -74,11 +74,10 @@ exports.socket = (io) => {
                 receiver_id: data.to_user.id,
                 msg: `<strong>${data.from_user.first_name} ${data.from_user.last_name}</strong> has accepted your connection request`,
             };
-            await usersConnectionNotificationsController.saveNotification(notificationData);
+            let n = await usersConnectionNotificationsController.saveNotification({...notificationData,type: 'accept_connection_request'});
+            console.log(JSON.parse(JSON.stringify(n)))
             io.to(socketId).emit('acceptedConnection', {
-                ...notificationData, from_user: data.from_user,
-                to_user: data.to_user,
-                type: 'accepted_connection_request'
+                ...notificationData,...JSON.parse(JSON.stringify(n))
             })
         });
 

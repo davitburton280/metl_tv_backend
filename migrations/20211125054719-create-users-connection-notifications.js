@@ -17,6 +17,9 @@ module.exports = {
       connection_id: {
         type: Sequelize.INTEGER
       },
+      type_id: {
+        type: Sequelize.INTEGER
+      },
       msg: {
         type: Sequelize.STRING
       },
