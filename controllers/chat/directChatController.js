@@ -16,6 +16,7 @@ const nl2br = require('../../helpers/nl2br');
 
 const usersController = require('../usersController');
 const m = require('../../helpers/multer');
+const showIfErrors = require('../../helpers/showIfErrors');
 
 const moment = require('moment');
 
@@ -107,18 +108,19 @@ exports.getDirectMessages = async (req, res) => {
 };
 
 exports.saveDirectMessage = async (req, res) => {
-    let data = req.body;
-    data.message = nl2br(data.message, false);
-    let msg = await to(DirectChatMessages.create(data));
+    if (!showIfErrors(req, res)) {
+        let data = req.body;
+        data.message = nl2br(data.message, false);
+        await to(DirectChatMessages.create(data));
 
-    if(!data.bottom_chat){
-    req.query.user_id = data.from_id;
-        this.getDirectMessages(req, res);
-    }
-    else {
-        req.query.from_id = data.from_id;
-        req.query.to_id = data.to_id;
-        this.getMessagesBetweenTwoUsers(req,res);
+        if (!data.bottom_chat) {
+            req.query.user_id = data.from_id;
+            this.getDirectMessages(req, res);
+        } else {
+            req.query.from_id = data.from_id;
+            req.query.to_id = data.to_id;
+            this.getMessagesBetweenTwoUsers(req, res);
+        }
     }
 
 
