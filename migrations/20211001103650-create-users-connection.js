@@ -8,6 +8,12 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      from_id: {
+        type: Sequelize.INTEGER,
+      },
+      to_id: {
+        type: Sequelize.INTEGER,
+      },
       confirmed: {
         type: Sequelize.INTEGER,
         defaultValue: 0

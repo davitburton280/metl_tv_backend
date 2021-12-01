@@ -24,6 +24,8 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     users_connection.init({
+        from_id: DataTypes.INTEGER,
+        to_id: DataTypes.INTEGER,
         confirmed: DataTypes.INTEGER,
         is_blocked: DataTypes.INTEGER
     }, {

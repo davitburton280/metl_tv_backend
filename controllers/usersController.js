@@ -448,7 +448,10 @@ exports.createUsersConnection = async (data) => {
     let checkIfConnected = await this.checkIfUsersConnected(params);
 
     if (!checkIfConnected) {
-        let connection = await to(UsersConnection.create());
+        let connection = await to(UsersConnection.create({
+            from_id: authUser.id,
+            to_id: channelUser.id,
+        }));
 
         if (connection) {
             await UsersConnectionMembers.create({
@@ -517,3 +520,4 @@ exports.declineConnection = async (data) => {
         }
     });
 };
+
