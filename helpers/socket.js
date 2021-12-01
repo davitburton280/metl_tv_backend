@@ -75,7 +75,6 @@ exports.socket = (io) => {
                 msg: `<strong>${data.from_user.first_name} ${data.from_user.last_name}</strong> has accepted your connection request`,
             };
             let n = await usersConnectionNotificationsController.saveNotification({...notificationData,type: 'accept_connection_request'});
-            console.log(JSON.parse(JSON.stringify(n)))
             io.to(socketId).emit('acceptedConnection', {
                 ...notificationData,...JSON.parse(JSON.stringify(n))
             })
