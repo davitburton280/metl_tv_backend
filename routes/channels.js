@@ -13,5 +13,6 @@ router.put('/subscribe', isAuth, channelsController.subscribeToChannel);
 router.put('/subscriptions/update-priority',isAuth, channelsController.changeSubscriptionPriority);
 router.put('/save-description',isAuth, validateChannelDescription.rules, channelsController.saveDescription);
 router.put('/save-channel-details', isAuth, channelsController.saveChannelDetails);
+router.get('/get-channel-subscribers', isAuth, channelsController.getChannelSubscribers);
 
 module.exports = router;

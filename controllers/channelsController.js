@@ -30,7 +30,7 @@ exports.getSubscriptions = async (req, res) => {
             include: [{model: Videos, as: 'videos', attributes: ['id']}, {model: Users, as: 'user'}]
         }]
     });
-    console.log(channels)
+    // console.log(channels)
     res.json(channels);
 };
 
@@ -218,4 +218,17 @@ exports.saveChannelDetails = async (req, res) => {
     await usersController.changeJwt(data, res);
     // let userInfo = await usersController.getUserInfo(req, res);
     // res.json(userInfo);
-}
+};
+
+
+exports.getChannelSubscribers = async (req, res) => {
+    let {id} = req.query;
+    let channelSubscribers = await Channels.findOne({
+        where: {id},
+        include: [
+            {model: Users, as: 'subscribers', attributes: ['id', 'avatar', 'username', 'first_name', 'last_name']}
+        ]
+    });
+
+    res.json(channelSubscribers);
+};
