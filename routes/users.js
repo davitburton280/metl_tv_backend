@@ -13,6 +13,7 @@ router.put('/save-profile-changes', isAuth, uploadUserAvatar, usersController.sa
 router.post('/change-profile-image', isAuth, uploadAvatar, usersController.changeAvatar);
 router.post('/change-cover-image', isAuth, uploadCover, usersController.changeCover);
 router.put('/block-user', isAuth, usersController.blockUser);
+router.get('/get-connections', isAuth, usersController.getUserConnections);
 
 
 module.exports = router;

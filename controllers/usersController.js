@@ -426,6 +426,8 @@ exports.checkIfUsersConnected = async (req, res = null) => {
         ]
     });
 
+    console.log(JSON.parse(JSON.stringify(usersConnection)))
+
     let ret = usersConnection.find(t => t.connection_users.every(elem => {
         return [+user_id, +channel_user_id].includes(elem.id)
     }));
@@ -521,3 +523,40 @@ exports.declineConnection = async (data) => {
     });
 };
 
+exports.getUserConnections = async (req, res) => {
+    let {user_id} = req.query;
+    let arr = [
+        {
+            to_id: user_id,
+
+        },
+        {
+            from_id: user_id
+        }
+    ];
+   let connections =  await UsersConnection.findAll({
+       include: [
+           {
+               model: Users,
+               as: 'connection_users',
+               attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+               where: {[Op.not]:{id: user_id}}
+           },
+       ],
+        where: {
+            [Op.or]:[
+                {
+                    [Op.or]: arr,
+                    confirmed: 1
+                },
+                {
+                    to_id: user_id,
+                    confirmed: 0
+                }
+            ]
+
+        }
+    });
+
+    res.json(connections)
+};
