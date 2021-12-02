@@ -59,7 +59,10 @@ exports.socket = (io) => {
             let socketId = users[username];
             console.log(users)
             let connection = await to(usersController.createUsersConnection(data));
-            await usersConnectionNotificationsController.saveNotification({...connection,type: 'users_connection_request'});
+            await usersConnectionNotificationsController.saveNotification({
+                ...connection,
+                type: 'users_connection_request'
+            });
             console.log('connect!!!', username, socketId)
             io.to(socketId).emit('getConnectWithUser', connection)
         });
@@ -74,9 +77,12 @@ exports.socket = (io) => {
                 receiver_id: data.to_user.id,
                 msg: `<strong>${data.from_user.first_name} ${data.from_user.last_name}</strong> has accepted your connection request`,
             };
-            let n = await usersConnectionNotificationsController.saveNotification({...notificationData,type: 'accept_connection_request'});
+            let n = await usersConnectionNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'accept_connection_request'
+            });
             io.to(socketId).emit('acceptedConnection', {
-                ...notificationData,...JSON.parse(JSON.stringify(n))
+                ...notificationData, ...JSON.parse(JSON.stringify(n))
             })
         });
 
@@ -94,7 +100,7 @@ exports.socket = (io) => {
             io.to(socketId).emit('declinedConnection', {
                 ...notificationData, from_user: data.from_user,
                 to_user: data.to_user,
-                type: 'declined_connection_request'
+                notification_type: {name: 'declined_connection_request'}
             })
         });
 
