@@ -62,3 +62,11 @@ exports.getCurrentUserNotifications = async (data) => {
 exports.removeNotification = async (req, res) => {
     // await UserConnectionNots.destroy({id: data.notification_id});
 };
+
+exports.read = async (req, res) => {
+    let {id} = req.body;
+    console.log(id)
+    await UserConnectionNots.update({read: 1}, {where: {id}});
+
+    res.json('OK');
+};

@@ -5,6 +5,9 @@ module.exports = {
     TEXT_ONLY_WITH_SPECIALS_PATTERN: /^[a-zA-Z -/]*$/,
     FMP_URL: 'https://financialmodelingprep.com/',
     FMP_API_V3_URL: 'https://financialmodelingprep.com/api/v3/',
-    MAX_STOCKS_COUNT_FOR_BATCH: 14
+    MAX_STOCKS_COUNT_FOR_BATCH: 14,
+    USER_CONNECTION_NOTIFICATION_TYPES : [
+        'accept_connection_request', 'decline_connection_request'
+    ]
 };
 
