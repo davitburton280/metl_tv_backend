@@ -31,9 +31,13 @@ exports.get = async (req, res) => {
 
 exports.read = async (req, res) => {
     let {type, id} = req.body;
+    let userNotificationsResult;
     console.log(c.USER_CONNECTION_NOTIFICATION_TYPES, type, c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type))
     if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
-        await usersConnectionNotificationsController.read(req, res);
+        userNotificationsResult = await usersConnectionNotificationsController.read(req, res);
+        req.query.user_id = userNotificationsResult;
     }
+
+    this.get(req, res);
     // console.log(req.body)
 };

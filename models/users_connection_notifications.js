@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
         to_id: DataTypes.INTEGER,
         connection_id: DataTypes.INTEGER,
         type_id: DataTypes.INTEGER,
-        msg: DataTypes.STRING
+        msg: DataTypes.STRING,
+        read: DataTypes.INTEGER,
     }, {
         sequelize,
         modelName: 'users_connection_notifications',

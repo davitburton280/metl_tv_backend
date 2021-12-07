@@ -59,6 +59,7 @@ exports.getCurrentUserNotifications = async (data) => {
     return notifications;
 };
 
+
 exports.removeNotification = async (req, res) => {
     // await UserConnectionNots.destroy({id: data.notification_id});
 };
@@ -66,7 +67,10 @@ exports.removeNotification = async (req, res) => {
 exports.read = async (req, res) => {
     let {id} = req.body;
     console.log(id)
-    await UserConnectionNots.update({read: 1}, {where: {id}});
+    await UserConnectionNots.update({read: '1'}, {where: {id}});
 
-    res.json('OK');
+    let currentNotification = await UserConnectionNots.findOne({where: {id}, attributes: ['to_id']});
+
+    return currentNotification.to_id;
+
 };
