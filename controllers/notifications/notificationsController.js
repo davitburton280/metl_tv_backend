@@ -41,3 +41,11 @@ exports.read = async (req, res) => {
     this.get(req, res);
     // console.log(req.body)
 };
+
+exports.markAllAsRead = async (req, res) => {
+    let {user_id} = req.body;
+    await usersConnectionNotificationsController.markAllAsRead(req, res);
+    req.query.user_id = user_id;
+    console.log(req.query)
+    this.get(req, res);
+};

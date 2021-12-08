@@ -74,3 +74,16 @@ exports.read = async (req, res) => {
     return currentNotification.to_id;
 
 };
+
+exports.markAllAsRead = async (req, res) => {
+    let {ids} = req.body;
+    let result = ids.map(async (id) => {
+        await UserConnectionNots.update({read: '1'}, {where: {id}});
+    });
+
+    await Promise.all(result);
+
+    return 'OK';
+
+
+};
