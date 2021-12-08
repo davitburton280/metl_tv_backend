@@ -523,6 +523,12 @@ exports.declineConnection = async (data) => {
     });
 };
 
+exports.disconnectUsers = async (data) => {
+    let {id} = data;
+    await to(UsersConnectionMembers.destroy({where:{connection_id: id}}));
+    await to(UsersConnection.destroy({where:{id}}));
+};
+
 exports.getUserConnections = async (req, res) => {
     let {user_id} = req.query;
     let arr = [
@@ -534,17 +540,17 @@ exports.getUserConnections = async (req, res) => {
             from_id: user_id
         }
     ];
-   let connections =  await UsersConnection.findAll({
-       include: [
-           {
-               model: Users,
-               as: 'connection_users',
-               attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
-               where: {[Op.not]:{id: user_id}}
-           },
-       ],
+    let connections = await UsersConnection.findAll({
+        include: [
+            {
+                model: Users,
+                as: 'connection_users',
+                attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+                where: {[Op.not]: {id: user_id}}
+            },
+        ],
         where: {
-            [Op.or]:[
+            [Op.or]: [
                 {
                     [Op.or]: arr,
                     confirmed: 1

@@ -81,6 +81,8 @@ exports.socket = (io) => {
                 ...notificationData,
                 type: 'accept_connection_request'
             });
+
+            io.to(users[data.from_user.username]).emit('acceptedConnection', null);
             io.to(socketId).emit('acceptedConnection', {
                 ...notificationData, ...JSON.parse(JSON.stringify(n))
             })
@@ -102,6 +104,13 @@ exports.socket = (io) => {
                 to_user: data.to_user,
                 notification_type: {name: 'declined_connection_request'}
             })
+        });
+
+        socket.on('disconnectUsers', async (data) => {
+            let username = data.to_username;
+            let socketId = users[username];
+            await to(usersController.disconnectUsers(data));
+            io.to(socketId).emit('getDisconnectUsers', data)
         });
 
 
