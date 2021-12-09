@@ -259,13 +259,19 @@ exports.getUserInfo = async (req, res) => {
         order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });
 
-    let {videos, ...rest} = user.toJSON();
-    if (!+data.own_channel) {
-        console.log('not own channel')
-        let ret = {videos: videos.filter(t => t.privacy.name === 'Public'), ...rest};
-        res.json(ret);
-    } else {
-        res.json(user)
+    if (user) {
+        let {videos, ...rest} = user.toJSON();
+        if (!+data.own_channel) {
+            console.log('not own channel')
+            let ret = {videos: videos.filter(t => t.privacy.name === 'Public'), ...rest};
+            res.json(ret);
+        } else {
+            res.json(user)
+        }
+    }
+
+    else {
+        res.status(500).json({msg: 'The channel is not found'})
     }
 };
 
@@ -525,8 +531,8 @@ exports.declineConnection = async (data) => {
 
 exports.disconnectUsers = async (data) => {
     let {id} = data;
-    await to(UsersConnectionMembers.destroy({where:{connection_id: id}}));
-    await to(UsersConnection.destroy({where:{id}}));
+    await to(UsersConnectionMembers.destroy({where: {connection_id: id}}));
+    await to(UsersConnection.destroy({where: {id}}));
 };
 
 exports.getUserConnections = async (req, res) => {
