@@ -49,3 +49,18 @@ exports.markAllAsRead = async (req, res) => {
     console.log(req.query)
     this.get(req, res);
 };
+
+exports.remove = async (req, res) => {
+    let {type, id} = req.query;
+    console.log(req.query)
+    let userNotificationsResult;
+
+    if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
+        userNotificationsResult = await usersConnectionNotificationsController.removeNotification(req, res);
+        console.log(userNotificationsResult)
+        req.query.user_id = userNotificationsResult;
+    }
+
+    this.get(req, res);
+    // console.log(req.body)
+};
