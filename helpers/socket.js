@@ -54,6 +54,11 @@ exports.socket = (io) => {
             }
         });
 
+        socket.on('getConnectedUsers', (data) =>{
+            let socketId = users[data.username];
+            io.to(socketId).emit('usersConnected', Object.keys(users))
+        });
+
         socket.on('connectWithUser', async (data) => {
             let username = data.channelUser.username;
             let socketId = users[username];
