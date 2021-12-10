@@ -82,7 +82,7 @@ exports.socket = (io) => {
                 type: 'accept_connection_request'
             });
 
-            io.to(users[data.from_user.username]).emit('acceptedConnection', null);
+            io.to(users[data.from_user.username]).emit('acceptedConnection', notificationData);
             io.to(socketId).emit('acceptedConnection', {
                 ...notificationData, ...JSON.parse(JSON.stringify(n))
             })
@@ -98,6 +98,11 @@ exports.socket = (io) => {
                 receiver_id: data.to_user.id,
                 msg: `<strong>${data.from_user.first_name} ${data.from_user.last_name}</strong> has declined your connection request`,
             };
+
+            let n = await usersConnectionNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'decline_connection_request'
+            });
 
             io.to(socketId).emit('declinedConnection', {
                 ...notificationData, from_user: data.from_user,
