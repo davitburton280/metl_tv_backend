@@ -529,6 +529,26 @@ exports.declineConnection = async (data) => {
     });
 };
 
+exports.cancelUsersConnection = async (connection_id) => {
+    await UsersConnectionMembers.destroy({
+        where: {
+            connection_id: connection_id
+        }
+    });
+
+    await UsersConnection.destroy({
+        where: {
+            id: connection_id
+        }
+    });
+
+    await UserConnectionNots.destroy({
+        where: {
+            connection_id: connection_id
+        }
+    });
+};
+
 exports.disconnectUsers = async (data) => {
     let {id} = data;
     await to(UsersConnectionMembers.destroy({where: {connection_id: id}}));

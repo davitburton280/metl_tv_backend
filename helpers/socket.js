@@ -54,7 +54,7 @@ exports.socket = (io) => {
             }
         });
 
-        socket.on('getConnectedUsers', (data) =>{
+        socket.on('getConnectedUsers', (data) => {
             let socketId = users[data.username];
             io.to(socketId).emit('usersConnected', Object.keys(users))
         });
@@ -70,6 +70,15 @@ exports.socket = (io) => {
             });
             console.log('connect!!!', username, socketId)
             io.to(socketId).emit('getConnectWithUser', connection)
+            io.to(users[data.authUser.username]).emit('getConnectWithUser', connection)
+        });
+
+        socket.on('cancelUsersConnection', async (data) => {
+            let username = data.channelUser.username;
+            let socketId = users[username];
+            let connection = await to(usersController.cancelUsersConnection(data.connection_id));
+            io.to(socketId).emit('cancelledUsersConnection', connection)
+            io.to(users[data.authUser.username]).emit('cancelledUsersConnection', connection)
         });
 
         socket.on('acceptConnection', async (data) => {
