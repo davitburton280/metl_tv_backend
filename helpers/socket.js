@@ -69,6 +69,7 @@ exports.socket = (io) => {
                 type: 'users_connection_request'
             });
             console.log('connect!!!', username, socketId)
+            console.log('users!!!', users)
             io.to(socketId).emit('getConnectWithUser', connection)
             io.to(users[data.authUser.username]).emit('getConnectWithUser', connection)
         });
