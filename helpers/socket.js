@@ -62,7 +62,7 @@ exports.socket = (io) => {
         socket.on('connectWithUser', async (data) => {
             let username = data.channelUser.username;
             let socketId = users[username];
-            console.log(users)
+            // console.log(data)
             let connection = await to(usersController.createUsersConnection(data));
             await usersConnectionNotificationsController.saveNotification({
                 ...connection,
@@ -70,7 +70,8 @@ exports.socket = (io) => {
             });
             console.log('connect!!!', username, socketId)
             console.log('users!!!', users)
-            io.to(socketId).emit('getConnectWithUser', connection)
+            console.log('connection!!!', connection)
+            io.to(socketId).emit('getConnectWithUser', connection);
             io.to(users[data.authUser.username]).emit('getConnectWithUser', connection)
         });
 

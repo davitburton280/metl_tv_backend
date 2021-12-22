@@ -1,16 +1,16 @@
-const usersConnectionNotificationsController = require('./usersConnectionNotificationsController');
-const groupChatNotificationsController = require('./groupChatNotificationsController');
+const usersConnectionNotificationsController = require('./notifications/usersConnectionNotificationsController');
+const groupChatNotificationsController = require('./notifications/groupChatNotificationsController');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
-const db = require('../../models');
+const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
 
-const c = require('../../config/constants');
+const c = require('../config/constants');
 
 exports.get = async (req, res) => {
     let data = req.query;
@@ -63,4 +63,10 @@ exports.remove = async (req, res) => {
 
     this.get(req, res);
     // console.log(req.body)
+};
+
+exports.removeAll = async (req, res) => {
+    let {user_id} = req.query;
+    await usersConnectionNotificationsController.removeAllNotifications(user_id);
+    this.get(req, res);
 };
