@@ -13,8 +13,11 @@ const ChatGroups = db.chat_groups;
 const to = require('../helpers/getPromiseResult');
 
 
-exports.socket = (io) => {
-    io.on('connection', (socket) => {
+let socket = (io) => {
+    io.on('connection', async (socket) => {
+
+
+
         console.log('new connection made');
 
         socket.on('newUser', async (user) => {
@@ -357,4 +360,9 @@ exports.socket = (io) => {
             console.log('user disconnected');
         });
     });
+};
+
+
+module.exports = {
+    socket
 };

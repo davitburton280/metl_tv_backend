@@ -11,7 +11,6 @@ const cors = require('cors');
 const path = require('path');
 
 
-
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const IN_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -28,6 +27,20 @@ const io = require('socket.io')(server, {
 });
 const {socket} = require('./helpers/socket');
 socket(io);
+
+const redis = require('redis');
+global.redisClient = redis.createClient({
+    host: '127.0.0.1'
+});
+
+if (!redisClient.isOpen) {
+    console.log('redis connection!!!')
+    redisClient.connect().then(a => a);
+}
+
+
+redisClient.on('connect', () => console.log('::> Redis Client Connected'));
+redisClient.on('error', (err) => console.log('<:: Redis Client Error', err));
 
 // Multer
 require('./helpers/multer');

@@ -20,8 +20,15 @@ const showIfErrors = require('../../helpers/showIfErrors');
 
 const moment = require('moment');
 
+let {getMessagesFromRedis, generateFtSearchQuery} = require('../../helpers/redis');
+
 exports.getDirectMessages = async (req, res) => {
     let {user_id, from_id, to_id, blocked} = req.query;
+// console.log(typeof socket)
+
+    let redisMessages = await getMessagesFromRedis(generateFtSearchQuery(req.query));
+    console.log(redisMessages)
+
 
     if (from_id && to_id) {
         this.getMessagesBetweenTwoUsers(req, res);
@@ -34,8 +41,6 @@ exports.getDirectMessages = async (req, res) => {
         });
 
         let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
-
-        console.log('aaaaa', directConnectionIds)
 
         let usersMessages = await Users.findAll({
             attributes: ['id', 'first_name', 'last_name', 'avatar', 'username'],
@@ -84,9 +89,14 @@ exports.getDirectMessages = async (req, res) => {
         let usersFiltered = [];
         // let blockedUsers = await usersController.getBlockedContactsIds(user_id, 1);
         let blockedUsers = [];
-
         usersMessages.map(um => {
             let unseens = 0;
+
+            if (redisMessages) {
+                // redisMessages.map(rm => {
+                //     um.users_connections[0]?.users_messages.push(rm);
+                // })
+            }
 
             um.users_connections[0]?.users_messages?.map(m => {
                 let msg = m.toJSON();
@@ -94,8 +104,11 @@ exports.getDirectMessages = async (req, res) => {
                     ++unseens;
                 }
             });
+
+
             usersFiltered.push({unseens, ...um.toJSON()});
         });
+        console.log(usersFiltered)
 
         let ret = usersFiltered.sort((a, b) => {
             let aMessages = a.users_connections[0]?.users_messages;
