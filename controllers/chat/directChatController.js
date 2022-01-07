@@ -68,18 +68,18 @@ exports.getDirectMessages = async (req, res) => {
                             model: DirectChatMessages,
                             attributes: {exclude: ['group_id', 'video_id', 'connection_id', 'to_user', 'updated_at']},
                             as: 'users_messages',
-                            include: [
-                                {
-                                    model: Users,
-                                    as: 'from_user',
-                                    attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
-                                },
-                                {
-                                    model: Users,
-                                    as: 'to_user',
-                                    attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
-                                },
-                            ]
+                            // include: [
+                            //     {
+                            //         model: Users,
+                            //         as: 'from_user',
+                            //         attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name']
+                            //     },
+                            //     {
+                            //         model: Users,
+                            //         as: 'to_user',
+                            //         attributes: [['username', 'from'], 'id', 'avatar', 'first_name', 'last_name'],
+                            //     },
+                            // ]
                         }
                     ]
                 }
@@ -89,24 +89,25 @@ exports.getDirectMessages = async (req, res) => {
         let usersFiltered = [];
         // let blockedUsers = await usersController.getBlockedContactsIds(user_id, 1);
         let blockedUsers = [];
-        usersMessages.map(um => {
+        console.log(JSON.parse(JSON.stringify(usersMessages)))
+        JSON.parse(JSON.stringify(usersMessages)).map(um => {
             let unseens = 0;
 
             if (redisMessages) {
-                // redisMessages.map(rm => {
-                //     um.users_connections[0]?.users_messages.push(rm);
-                // })
+                redisMessages.map(rm => {
+                    um.users_connections[0]?.users_messages.push(rm);
+                })
             }
 
             um.users_connections[0]?.users_messages?.map(m => {
-                let msg = m.toJSON();
-                if (msg.seen === 0 && +user_id !== +m.from_id) {
+                // let msg = m.toJSON();
+                if (m.seen === 0 && +user_id !== +m.from_id) {
                     ++unseens;
                 }
             });
 
 
-            usersFiltered.push({unseens, ...um.toJSON()});
+            usersFiltered.push({unseens, ...um});
         });
         console.log(usersFiltered)
 
