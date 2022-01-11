@@ -28,19 +28,19 @@ const io = require('socket.io')(server, {
 const {socket} = require('./helpers/socket');
 socket(io);
 
-const redis = require('redis');
-global.redisClient = redis.createClient({
-    host: '127.0.0.1'
-});
-
-if (!redisClient.isOpen) {
-    console.log('redis connection!!!')
-    redisClient.connect().then(a => a);
-}
-
-
-redisClient.on('connect', () => console.log('::> Redis Client Connected'));
-redisClient.on('error', (err) => console.log('<:: Redis Client Error', err));
+// const redis = require('redis');
+// global.redisClient = redis.createClient({
+//     host: '127.0.0.1'
+// });
+//
+// if (!redisClient.isOpen) {
+//     console.log('redis connection!!!')
+//     redisClient.connect().then(a => a);
+// }
+//
+//
+// redisClient.on('connect', () => console.log('::> Redis Client Connected'));
+// redisClient.on('error', (err) => console.log('<:: Redis Client Error', err));
 
 // Multer
 require('./helpers/multer');
@@ -88,8 +88,12 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 50
 const mongoose = require('mongoose');
 
 //Set up default mongoose connection
-// const mongoDB = 'mongodb://127.0.0.1/metltv';
-// mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
+const mongoDB = 'mongodb://142.93.250.43/metltv_chat';
+mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then(t=>{
+    console.log(mongoose.connection.readyState)
+    console.log('connected')
+});
+
 
 
 //Get the default connection

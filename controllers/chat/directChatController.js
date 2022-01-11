@@ -26,9 +26,6 @@ exports.getDirectMessages = async (req, res) => {
     let {user_id, from_id, to_id, blocked} = req.query;
 // console.log(typeof socket)
 
-    let redisMessages = await getMessagesFromRedis(generateFtSearchQuery(req.query));
-    console.log(redisMessages)
-
 
     if (from_id && to_id) {
         this.getMessagesBetweenTwoUsers(req, res);
