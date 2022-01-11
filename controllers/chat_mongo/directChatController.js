@@ -41,7 +41,7 @@ console.log(directConnectionIds)
         connection_id: {"$in": directConnectionIds}
     }).sort({'created':-1});
 
-    console.log(messages)
+    // console.log(messages)
 
 
     let usersConnections = await Users.findAll({
