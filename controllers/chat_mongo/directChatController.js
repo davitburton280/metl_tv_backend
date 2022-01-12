@@ -35,14 +35,10 @@ exports.getDirectMessages = async (req, res) => {
 
     let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
 
-console.log(directConnectionIds)
     // Gets messages from MongoDb
     let messages = await Messages.find({
         connection_id: {"$in": directConnectionIds}
     }).sort({'created':-1});
-
-    // console.log(messages)
-
 
     let usersConnections = await Users.findAll({
         attributes: ['id', 'first_name', 'last_name', 'avatar', 'username'],
