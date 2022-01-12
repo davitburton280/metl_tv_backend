@@ -71,9 +71,9 @@ let socket = (io) => {
                 ...connection,
                 type: 'users_connection_request'
             });
-            console.log('connect!!!', username, socketId)
-            console.log('users!!!', users)
-            console.log('connection!!!', connection)
+            // console.log('connect!!!', username, socketId)
+            console.log('users!!!', users, socketId, users[data.authUser.username])
+            // console.log('connection!!!', connection)
             io.to(socketId).emit('getConnectWithUser', connection);
             io.to(users[data.authUser.username]).emit('getConnectWithUser', connection)
         });
@@ -205,9 +205,23 @@ let socket = (io) => {
         });
 
         socket.on('blockUnblockUser', async (data) => {
-            console.log('block/unblock user!!!', data)
             let toSocketId = users[data.contact_username];
-            io.to(toSocketId).emit('getBlockUnblockUser', data)
+            console.log('block/unblock user!!!', data.contact_username, toSocketId)
+            console.log(data)
+            let notificationData = {
+                connection_id: data.connection_id,
+                initiator_id: data.from_id,
+                receiver_id: data.to_id,
+                msg: data.msg,
+            };
+            let n = await usersConnectionNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'block_connection'
+            });
+            // console.log(JSON.parse(JSON.stringify(n))
+            io.to(toSocketId).emit('getBlockUnblockUser', {
+                ...notificationData, ...JSON.parse(JSON.stringify(n))
+            });
         });
 
 

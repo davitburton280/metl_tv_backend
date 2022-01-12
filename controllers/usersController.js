@@ -292,7 +292,7 @@ exports.saveProfileChanges = async (req, res) => {
 exports.blockUser = async (req, res) => {
     let {connection_id, block} = req.body;
 
-    let result = await UsersConnection.update({is_blocked: block, confirmed: 0},
+    let result = await UsersConnection.update({is_blocked: block},
         {
             where: {
                 id: connection_id
