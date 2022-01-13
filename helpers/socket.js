@@ -17,7 +17,6 @@ let socket = (io) => {
     io.on('connection', async (socket) => {
 
 
-
         console.log('new connection made');
 
         socket.on('newUser', async (user) => {
@@ -134,7 +133,20 @@ let socket = (io) => {
             let username = data.to_username;
             let socketId = users[username];
             await to(usersController.disconnectUsers(data));
-            io.to(socketId).emit('getDisconnectUsers', data)
+            console.log(data)
+            let notificationData = {
+                connection_id: data.connection_id,
+                initiator_id: data.from_id,
+                receiver_id: data.to_id,
+                msg: data.msg,
+            };
+            let n = await usersConnectionNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'break_connection'
+            });
+            io.to(socketId).emit('getDisconnectUsers', {
+                ...notificationData, ...JSON.parse(JSON.stringify(n))
+            });
         });
 
 
@@ -374,6 +386,10 @@ let socket = (io) => {
             console.log('user disconnected');
         });
     });
+};
+
+buildNotification = () => {
+
 };
 
 
