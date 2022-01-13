@@ -58,6 +58,7 @@ let socket = (io) => {
 
         socket.on('getConnectedUsers', (data) => {
             let socketId = users[data.username];
+            console.log("online",socketId)
             io.to(socketId).emit('usersConnected', Object.keys(users))
         });
 
@@ -100,6 +101,7 @@ let socket = (io) => {
                 type: 'accept_connection_request'
             });
 
+            console.log(users[data.from_user.username],socketId)
             io.to(users[data.from_user.username]).emit('acceptedConnection', notificationData);
             io.to(socketId).emit('acceptedConnection', {
                 ...notificationData, ...JSON.parse(JSON.stringify(n))
