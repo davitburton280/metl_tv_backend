@@ -251,16 +251,16 @@
                         color: #FFFFFF;
                     }
 
-                    .message-data {
+                    .message-date {
                         justify-content: flex-end;
                     }
                 }
 
-                .message-data {
+                .message-date {
                     display: flex;
                     align-items: center;
-                    margin-bottom: 16px;
-                    padding-left: 16px;
+                    margin-bottom: 0;
+                    padding-left: 0;
 
                     .img {
                         margin-right: 16px;
@@ -303,7 +303,7 @@
             }
         }
 
-        .chat-message {
+        .chat-message-form {
             background: #F5F5F5;
             display: flex;
             justify-content: space-between;
