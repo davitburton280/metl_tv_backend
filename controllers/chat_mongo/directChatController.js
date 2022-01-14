@@ -11,6 +11,8 @@ const moment = require('moment');
 
 const to = require('../../helpers/getPromiseResult');
 
+
+
 exports.create = async (req, res) => {
     // data.seen_at = '';
     let newMsg = new Messages(req.body);
@@ -35,10 +37,15 @@ exports.getDirectMessages = async (req, res) => {
 
     let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
 
+    console.log(directConnectionIds)
+
     // Gets messages from MongoDb
     let messages = await Messages.find({
         connection_id: {"$in": directConnectionIds}
-    }).sort({'created':-1});
+    }).sort({'created_at': -1});
+
+    console.log('messages', messages)
+
 
     let usersConnections = await Users.findAll({
         attributes: ['id', 'first_name', 'last_name', 'avatar', 'username'],
@@ -47,9 +54,7 @@ exports.getDirectMessages = async (req, res) => {
                 id: user_id
             }
         },
-        order: [
-
-        ],
+        order: [],
         include: [
             {
                 model: UsersConnection, as: 'users_connections',
@@ -64,11 +69,31 @@ exports.getDirectMessages = async (req, res) => {
         ]
     });
 
-    let result = JSON.parse(JSON.stringify(usersConnections)).map(uc=>{
+    let result = JSON.parse(JSON.stringify(usersConnections)).map(uc => {
         let connection_id = uc.users_connections[0]?.id;
         uc.direct_messages = messages.filter(msg => msg.toObject().connection_id === connection_id);
+        // uc.direct_messages = groupMessagesByDate(uc.direct_messages)
         return uc;
     });
 
     res.json(result);
+};
+
+groupMessagesByDate = (messages) => {
+    let property = 'created_at';
+   let t = messages.reduce((previous, current) => {
+        let key = current[property];
+        if (property === 'created_at') {
+            key = moment(current[property]).format('dddd, MMMM Do');
+        }
+        if (!previous[key]) {
+            previous[key] = [current];
+        } else {
+            previous[key].push(current);
+        }
+
+        return previous;
+    }, {});
+
+    return Object.keys(t).map(key => ({key, value: t[key]}));
 };

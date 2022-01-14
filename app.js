@@ -88,10 +88,10 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 50
 const mongoose = require('mongoose');
 
 //Set up default mongoose connection
-const mongoDB = 'mongodb://142.93.250.43/metltv_chat';
+const mongoDB = `mongodb://${process.env.MONGO_IP_PORT}/metltv_chat`;
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then(t=>{
     console.log(mongoose.connection.readyState)
-    console.log('connected')
+    console.log('mongo connected')
 });
 
 
