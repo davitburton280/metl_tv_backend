@@ -152,16 +152,18 @@ let socket = (io) => {
         });
 
 
-        socket.on('sendMessage', (data) => {
+        socket.on('sendMessage', async(data) => {
             let group = data.group;
             if (group) {
                 console.log('GROUP MESSAGE!!!')
                 io.to(group).emit('newMessage', data)
             } else {
-                let username = data.to_user.from || data.to_user.username;
-                let socketId = users[username];
-                console.log('DIRECT MESSAGE!!!')
-                io.to(socketId).emit('newMessage', data)
+                let fromUser = users[data.from_username];
+                let toUser = users[data.to_username];
+                let messages = await directChatController.saveDirectMessage(data)
+                console.log('DIRECT MESSAGE!!!', toUser, fromUser)
+                io.to(toUser).emit('newMessage', messages)
+                io.to(fromUser).emit('newMessage', messages)
             }
         });
 

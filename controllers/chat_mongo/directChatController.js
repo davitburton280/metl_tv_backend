@@ -10,18 +10,22 @@ const DirectMessages = require('../../mongoose_chat/direct_chat_messages');
 const moment = require('moment');
 
 const to = require('../../helpers/getPromiseResult');
-
+const nl2br = require('../../helpers/nl2br');
 
 exports.create = async (req, res) => {
-    // data.seen_at = '';
-    let newMsg = new DirectMessages(req.body);
-    let result = await to(newMsg.save());
-    return result;
+
+    this.getDirectMessages(req, res)
 };
 
-exports.saveDirectMessage = async (req, res) => {
-    let data = req.body;
-    console.log(data)
+exports.saveDirectMessage = async (data) => {
+    // data.seen_at = '';
+    data.message = nl2br(data.message, false);
+    let newMsg = new DirectMessages(data);
+    let result = await to(newMsg.save());
+    let messages = await DirectMessages.find({
+        connection_id:data.connection_id
+    }).sort({'created_at': 1});
+    return messages;
 };
 
 
@@ -70,6 +74,14 @@ exports.getDirectMessages = async (req, res) => {
     });
 
     res.json(result);
+};
+
+exports.getConnectionMessages = async (req, res) => {
+    let {connection_id} = req.query || req.connection_id;
+    let messages = await DirectMessages.find({
+        connection_id
+    }).sort({'created_at': 1});
+    res.json(messages);
 };
 
 exports.updateSeen = async (data) => {
