@@ -6,16 +6,15 @@ const Users = db.users;
 const UsersConnection = db.users_connection;
 const UsersConnectionMembers = db.users_connection_members;
 
-const Messages = require('../../mongoose_chat/direct_chat_messages');
+const DirectMessages = require('../../mongoose_chat/direct_chat_messages');
 const moment = require('moment');
 
 const to = require('../../helpers/getPromiseResult');
 
 
-
 exports.create = async (req, res) => {
     // data.seen_at = '';
-    let newMsg = new Messages(req.body);
+    let newMsg = new DirectMessages(req.body);
     let result = await to(newMsg.save());
     return result;
 };
@@ -37,15 +36,10 @@ exports.getDirectMessages = async (req, res) => {
 
     let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
 
-    console.log(directConnectionIds)
-
     // Gets messages from MongoDb
-    let messages = await Messages.find({
+    let messages = await DirectMessages.find({
         connection_id: {"$in": directConnectionIds}
-    }).sort({'created_at': -1});
-
-    console.log('messages', messages)
-
+    }).sort({'created_at': 1});
 
     let usersConnections = await Users.findAll({
         attributes: ['id', 'first_name', 'last_name', 'avatar', 'username'],
@@ -72,28 +66,25 @@ exports.getDirectMessages = async (req, res) => {
     let result = JSON.parse(JSON.stringify(usersConnections)).map(uc => {
         let connection_id = uc.users_connections[0]?.id;
         uc.direct_messages = messages.filter(msg => msg.toObject().connection_id === connection_id);
-        // uc.direct_messages = groupMessagesByDate(uc.direct_messages)
         return uc;
     });
 
     res.json(result);
 };
 
-groupMessagesByDate = (messages) => {
-    let property = 'created_at';
-   let t = messages.reduce((previous, current) => {
-        let key = current[property];
-        if (property === 'created_at') {
-            key = moment(current[property]).format('dddd, MMMM Do');
-        }
-        if (!previous[key]) {
-            previous[key] = [current];
-        } else {
-            previous[key].push(current);
-        }
+exports.updateSeen = async (data) => {
 
-        return previous;
-    }, {});
+    let {connection_id, seen_at} = data;
+    // console.log(data)
+    let updated = await to(DirectMessages.updateMany(
+        {
+            "$and": [
+                {seen: false},
+                {connection_id}
+            ],
+        }, {$set: {seen: true, seen_at}}, {multi: true}));
 
-    return Object.keys(t).map(key => ({key, value: t[key]}));
+    console.log('updated', updated)
+
+    return !!updated;
 };

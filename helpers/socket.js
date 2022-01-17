@@ -3,7 +3,7 @@ let groupsUsers = [];
 let filteredGroupsUsers = [];
 let groupChatController = require('../controllers/chat/groupChatController');
 let usersController = require('../controllers/usersController');
-let directChatController = require('../controllers/chat/directChatController');
+let directChatController = require('../controllers/chat_mongo/directChatController');
 let usersConnectionNotificationsController = require('../controllers/notifications/usersConnectionNotificationsController');
 
 
@@ -189,8 +189,7 @@ let socket = (io) => {
 
             if (!data.group) {
                 console.log('direct seen!!!', data.connection_id)
-                let username = data.to_user.from || data.to_user.username;
-                console.log(username)
+                let username = data.to_username;
                 let socketId = users[username];
                 let r = await directChatController.updateSeen(data);
                 // data.seen = +r;
