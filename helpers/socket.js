@@ -58,7 +58,7 @@ let socket = (io) => {
 
         socket.on('getConnectedUsers', (data) => {
             let socketId = users[data.username];
-            console.log("online",socketId)
+            console.log("online", socketId)
             io.to(socketId).emit('usersConnected', Object.keys(users))
         });
 
@@ -101,7 +101,7 @@ let socket = (io) => {
                 type: 'accept_connection_request'
             });
 
-            console.log(users[data.from_user.username],socketId)
+            console.log(users[data.from_user.username], socketId)
             io.to(users[data.from_user.username]).emit('acceptedConnection', notificationData);
             io.to(socketId).emit('acceptedConnection', {
                 ...notificationData, ...JSON.parse(JSON.stringify(n))
@@ -167,15 +167,11 @@ let socket = (io) => {
 
 
         socket.on('setTyping', (data) => {
-            console.log('typing')
+            console.log('typing', data)
 
             if (!data.group) {
-                let username = data.to_user?.from || data.to_user?.username;
-                let socketId = users[username];
-                if (data.to_user) {
-                    // console.log(username, users, socketId)
-                    io.to(socketId).emit('getTyping', data)
-                }
+                let socketId = users[data.to_username];
+                io.to(socketId).emit('getTyping', data)
             } else {
                 io.to(data.group).emit('getTyping', data)
             }
@@ -184,18 +180,15 @@ let socket = (io) => {
         });
 
         socket.on('setSeen', async (data) => {
-            console.log('set seen')
+            console.log('set seen', data)
 
 
             if (!data.group) {
-                console.log('direct seen!!!', data.connection_id)
-                let username = data.to_username;
-                let socketId = users[username];
-                let r = await directChatController.updateSeen(data);
-                // data.seen = +r;
-                console.log(data.from_user.username, users, socketId)
+                console.log('direct seen!!!')
+                let socketId = users[data.to_username];
+                await directChatController.updateSeen(data);
                 io.to(socketId).emit('getSeen', data)
-                io.to(users[data.from_user.username]).emit('getSeen', data)
+                io.to(users[data.from_username]).emit('getSeen', data)
             } else {
                 console.log('group seen!!!')
                 await to(groupChatController.updateSeen(data));
