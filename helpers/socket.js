@@ -152,7 +152,7 @@ let socket = (io) => {
         });
 
 
-        socket.on('sendMessage', async(data) => {
+        socket.on('sendMessage', async (data) => {
             let group = data.group;
             if (group) {
                 console.log('GROUP MESSAGE!!!')
@@ -187,10 +187,14 @@ let socket = (io) => {
 
             if (!data.group) {
                 console.log('direct seen!!!')
-                let socketId = users[data.to_username];
+                let toSocketId = users[data.to_username];
+                let fromSocketId = users[data.from_username];
                 await directChatController.updateSeen(data);
-                io.to(socketId).emit('getSeen', data)
-                io.to(users[data.from_username]).emit('getSeen', data)
+                data.direct_messages = await directChatController.getConnectionMessages(
+                    {return: true, connection_id: data.connection_id}
+                );
+                io.to(toSocketId).emit('getSeen', data)
+                io.to(fromSocketId).emit('getSeen', data)
             } else {
                 console.log('group seen!!!')
                 await to(groupChatController.updateSeen(data));

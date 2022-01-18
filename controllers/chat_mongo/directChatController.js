@@ -23,7 +23,7 @@ exports.saveDirectMessage = async (data) => {
     let newMsg = new DirectMessages(data);
     let result = await to(newMsg.save());
     let messages = await DirectMessages.find({
-        connection_id:data.connection_id
+        connection_id: data.connection_id
     }).sort({'created_at': 1});
     return messages;
 };
@@ -77,11 +77,16 @@ exports.getDirectMessages = async (req, res) => {
 };
 
 exports.getConnectionMessages = async (req, res) => {
-    let {connection_id} = req.query || req.connection_id;
+    console.log(req)
+    let {connection_id} = req || req.query;
     let messages = await DirectMessages.find({
         connection_id
     }).sort({'created_at': 1});
-    res.json(messages);
+    if (req.return) {
+        return messages
+    } else {
+        res.json(messages);
+    }
 };
 
 exports.updateSeen = async (data) => {
