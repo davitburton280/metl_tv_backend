@@ -160,10 +160,10 @@ let socket = (io) => {
             } else {
                 let fromUser = users[data.from_username];
                 let toUser = users[data.to_username];
-                let messages = await directChatController.saveDirectMessage(data)
+                data.direct_messages = await directChatController.saveDirectMessage(data)
                 console.log('DIRECT MESSAGE!!!', toUser, fromUser)
-                io.to(toUser).emit('newMessage', messages)
-                io.to(fromUser).emit('newMessage', messages)
+                io.to(toUser).emit('newMessage', data)
+                io.to(fromUser).emit('newMessage', data)
             }
         });
 
