@@ -9,6 +9,7 @@ const validateMessage = require('../../validators/validateChatMessage');
 // router.post('/save-message', validateMessage.rules, directChatController.saveDirectMessage);
 
 router.get('/get-direct-messages', directChatController.getDirectMessages);
+router.get('/get-connection-messages', directChatController.getConnectionMessages);
 router.post('/save-message', validateMessage.rules, directChatController.saveDirectMessage);
 
 module.exports = router;

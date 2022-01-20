@@ -30,15 +30,49 @@ exports.saveDirectMessage = async (data) => {
 
 
 exports.getDirectMessages = async (req, res) => {
-    let {user_id} = req.query;
+    let {user_id, other_user_id} = req.query;
+    let directConnectionIds = [];
 
-    // Get user connections ids
-    let directConnectionsResult = await UsersConnectionMembers.findAll({
-        where: {member_id: user_id},
-        attributes: ['connection_id']
-    });
+    // If want to get one connection messages
+    if (other_user_id) {
 
-    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+        let arr = [
+            {
+                to_id: user_id,
+                from_id: other_user_id
+
+            },
+            {
+                from_id: user_id,
+                to_id: other_user_id,
+            }
+        ];
+
+        let connection = await UsersConnection.findOne({
+            attributes: ['id'],
+            where: {
+                [Op.or]: arr,
+                confirmed: 1
+            },
+        });
+
+        if (connection) {
+            directConnectionIds = [connection.id];
+        }
+
+    }
+
+    // If want to get one user's all connections messages
+    else {
+        // Get user connections ids
+        let directConnectionsResult = await UsersConnectionMembers.findAll({
+            where: {member_id: user_id},
+            attributes: ['connection_id']
+        });
+
+        directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+    }
+
 
     // Gets messages from MongoDb
     let messages = await DirectMessages.find({
