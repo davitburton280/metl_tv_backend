@@ -208,8 +208,12 @@ let socket = (io) => {
             if (!data.group) {
                 let toSocketId = users[data.to_user];
                 let fromSocketId = users[data.from_user];
-                console.log(toSocketId, fromSocketId)
+
                 await directChatController.unreadMessages(data);
+                data.direct_messages = await directChatController.getConnectionMessages(
+                    {return: true, connection_id: data.connection_id}
+                );
+
                 io.to(toSocketId).emit('getSeen', data)
                 io.to(fromSocketId).emit('getSeen', data)
 

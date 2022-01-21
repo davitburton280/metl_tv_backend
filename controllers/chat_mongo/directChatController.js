@@ -133,9 +133,22 @@ exports.updateSeen = async (data) => {
                 {seen: false},
                 {connection_id}
             ],
-        }, {$set: {seen: true, seen_at}}, {multi: true}));
+        }, {$set: {seen: true, seen_at}}));
 
     console.log('updated', updated)
 
+    return !!updated;
+};
+
+exports.unreadMessages = async (data) => {
+    let {message_ids} = data;
+    console.log('unread messages controller!!!', message_ids);
+
+    let updated = await to(DirectMessages.updateMany(
+        {
+            _id: {"$in": message_ids},
+        }, {$set: {seen: false, seen_at:''}}));
+
+    console.log(updated)
     return !!updated;
 };
