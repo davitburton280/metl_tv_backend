@@ -233,12 +233,24 @@ exports.changeJwt = async (data, res, ret = false) => {
 
 exports.getUserInfo = async (req, res) => {
     console.log('get user info!!!!')
-    let data = req.query;
-    let excludeFields = ['password', 'role_id', 'status_id', 'verification_code', 'phone']
+    let {username, own_channel} = req.query;
+    let excludeFields = ['password', 'role_id', 'status_id', 'verification_code', 'phone'];
+
+    let userByUsername = await Users.findOne({where: {username}, attributes: ['id']});
+    console.log(userByUsername)
+
+    let directConnectionsResult = await UsersConnectionMembers.findAll({
+        where: {member_id: userByUsername.id},
+        attributes: ['connection_id']
+    });
+
+    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+
+
     let user = await Users.findOne({
         where:
             [
-                sequelize.where(sequelize.fn('BINARY', sequelize.col('username')), data.username),
+                sequelize.where(sequelize.fn('BINARY', sequelize.col('username')), username),
                 // {name: sequelize.col('videos->privacy.name')}
                 // {'$videos.privacy.name$': 'Public'}
                 // [{model: PrivacyTypes}, sequelize.col(`name`), 'Public']
@@ -255,22 +267,28 @@ exports.getUserInfo = async (req, res) => {
                     {model: PrivacyTypes, as: 'privacy'}
                 ],
                 // where: sequelize.where(sequelize.col('`videos`.`privacy`.`name`'), 'Public')
-            }],
+            },
+            {
+                model: UsersConnection, as: 'users_connections',
+                where: {
+                    id: {[Op.in]: directConnectionIds},
+                    // confirmed: 1
+                },
+            }
+        ],
         order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
     });
 
     if (user) {
         let {videos, ...rest} = user.toJSON();
-        if (!+data.own_channel) {
+        if (!+own_channel) {
             console.log('not own channel')
             let ret = {videos: videos.filter(t => t.privacy.name === 'Public'), ...rest};
             res.json(ret);
         } else {
             res.json(user)
         }
-    }
-
-    else {
+    } else {
         res.status(500).json({msg: 'The channel is not found'})
     }
 };
