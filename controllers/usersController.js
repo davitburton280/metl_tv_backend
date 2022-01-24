@@ -270,6 +270,7 @@ exports.getUserInfo = async (req, res) => {
             },
             {
                 model: UsersConnection, as: 'users_connections',
+                required: false,
                 where: {
                     id: {[Op.in]: directConnectionIds},
                     // confirmed: 1
