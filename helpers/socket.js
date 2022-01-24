@@ -89,7 +89,9 @@ let socket = (io) => {
         socket.on('acceptConnection', async (data) => {
             let username = data.to_user.username;
             let socketId = users[username];
-            let d = await usersController.confirmConnection(data);
+            let confirmedConnection = await usersController.confirmConnection(data);
+            let fromUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.from_user.id});
+            let toUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.to_user.id});
             let notificationData = {
                 connection_id: data.connection_id,
                 initiator_id: data.from_user.id,
@@ -102,9 +104,13 @@ let socket = (io) => {
             });
 
             console.log(users[data.from_user.username], socketId)
-            io.to(users[data.from_user.username]).emit('acceptedConnection', notificationData);
+            io.to(users[data.from_user.username]).emit('acceptedConnection', {
+                ...notificationData,
+                users_messages: fromUserMessages
+            });
             io.to(socketId).emit('acceptedConnection', {
-                ...notificationData, ...JSON.parse(JSON.stringify(n))
+                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                users_messages: toUserMessages
             })
         });
 
@@ -142,12 +148,15 @@ let socket = (io) => {
                 receiver_id: data.to_id,
                 msg: data.msg,
             };
+
+            let toUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.to_id});
             let n = await usersConnectionNotificationsController.saveNotification({
                 ...notificationData,
                 type: 'break_connection'
             });
             io.to(socketId).emit('getDisconnectUsers', {
-                ...notificationData, ...JSON.parse(JSON.stringify(n))
+                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                users_messages: toUserMessages
             });
         });
 
@@ -221,7 +230,9 @@ let socket = (io) => {
         });
 
         socket.on('blockUnblockUser', async (data) => {
+
             let toSocketId = users[data.contact_username];
+            let fromSocketId = users[data.from_username];
             console.log('block/unblock user!!!', data.contact_username, toSocketId)
             console.log(data)
             let notificationData = {
@@ -230,14 +241,20 @@ let socket = (io) => {
                 receiver_id: data.to_id,
                 msg: data.msg,
             };
+            let fromUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.from_id});
+            let toUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.to_id});
             let n = await usersConnectionNotificationsController.saveNotification({
                 ...notificationData,
                 type: 'block_connection'
             });
             // console.log(JSON.parse(JSON.stringify(n))
             io.to(toSocketId).emit('getBlockUnblockUser', {
-                ...notificationData, ...JSON.parse(JSON.stringify(n))
+                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                users_messages: fromUserMessages
             });
+            io.to(fromSocketId).emit('getBlockUnblockUser', {
+                users_messages: toUserMessages
+            })
         });
 
 

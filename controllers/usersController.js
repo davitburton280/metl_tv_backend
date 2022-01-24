@@ -522,9 +522,15 @@ exports.confirmConnection = async (data) => {
         }
     });
 
+    let confirmedConnection = await UsersConnection.findOne({
+        where: {
+            id: data.connection_id
+        }
+    });
+
 
     // return JSON.parse(JSON.stringify(t[0]));
-    return 'OK';
+    return confirmedConnection;
 };
 
 exports.declineConnection = async (data) => {

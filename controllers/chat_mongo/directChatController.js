@@ -30,7 +30,14 @@ exports.saveDirectMessage = async (data) => {
 
 
 exports.getDirectMessages = async (req, res) => {
-    let {user_id, other_user_id} = req.query;
+    let user_id, other_user_id;
+    if (req.return) {
+        user_id = req.user_id;
+    } else {
+        let data = req.query;
+        user_id = data.user_id;
+        other_user_id = data.other_user_id;
+    }
     let directConnectionIds = [];
 
     // If want to get one connection messages
@@ -107,7 +114,11 @@ exports.getDirectMessages = async (req, res) => {
         return uc;
     });
 
-    res.json(result);
+    if (req.return) {
+        return result
+    } else {
+        res.json(result);
+    }
 };
 
 exports.getConnectionMessages = async (req, res) => {
@@ -147,7 +158,7 @@ exports.unreadMessages = async (data) => {
     let updated = await to(DirectMessages.updateMany(
         {
             _id: {"$in": message_ids},
-        }, {$set: {seen: false, seen_at:''}}));
+        }, {$set: {seen: false, seen_at: ''}}));
 
     console.log(updated)
     return !!updated;
