@@ -33,6 +33,7 @@ exports.getDirectMessages = async (req, res) => {
     let user_id, other_user_id;
     if (req.return) {
         user_id = req.user_id;
+        // console.log("USER ID:"+user_id)
     } else {
         let data = req.query;
         user_id = data.user_id;
@@ -78,7 +79,9 @@ exports.getDirectMessages = async (req, res) => {
         });
 
         directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+    // console.log(directConnectionIds)
     }
+
 
 
     // Gets messages from MongoDb
@@ -107,6 +110,8 @@ exports.getDirectMessages = async (req, res) => {
             }
         ]
     });
+
+    // console.log(JSON.parse(JSON.stringify(usersConnections)))
 
     let result = JSON.parse(JSON.stringify(usersConnections)).map(uc => {
         let connection_id = uc.users_connections[0]?.id;
