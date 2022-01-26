@@ -87,8 +87,7 @@ let socket = (io) => {
         });
 
         socket.on('acceptConnection', async (data) => {
-            let username = data.to_user.username;
-            let socketId = users[username];
+            let socketId = users[data.to_user.username];
             let confirmedConnection = await usersController.confirmConnection(data);
             let fromUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.from_user.id});
             let toUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.to_user.id});
