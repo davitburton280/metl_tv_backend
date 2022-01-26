@@ -21,7 +21,14 @@ const nl2br = require('../../helpers/nl2br');
 
 
 exports.getGroupsMessages = async (req, res) => {
-    let {user_id} = req.query;
+    let user_id;
+    if (req.return) {
+        user_id = req.user_id;
+        // console.log("USER ID:"+user_id)
+    } else {
+        let data = req.query;
+        user_id = data.user_id;
+    }
 
     console.log('get groups messages!!!')
 
