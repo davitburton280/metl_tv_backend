@@ -8,7 +8,6 @@
     //    min-height: 100vh;
     //}
 
-
     .img {
         width: 48px;
         height: 48px;
@@ -21,28 +20,12 @@
 
 }
 
-
-
-
-
-.more-btn {
-    //display: none;
-}
-
 .responsive-list {
     flex: 0 0 100% !important;
 
     .more-btn {
         display: block;
     }
-}
-
-.responsive-list + .chat {
-    //display: none!important;
-}
-
-.other-message {
-
 }
 
 .my-message {
@@ -58,3 +41,5 @@
         overflow: hidden !important;
     }
 }
+
+// Todo implement contacts list with infinite scroll
