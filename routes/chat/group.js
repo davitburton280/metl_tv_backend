@@ -6,10 +6,11 @@ router.get('/get-groups-messages', groupChatController.getGroupsMessages);
 router.post('/create-group', groupChatController.createGroup);
 router.delete('/remove-group', groupChatController.removeGroup);
 
+router.get('/get-group-members', groupChatController.getGroupMembers);
+router.post('/add-group-members', groupChatController.addGroupMembers);
+router.delete('/remove-group-member', groupChatController.removeGroupMember);
+
 // router.get('/get-chat-groups', groupChatController.getChatGroups);
-// router.get('/get-group-members', groupChatController.getGroupMembers);
-// router.post('/add-group-members', groupChatController.addGroupMembers);
-// router.delete('/remove-group-member', groupChatController.removeGroupMember);
 // router.delete('/leave-group', groupChatController.leaveGroup);
 // router.post('/change-group-avatar', groupChatController.changeGroupAvatar);
 // router.put('/accept-join-group', groupChatController.acceptGroupJoin);
