@@ -14,7 +14,15 @@ const nl2br = require('../../helpers/nl2br');
 
 
 exports.getGroupsMessages = async (req, res) => {
-    let {user_id} = req.query;
+
+    let user_id;
+    if (req.return) {
+        user_id = req.user_id;
+        // console.log("USER ID:"+user_id)
+    } else {
+        let data = req.query;
+        user_id = data.user_id;
+    }
 
     console.log('get groups messages!!!')
 
@@ -101,4 +109,18 @@ exports.removeGroupMember = async (req, res) => {
     const {group_id, member_id} = req.query;
     await ChatGroupsMembers.destroy({where: {group_id, member_id}});
     this.getGroupMembers(req, res);
+};
+
+exports.leaveGroup = async (req, res) => {
+    const {group_id, member_id} = req.query;
+    let group = await ChatGroups.findOne({where: {id: group_id}, attributes: ['creator_id']});
+    if (+member_id !== group.creator_id) {
+        // await ChatGroups.destroy({where: {id: group_id}});
+        await ChatGroupsMembers.destroy({where: {group_id, member_id}});
+        req.query.user_id = member_id;
+        this.getGroupsMessages(req, res);
+    } else {
+        res.status(500).json({msg: 'The group owner cannot leave the group'});
+    }
+
 };
