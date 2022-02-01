@@ -278,17 +278,17 @@ let socket = (io) => {
             console.log('invite to new group!!!', data);
 
 
-            if (data.group_name) {
+            if (data.group.name) {
                 await Promise.all(data.invited_members.map(async (member) => {
                     let username = member.username;
                     let socketId = users[username];
 
 
                     let notificationData = {
-                        group_id: data.group_id,
+                        group_id: data.group.id,
                         initiator_id: data.from_id,
                         receiver_id: member.id,
-                        msg: `<strong>${data.sender_name}</strong> has sent an invitation to join the <strong>${data.group_name}</strong> group`,
+                        msg: `<strong>${data.sender_name}</strong> has sent an invitation to join the <strong>${data.group.name}</strong> group`,
                     };
 
                     let n = await groupChatNotificationsController.saveNotification({
@@ -296,17 +296,16 @@ let socket = (io) => {
                         type: 'group_join_invitation'
                     });
 
-
                     // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});
                     console.log(username);
                     console.log(socketId)
                     console.log(groupsUsers)
                     io.to(socketId).emit('inviteToGroupSent', {
-                        msg: `You are invited to join the ${data.group_name} group`,
-                        group_id: data.group_id,
+                        msg: `You are invited to join the ${data.group.name} group`,
+                        group_id: data.group.id,
                         ...notificationData,
-                        ...JSON.parse(JSON.stringify(n))
-
+                        ...JSON.parse(JSON.stringify(n)),
+                        group_details: data.group
                     })
                 }))
 

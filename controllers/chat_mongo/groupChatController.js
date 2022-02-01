@@ -129,12 +129,12 @@ exports.acceptGroupJoin = async (req, res) => {
     const {group_id, member_id} = req.body;
     await ChatGroupsMembers.update({confirmed: 1}, {where: {group_id, member_id}});
     req.query.user_id = member_id;
-    this.getChatGroups(req, res);
+    this.getGroupsMessages(req, res);
 };
 
 exports.declineGroupJoin = async (req, res) => {
     const {group_id, member_id} = req.body;
     await ChatGroupsMembers.destroy({where: {group_id, member_id}});
     req.query.user_id = member_id;
-    this.getChatGroups(req, res);
+    this.getGroupsMessages(req, res);
 };
