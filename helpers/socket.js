@@ -23,7 +23,6 @@ let socket = (io) => {
         socket.on('newUser', async (user) => {
             let username = user.username;
             users[username] = socket.id;
-
             console.log('USERS CONNECTED!!!')
             console.log(users)
 
@@ -278,7 +277,7 @@ let socket = (io) => {
             console.log('invite to new group!!!', data);
 
             let {inviter, invited_members, group} = data;
-            let inviterName = inviter.first_name+ ' '+inviter.last_name;
+            let inviterName = inviter.first_name + ' ' + inviter.last_name;
 
 
             if (data.group.name) {
@@ -307,7 +306,7 @@ let socket = (io) => {
                         msg: `You are invited to join the ${group.name} group`,
                         group_id: group.id,
                         ...notificationData,
-                        ...JSON.parse(JSON.stringify(n)),
+                        ...n,
                         group_details: group
                     })
                 }))
@@ -359,15 +358,33 @@ let socket = (io) => {
         });
 
 
-        socket.on('leaveGroup', (data) => {
+        socket.on('leaveGroup', async (data) => {
             console.log('leave group!!!')
-            filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username || u.group !== data.group);
+            let {user, group} = data;
+
+            filteredGroupsUsers = groupsUsers.filter(u => u.username !== user.username || u.group !== group.name);
             groupsUsers = filteredGroupsUsers;
-            socket.leave(data.group);
-            data.msg = `${data.username} has left the group`;
-            data.groupsUsers = filteredGroupsUsers;
-            data.leavingGroup = 1;
-            io.sockets.in(data.group).emit('chatNotification', data);
+            socket.leave(group.name);
+
+            data.leftMembers = filteredGroupsUsers.filter(u => u.group === group.name);
+
+            let notificationData = {
+                group_id: group.id,
+                initiator_id: user.id,
+                msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has left the <strong>${group.name}</strong> group`,
+            };
+
+            let n = await groupChatNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'left_group_invitation'
+            });
+
+            console.log(group.name)
+            io.sockets.in(group.name).emit('leaveGroupNotify', {
+                ...data,
+                ...notificationData,
+                ...n,
+            });
         });
 
         socket.on('removeGroup', async (data) => {

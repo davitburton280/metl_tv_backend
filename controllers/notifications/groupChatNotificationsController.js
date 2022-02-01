@@ -40,7 +40,12 @@ exports.saveNotification = async (data) => {
         where: {id: savedNotification.id},
     });
 
-    return notification;
+    if(notification){
+        return JSON.parse(JSON.stringify(notification))
+    }
+    else {
+        return '';
+    }
 };
 
 exports.getCurrentGroupUsersNotifications = async (data) => {
