@@ -26,7 +26,7 @@ exports.get = async (req, res) => {
     let groupChatNotifs = await groupChatNotificationsController.getCurrentGroupUsersNotifications(user.toJSON());
     let ret = [...new Set([...usersConnectionNotifs, ...groupChatNotifs])];
     //
-    res.json(usersConnectionNotifs);
+    res.json(ret);
 };
 
 exports.read = async (req, res) => {

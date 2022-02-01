@@ -5,6 +5,7 @@ let groupChatController = require('../controllers/chat/groupChatController');
 let usersController = require('../controllers/usersController');
 let directChatController = require('../controllers/chat_mongo/directChatController');
 let usersConnectionNotificationsController = require('../controllers/notifications/usersConnectionNotificationsController');
+let groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController');
 
 
 const db = require('../models');
@@ -89,8 +90,11 @@ let socket = (io) => {
         socket.on('acceptConnection', async (data) => {
             let socketId = users[data.to_user.username];
             let confirmedConnection = await usersController.confirmConnection(data);
-            let fromUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.from_user.id});
-            let toUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.to_user.id});
+            let fromUserMessages = await directChatController.getDirectMessages({
+                return: true,
+                user_id: data.from_user.id
+            });
+            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: data.to_user.id});
             let notificationData = {
                 connection_id: data.connection_id,
                 initiator_id: data.from_user.id,
@@ -148,7 +152,7 @@ let socket = (io) => {
                 msg: data.msg,
             };
 
-            let toUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.to_id});
+            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: data.to_id});
             let n = await usersConnectionNotificationsController.saveNotification({
                 ...notificationData,
                 type: 'break_connection'
@@ -240,8 +244,8 @@ let socket = (io) => {
                 receiver_id: data.to_id,
                 msg: data.msg,
             };
-            let fromUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.from_id});
-            let toUserMessages = await directChatController.getDirectMessages({return: true,user_id: data.to_id});
+            let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: data.from_id});
+            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: data.to_id});
             console.log(fromUserMessages, toUserMessages)
             let n = await usersConnectionNotificationsController.saveNotification({
                 ...notificationData,
@@ -270,21 +274,41 @@ let socket = (io) => {
         });
 
         socket.on('inviteToNewGroup', async (data) => {
+
             console.log('invite to new group!!!', data);
 
-            let group = await ChatGroups.findOne({where: {id: data.group_id}, attributes: ['name']});
-            if (group) {
-                data.members.map(member => {
+
+            if (data.group_name) {
+                await Promise.all(data.invited_members.map(async (member) => {
                     let username = member.username;
                     let socketId = users[username];
+
+
+                    let notificationData = {
+                        group_id: data.group_id,
+                        initiator_id: data.from_id,
+                        receiver_id: member.id,
+                        msg: `<strong>${data.sender_name}</strong> has sent an invitation to join the <strong>${data.group_name}</strong> group`,
+                    };
+
+                    let n = await groupChatNotificationsController.saveNotification({
+                        ...notificationData,
+                        type: 'group_join_invitation'
+                    });
+
+
+                    // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});
                     console.log(username);
                     console.log(socketId)
                     console.log(groupsUsers)
                     io.to(socketId).emit('inviteToGroupSent', {
-                        msg: `You are invited to join the ${group.name} group`,
-                        group_id: data.group_id
+                        msg: `You are invited to join the ${data.group_name} group`,
+                        group_id: data.group_id,
+                        ...notificationData,
+                        ...JSON.parse(JSON.stringify(n))
+
                     })
-                })
+                }))
 
 
                 // io.sockets.in(group.name).emit('inviteToGroupSent', data);
