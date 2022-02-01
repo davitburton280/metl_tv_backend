@@ -277,18 +277,21 @@ let socket = (io) => {
 
             console.log('invite to new group!!!', data);
 
+            let {inviter, invited_members, group} = data;
+            let inviterName = inviter.first_name+ ' '+inviter.last_name;
+
 
             if (data.group.name) {
-                await Promise.all(data.invited_members.map(async (member) => {
+                await Promise.all(invited_members.map(async (member) => {
                     let username = member.username;
                     let socketId = users[username];
 
 
                     let notificationData = {
-                        group_id: data.group.id,
-                        initiator_id: data.from_id,
+                        group_id: group.id,
+                        initiator_id: inviter.id,
                         receiver_id: member.id,
-                        msg: `<strong>${data.sender_name}</strong> has sent an invitation to join the <strong>${data.group.name}</strong> group`,
+                        msg: `<strong>${inviterName}</strong> has sent an invitation to join the <strong>${group.name}</strong> group`,
                     };
 
                     let n = await groupChatNotificationsController.saveNotification({
@@ -301,11 +304,11 @@ let socket = (io) => {
                     console.log(socketId)
                     console.log(groupsUsers)
                     io.to(socketId).emit('inviteToGroupSent', {
-                        msg: `You are invited to join the ${data.group.name} group`,
-                        group_id: data.group.id,
+                        msg: `You are invited to join the ${group.name} group`,
+                        group_id: group.id,
                         ...notificationData,
                         ...JSON.parse(JSON.stringify(n)),
-                        group_details: data.group
+                        group_details: group
                     })
                 }))
 
