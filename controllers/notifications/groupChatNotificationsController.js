@@ -78,3 +78,7 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
     // });
     // return notifications;
 };
+
+exports.removeAllNotifications = async (user_id) => {
+    await GroupChatNots.destroy({where: {to_id: user_id}});
+};
