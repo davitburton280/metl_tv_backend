@@ -346,7 +346,7 @@ let socket = (io) => {
 
             // data.msg = `${username} has joined the group`;
             data.groupsUsers = groupsUsers;
-            data.groupMembers = groupsUsers.filter(u => u.group === group.name);
+            data.groupMembers = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             io.sockets.in(group.name).emit('acceptedJoinGroup', {
                 ...data,
                 ...notificationData,
