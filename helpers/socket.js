@@ -1,7 +1,7 @@
 let users = [];
 let groupsUsers = [];
 let filteredGroupsUsers = [];
-let groupChatController = require('../controllers/chat/groupChatController');
+let groupChatController = require('../controllers/chat_mongo/groupChatController');
 let usersController = require('../controllers/usersController');
 let directChatController = require('../controllers/chat_mongo/directChatController');
 let usersConnectionNotificationsController = require('../controllers/notifications/usersConnectionNotificationsController');
@@ -27,7 +27,7 @@ let socket = (io) => {
             console.log(users)
 
             if (user.group) {
-                let groups = await groupChatController.getChatGroups({user_id: user.id});
+                let groups = await groupChatController.getGroupsMessages({return: true, user_id: user.id});
                 groups.map(g => {
                     let group = g.name;
                     socket.join(g.name);
@@ -208,7 +208,7 @@ let socket = (io) => {
                 io.to(fromSocketId).emit('getSeen', data)
             } else {
                 console.log('group seen!!!')
-                await to(groupChatController.updateSeen(data));
+                // await to(groupChatController.updateSeen(data));
                 io.to(data.group).emit('getSeen', data)
             }
 
@@ -318,42 +318,84 @@ let socket = (io) => {
 
         socket.on('acceptJoinGroup', async (data) => {
             console.log('joining group!!!');
-            let socketId = users[data.username]; //socket.id
-            let theSocket = io.sockets.sockets.get(socketId)
-            theSocket.join(data.group);
-            console.log(await io.in(data.group).allSockets())
-            console.log(socketId, socket.id)
-            if (!groupsUsers.find(gu => gu.username === data.username && gu.group === data.group)) {
-                groupsUsers.push({id: socketId, username: data.username, group: data.group});
+
+            let {user, group} = data;
+
+            let socketId = users[user.username]; //socket.id
+            let theSocket = io.sockets.sockets.get(socketId);
+            theSocket.join(group.name);
+            // console.log(await io.in(group.name).allSockets())
+            // console.log(socketId, socket.id)
+            if (!groupsUsers.find(gu => gu.username === user.username && gu.group === group.name)) {
+                groupsUsers.push({id: socketId, username: user.username, group: group.name});
             }
             console.log(groupsUsers)
             console.log(socketId)
 
-            data.msg = `${data.username} has joined the group`;
+            let notificationData = {
+                group_id: group.id,
+                initiator_id: user.id,
+                msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has accepted to join the <strong>${group.name}</strong> group`,
+            };
+
+            let n = await groupChatNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'accept_group_invitation'
+            });
+
+
+            // data.msg = `${username} has joined the group`;
             data.groupsUsers = groupsUsers;
-            data.acceptingJoinGroup = 1;
-            io.sockets.in(data.group).emit('chatNotification', data);
-            // io.to(socketId).emit('chatNotification', data)
+            data.groupMembers = groupsUsers.filter(u => u.group === group.name);
+            io.sockets.in(group.name).emit('acceptedJoinGroup', {
+                ...data,
+                ...notificationData,
+                ...n,
+            });
+            // io.to(socketId).emit('acceptJoinGroup', data)
         });
 
         socket.on('declineJoinGroup', async (data) => {
-            console.log('decline joining group!!!');
-            let socketId = users[data.username]; //socket.id
+            console.log('decline joining group!!!', data);
+
+            let {user, group} = data;
+
+
+            let socketId = users[user.username]; //socket.id
             let theSocket = io.sockets.sockets.get(socketId)
-            theSocket.join(data.group);
-            console.log(await io.in(data.group).allSockets())
-            console.log(socketId, socket.id)
-            if (!groupsUsers.find(gu => gu.username === data.username && gu.group === data.group)) {
-                filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username || u.group !== data.group);
+            // theSocket.join(group.name);
+            // console.log(await io.in(data.group).allSockets())
+            // console.log(socketId, socket.id)
+            data.groupMembers = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            if (!groupsUsers.find(gu => gu.username === user.username && gu.group === group.name)) {
+                filteredGroupsUsers = groupsUsers.filter(u => u.username !== user.username || u.group !== group.name);
                 // groupsUsers.push({id: socketId, username: data.username, group: data.group});
             }
             console.log(filteredGroupsUsers)
-            console.log(socketId)
+            // console.log(socketId)
 
-            data.msg = `${data.username} has declined joining the group`;
+
+            let notificationData = {
+                group_id: group.id,
+                initiator_id: user.id,
+                msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has declined joining the <strong>${group.name}</strong> group`,
+            };
+
+            let n = await groupChatNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'decline_group_invitation'
+            });
+
+
+            // data.msg = `${data.username} has declined joining the group`;
             data.groupsUsers = filteredGroupsUsers;
-            data.decliningJoinGroup = 1;
-            io.sockets.in(data.group).emit('chatNotification', data);
+            // data.decliningJoinGroup = 1;
+            console.log('declined!!!', group.name)
+            io.sockets.in(group.name).emit('getDeclinedJoinGroup', {
+                ...data,
+                ...notificationData,
+                ...n,
+            });
             // io.to(socketId).emit('chatNotification', data)
         });
 
@@ -376,7 +418,7 @@ let socket = (io) => {
 
             let n = await groupChatNotificationsController.saveNotification({
                 ...notificationData,
-                type: 'left_group_invitation'
+                type: 'left_group'
             });
 
             console.log(group.name)

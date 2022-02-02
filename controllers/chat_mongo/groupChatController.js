@@ -51,7 +51,11 @@ exports.getGroupsMessages = async (req, res) => {
         ]
     });
 
-    res.json(groupsMessages)
+    if (req.return) {
+        return groupsMessages;
+    } else {
+        res.json(groupsMessages)
+    }
 
 };
 
@@ -77,7 +81,12 @@ exports.removeGroup = async (req, res) => {
 
 exports.getGroupMembers = async (req, res) => {
     console.log('get group members!!!');
-    const {group_id} = req.query;
+    let group_id;
+    if (req.return) {
+        group_id = req.group_id;
+    } else {
+        group_id = req.query.group_id;
+    }
 
     let members = await ChatGroups.findOne({
         include: [
@@ -91,7 +100,12 @@ exports.getGroupMembers = async (req, res) => {
         where: {id: group_id}
     });
 
-    res.json(members);
+    if (req.return) {
+        return members;
+    } else {
+
+        res.json(members);
+    }
 };
 
 exports.addGroupMembers = async (req, res) => {
@@ -137,4 +151,6 @@ exports.declineGroupJoin = async (req, res) => {
     await ChatGroupsMembers.destroy({where: {group_id, member_id}});
     req.query.user_id = member_id;
     this.getGroupsMessages(req, res);
+    // req.query.group_id = group_id;
+    // this.getGroupMembers(req, res);
 };
