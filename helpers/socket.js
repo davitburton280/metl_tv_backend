@@ -346,7 +346,8 @@ let socket = (io) => {
 
             // data.msg = `${username} has joined the group`;
             data.groupsUsers = groupsUsers;
-            data.groupMembers = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+
             io.sockets.in(group.name).emit('acceptedJoinGroup', {
                 ...data,
                 ...notificationData,
@@ -367,7 +368,7 @@ let socket = (io) => {
             // theSocket.join(group.name);
             // console.log(await io.in(data.group).allSockets())
             // console.log(socketId, socket.id)
-            data.groupMembers = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             if (!groupsUsers.find(gu => gu.username === user.username && gu.group === group.name)) {
                 filteredGroupsUsers = groupsUsers.filter(u => u.username !== user.username || u.group !== group.name);
                 // groupsUsers.push({id: socketId, username: data.username, group: data.group});
@@ -410,6 +411,10 @@ let socket = (io) => {
             socket.leave(group.name);
 
             data.leftMembers = filteredGroupsUsers.filter(u => u.group === group.name);
+
+
+            const leftGroupMembers = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            data.group = JSON.parse(JSON.stringify(leftGroupMembers));
 
             let notificationData = {
                 group_id: group.id,
