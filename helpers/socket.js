@@ -359,6 +359,7 @@ let socket = (io) => {
             console.log('decline joining group!!!', data);
 
             let {user, group} = data;
+            console.log(data)
 
 
             let socketId = users[user.username]; //socket.id
