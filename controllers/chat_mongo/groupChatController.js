@@ -159,3 +159,14 @@ exports.declineGroupJoin = async (req, res) => {
     // req.query.group_id = group_id;
     // this.getGroupMembers(req, res);
 };
+
+exports.changeGroupAvatar = async (req, res) => {
+
+    uploadGroupAvatar(req, res, async (err) => {
+
+        const {avatar, group_id, member_id} = req.body;
+        let t = await to(ChatGroups.update({avatar: avatar}, {where: {id: group_id}}));
+        req.query.user_id = member_id;
+        this.getGroupsMessages(req, res);
+    })
+};

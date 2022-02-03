@@ -16,7 +16,7 @@ router.put('/decline-join-group', groupChatController.declineGroupJoin);
 router.delete('/leave-group', groupChatController.leaveGroup);
 
 
-// router.post('/change-group-avatar', groupChatController.changeGroupAvatar);
+router.post('/change-group-avatar', groupChatController.changeGroupAvatar);
 // router.get('/get-chat-groups', groupChatController.getChatGroups);
 // router.post('/save-message', groupChatController.saveGroupMessage);
 

@@ -61,6 +61,7 @@ exports.remove = async (req, res) => {
         req.query.user_id = userNotificationsResult;
     }
 
+
     this.get(req, res);
     // console.log(req.body)
 };

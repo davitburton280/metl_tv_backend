@@ -6,8 +6,11 @@ module.exports = {
     FMP_URL: 'https://financialmodelingprep.com/',
     FMP_API_V3_URL: 'https://financialmodelingprep.com/api/v3/',
     MAX_STOCKS_COUNT_FOR_BATCH: 14,
-    USER_CONNECTION_NOTIFICATION_TYPES : [
-        'accept_connection_request', 'decline_connection_request','break_connection'
-    ]
+    USER_CONNECTION_NOTIFICATION_TYPES: [
+        'accept_connection_request', 'decline_connection_request', 'break_connection'
+    ],
+    // GROUP_CHAT_NOTIFICATION_TYPES: [
+    //     'accept_group_invitation', 'decline_group_invitation'
+    // ]
 };
 
