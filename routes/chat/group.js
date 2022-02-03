@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const groupChatController = require('../../controllers/chat_mongo/groupChatController');
+const validateChatGroupName = require('../../validators/validateChatGroupName');
 
 router.get('/get-groups-messages', groupChatController.getGroupsMessages);
-router.post('/create-group', groupChatController.createGroup);
+router.post('/create-group', validateChatGroupName.rules, groupChatController.createGroup);
 router.delete('/remove-group', groupChatController.removeGroup);
 
 router.get('/get-group-members', groupChatController.getGroupMembers);

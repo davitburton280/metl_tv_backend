@@ -12,6 +12,8 @@ const moment = require('moment');
 const to = require('../../helpers/getPromiseResult');
 const nl2br = require('../../helpers/nl2br');
 
+const showIfErrors = require('../../helpers/showIfErrors');
+
 
 exports.getGroupsMessages = async (req, res) => {
 
@@ -60,13 +62,16 @@ exports.getGroupsMessages = async (req, res) => {
 };
 
 exports.createGroup = async (req, res) => {
-    let data = req.body;
-    let group = await ChatGroups.create(data);
-    console.log(data)
-    await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id, confirmed: 1}));
-    req.query.user_id = data.creator_id;
-    // this.getChatGroups(req, res);
-    this.getGroupsMessages(req, res);
+    if (!showIfErrors(req, res)) {
+        let data = req.body;
+        let group = await ChatGroups.create(data);
+        console.log(data)
+        await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id, confirmed: 1}));
+        req.query.user_id = data.creator_id;
+        // this.getChatGroups(req, res);
+        this.getGroupsMessages(req, res);
+    }
+
 };
 
 exports.removeGroup = async (req, res) => {

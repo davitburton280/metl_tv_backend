@@ -456,15 +456,14 @@ let socket = (io) => {
             filteredGroupsUsers = groupsUsers.filter(u => u.group !== data.group);
             groupsUsers = filteredGroupsUsers;
             console.log(groupsUsers)
-            data.msg = `${data.username} has removed the group`;
-            data.groupRemoved = 1;
+
             data.groupsUsers = filteredGroupsUsers;
 
+            io.sockets.in(group).emit('removeGroupNotify', data);
             console.log(await io.in(group).allSockets());
-            io.sockets.in(group).emit('chatNotification', data);
             io.in(group).socketsLeave(group);
             console.log('sockets leaved the group!!!')
-            console.log(await io.in(group).allSockets())
+            console.log(await io.in(group).allSockets());
         });
 
         socket.on('forceDisconnect', (data) => {
