@@ -452,20 +452,21 @@ let socket = (io) => {
         });
 
         socket.on('removeGroup', async (data) => {
-            console.log('remove group!!!', data.group)
-            let group = data.group;
+            console.log('remove group!!!', data)
+            let {initiator, group} = data;
             console.log(groupsUsers)
-            filteredGroupsUsers = groupsUsers.filter(u => u.group !== data.group);
+            filteredGroupsUsers = groupsUsers.filter(u => u.group !== group.name);
             groupsUsers = filteredGroupsUsers;
             console.log(groupsUsers)
 
             data.groupsUsers = filteredGroupsUsers;
 
-            io.sockets.in(group).emit('removeGroupNotify', data);
-            console.log(await io.in(group).allSockets());
-            io.in(group).socketsLeave(group);
+
+            io.sockets.in(group.name).emit('removeGroupNotify', data);
+            console.log(await io.in(group.name).allSockets());
+            io.in(group).socketsLeave(group.name);
             console.log('sockets leaved the group!!!')
-            console.log(await io.in(group).allSockets());
+            console.log(await io.in(group.name).allSockets());
         });
 
         socket.on('forceDisconnect', (data) => {
