@@ -156,8 +156,6 @@ exports.declineGroupJoin = async (req, res) => {
     await ChatGroupsMembers.destroy({where: {group_id, member_id}});
     req.query.user_id = member_id;
     this.getGroupsMessages(req, res);
-    // req.query.group_id = group_id;
-    // this.getGroupMembers(req, res);
 };
 
 exports.changeGroupAvatar = async (req, res) => {

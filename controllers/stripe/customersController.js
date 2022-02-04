@@ -35,7 +35,7 @@ exports.getCustomerCards = async (req, res) => {
         res.json(userCards)
     }
 
-}
+};
 
 exports.getCardDetails = async (req, res) => {
     let {card_id} = req.query;
