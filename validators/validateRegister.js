@@ -19,8 +19,8 @@ const rules = [
     body('password')
         .matches(NO_SPACE_PATTERN).withMessage('Password should not contain spaces')
         .not().isEmpty().withMessage('Password is required'),
-    body('birthday')
-        .not().isEmpty().withMessage('Birth day is required'),
+    // body('birthday')
+    //     .not().isEmpty().withMessage('Birth day is required'),
     body().custom(async (req) => {
         let email = req.email;
 
