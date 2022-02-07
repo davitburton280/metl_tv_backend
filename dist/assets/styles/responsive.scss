@@ -9,7 +9,6 @@
 }
 
 
-
 @media (max-width: 1700px) {
     nav.home-header {
         padding: 0 100px !important;
@@ -38,7 +37,7 @@
         justify-content: space-around;
     }
     nav.home-header {
-        padding: 20px 50px!important;
+        padding: 20px 50px !important;
     }
     .body-content {
         padding: 0 50px !important;
@@ -170,6 +169,7 @@
     }
     .body-content-right {
         width: 100% !important;
+        overflow-y: auto !important;
         //margin-top: 40px;
     }
     #left-menu {
@@ -182,9 +182,6 @@
         width: 80%;
         margin: 30px auto 10px;
         text-align: left;
-    }
-    .main-carousel .owl-nav button.owl-next {
-        display: none;
     }
 
     .trending-text {
@@ -205,11 +202,7 @@
     .channel-block {
         max-width: 100%;
     }
-    .owl-item .channel-block {
-        justify-content: left;
-        max-width: 100%;
-        margin: 10px 0;
-    }
+
     .categories {
         width: 80%;
         margin: 0 auto 20px;
@@ -259,6 +252,7 @@
         justify-content: space-between;
     }
 }
+
 @media screen and (min-width: 320px) and (max-width: 374px) {
     nav.home-header {
         padding: 20px 20px !important;
