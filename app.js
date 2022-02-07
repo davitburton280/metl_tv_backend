@@ -89,6 +89,7 @@ const mongoose = require('mongoose');
 
 //Set up default mongoose connection
 const mongoDB = `mongodb://${process.env.MONGO_IP_PORT}/metltv_chat`;
+console.log(mongoDB)
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then(t=>{
     console.log(mongoose.connection.readyState)
     console.log('mongo connected')

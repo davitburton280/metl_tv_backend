@@ -6,7 +6,7 @@ const Users = db.users;
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
 
-const GroupMessages = require('../../mongoose_chat/group_chat_messages');
+const GroupsMessages = require('../../mongoose_chat/group_chat_messages');
 const moment = require('moment');
 
 const to = require('../../helpers/getPromiseResult');
@@ -53,10 +53,21 @@ exports.getGroupsMessages = async (req, res) => {
         ]
     });
 
+    // Gets messages from MongoDb
+    let messages = await GroupsMessages.find({
+        group_id: chatGroups
+    }).sort({'created_at': 1});
+
+    let result = JSON.parse(JSON.stringify(groupsMessages)).map(uc => {
+        let group_id = uc.id;
+        uc.group_messages = messages.filter(msg => msg.toObject().group_id === group_id);
+        return uc;
+    });
+
     if (req.return) {
-        return groupsMessages;
+        return result;
     } else {
-        res.json(groupsMessages)
+        res.json(result)
     }
 
 };

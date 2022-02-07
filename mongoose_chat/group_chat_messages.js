@@ -38,4 +38,4 @@ let MessagesSchema = new mongoose.Schema({
 
 }, {timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}});
 
-module.exports = mongoose.model('GroupMessages', MessagesSchema, 'group_chat_messages');
+module.exports = mongoose.model('GroupsMessages', MessagesSchema, 'group_chat_messages');
