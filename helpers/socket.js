@@ -164,10 +164,11 @@ let socket = (io) => {
 
 
         socket.on('sendMessage', async (data) => {
-            let group = data.group;
+            let group = data.group_id;
             if (group) {
                 console.log('GROUP MESSAGE!!!')
-                io.to(group).emit('newMessage', data)
+                data.group_messages = await groupChatController.saveGroupMessage(data)
+                io.to(data.group_name).emit('newMessage', data)
             } else {
                 let fromUser = users[data.from_username];
                 let toUser = users[data.to_username];

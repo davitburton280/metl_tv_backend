@@ -179,3 +179,23 @@ exports.changeGroupAvatar = async (req, res) => {
         this.getGroupsMessages(req, res);
     })
 };
+
+
+exports.saveGroupMessage = async (data) => {
+    // data.seen_at = '';
+    data.message = nl2br(data.message, false);
+    console.log(data)
+    let newMsg = new GroupsMessages({
+        ...data,
+        seen: {
+            seen: false,
+            seen_at: ''
+        }
+    });
+    let result = await to(newMsg.save());
+    console.log(result)
+    let messages = await GroupsMessages.find({
+        group_id: data.group_id
+    }).sort({'created_at': 1});
+    return messages;
+};

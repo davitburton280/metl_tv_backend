@@ -10,10 +10,14 @@ let MessagesSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    // from_user_id: {
-    //     type: Number,
-    //     required: true
-    // },
+    from_first_name: {
+        type: String,
+        required: true
+    },
+    from_last_name: {
+        type: String,
+        required: true
+    },
     message: {
         type: String
     },
