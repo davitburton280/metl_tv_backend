@@ -91,7 +91,7 @@ const mongoose = require('mongoose');
 let mongoDB = `mongodb://${process.env.MONGO_IP_PORT}/metltv_chat`;
 
 if (process.env.NODE_ENV === 'production') {
-    mongoDB = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_IP_PORT}/metltv_chat`;
+    mongoDB = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@127.0.0.1/metltv_chat`;
 }
 
 
