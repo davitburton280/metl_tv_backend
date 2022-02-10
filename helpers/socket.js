@@ -167,7 +167,7 @@ let socket = (io) => {
             let group = data.group_id;
             if (group) {
                 data.group_messages = await groupChatController.saveGroupMessage(data);
-                console.log('GROUP MESSAGE!!!', data.group_messages)
+                console.log('GROUP MESSAGE!!!', data.group_name)
                 io.to(data.group_name).emit('newMessage', data)
             } else {
                 let fromUser = users[data.from_username];
@@ -183,8 +183,11 @@ let socket = (io) => {
         socket.on('setTyping', (data) => {
 
             if (!data.group_name) {
-                let socketId = users[data.to_username];
-                io.to(socketId).emit('getTyping', data)
+                let toUser = users[data.to_username];
+                let fromUser = users[data.from_username];
+                console.log('typing', toUser, fromUser)
+                io.to(toUser).emit('getTyping', data)
+                io.to(fromUser).emit('getTyping', data)
             } else {
                 console.log('typing', data.group_name)
                 // io.to(data.group_name).emit('getTyping', data)
