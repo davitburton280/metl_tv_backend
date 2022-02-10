@@ -187,15 +187,49 @@ exports.saveGroupMessage = async (data) => {
     console.log(data)
     let newMsg = new GroupsMessages({
         ...data,
-        seen: {
-            seen: false,
-            seen_at: ''
-        }
+        seen: []
     });
     let result = await to(newMsg.save());
-    console.log(result)
+    console.log("RESULT", result)
     let messages = await GroupsMessages.find({
         group_id: data.group_id
     }).sort({'created_at': 1});
     return messages;
+};
+
+exports.getGroupMessages = async (req, res) => {
+
+    let {group_id} = req || req.query;
+    let messages = await GroupsMessages.find({
+        group_id
+    }).populate({path: 'seen'}).sort({'created_at': 1});
+
+    if (req.return) {
+        return messages
+    } else {
+        res.json(messages);
+    }
+};
+
+exports.updateSeen = async (data) => {
+
+    let {message_id, seen_at, from_id} = data;
+    let seen_by = {
+        id: from_id,
+        first_name: data.from_first_name,
+        last_name: data.from_last_name,
+        avatar: data.from_avatar
+    };
+    console.log('update seen!!!', data)
+    let foundMessage = await GroupsMessages.findById(message_id);
+
+    if (!foundMessage.seen.find(s => s.seen_by.id === seen_by.id)) {
+        foundMessage.seen.push({
+            seen_by, seen_at
+        });
+    }
+    let updated = await to(foundMessage.save());
+    console.log(updated)
+
+    return updated;
 };

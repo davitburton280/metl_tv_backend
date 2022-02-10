@@ -18,6 +18,9 @@ let MessagesSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    from_avatar: {
+        type: String
+    },
     message: {
         type: String
     },
@@ -30,7 +33,12 @@ let MessagesSchema = new mongoose.Schema({
     },
     seen: [
         {
-            seen_by: {type: Number},
+            seen_by: {
+                avatar: {type: String},
+                first_name: {type: String},
+                last_name: {type: String},
+                id: {type: Number}
+            },
             seen_at: {type: String}
         }
     ],

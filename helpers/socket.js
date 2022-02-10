@@ -167,7 +167,7 @@ let socket = (io) => {
             let group = data.group_id;
             if (group) {
                 data.group_messages = await groupChatController.saveGroupMessage(data);
-                console.log('GROUP MESSAGE!!!',  data.group_messages)
+                console.log('GROUP MESSAGE!!!', data.group_messages)
                 io.to(data.group_name).emit('newMessage', data)
             } else {
                 let fromUser = users[data.from_username];
@@ -198,7 +198,7 @@ let socket = (io) => {
             console.log('set seen', data)
 
 
-            if (!data.group) {
+            if (!data.group_id) {
                 console.log('direct seen!!!')
                 let toSocketId = users[data.to_username];
                 let fromSocketId = users[data.from_username];
@@ -209,9 +209,12 @@ let socket = (io) => {
                 io.to(toSocketId).emit('getSeen', data)
                 io.to(fromSocketId).emit('getSeen', data)
             } else {
-                console.log('group seen!!!')
-                // await to(groupChatController.updateSeen(data));
-                io.to(data.group).emit('getSeen', data)
+                console.log('group seen!!!', data.group_name)
+                await to(groupChatController.updateSeen(data));
+                data.group_messages = await groupChatController.getGroupMessages(
+                    {return: true, group_id: data.group_id}
+                );
+                io.sockets.in(data.group_name).emit('getSeen', data)
             }
 
         });
