@@ -213,7 +213,7 @@ exports.getGroupMessages = async (req, res) => {
 
 exports.updateSeen = async (data) => {
 
-    let {message_id, seen_at, from_id} = data;
+    let {message_id, seen_at, from_id, group_id} = data;
     let seen_by = {
         id: from_id,
         first_name: data.from_first_name,
@@ -229,7 +229,40 @@ exports.updateSeen = async (data) => {
         });
     }
     let updated = await to(foundMessage.save());
-    console.log(updated)
+
+
+    // updated = await to(GroupsMessages.updateMany(
+    //    {
+    //        "$and": [
+    //            {group_id}
+    //        ],
+    //    }, {$set: {seen: true, seen_at}}));
+
+    let notOwnedMessages = await to(GroupsMessages.find({
+        "$and": [
+            {group_id},
+            {
+                from_id: {"$ne": from_id}
+                // "$ne": [
+                //     {from_id}
+                // ]
+            }
+        ],
+    }));
+
+
+    let groupUnseenMessages = notOwnedMessages.filter(gm => !gm.seen.find(g => g.seen_by.id === from_id));
+
+    await Promise.all(groupUnseenMessages.map(async (gum) => {
+        gum.seen.push({
+            seen_by, seen_at
+        });
+        await to(gum.save());
+    }))
+
+    console.log('!!!!!')
+    console.log(groupUnseenMessages)
+    console.log('!!!!!')
 
     return updated;
 };
