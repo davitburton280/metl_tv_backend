@@ -180,7 +180,7 @@ let socket = (io) => {
         });
 
 
-        socket.on('setTyping', (data) => {
+        socket.on('setTyping', async(data) => {
 
             if (!data.group_name) {
                 let toUser = users[data.to_username];
@@ -189,9 +189,10 @@ let socket = (io) => {
                 io.to(toUser).emit('getTyping', data)
                 io.to(fromUser).emit('getTyping', data)
             } else {
-                console.log('typing', data.group_name)
-                // io.to(data.group_name).emit('getTyping', data)
-                io.sockets.in(data.group_name).emit('getTyping', data)
+                console.log('typing', groupsUsers)
+                io.to(data.group_name).emit('getTyping', data)
+                console.log(await io.in(data.group_name).allSockets());
+                // io.sockets.in(data.group_name).emit('getTyping', data)
             }
 
 
