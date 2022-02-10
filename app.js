@@ -95,7 +95,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 
-console.log(mongoDB)
+console.log("MONGO URL",mongoDB)
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then(t => {
     console.log(mongoose.connection.readyState)
     console.log('mongo connected')
