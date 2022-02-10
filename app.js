@@ -88,10 +88,10 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 50
 const mongoose = require('mongoose');
 
 //Set up default mongoose connection
-let mongoDB = `mongodb://${process.env.MONGO_IP_PORT}/admin`;
+let mongoDB = `mongodb://${process.env.MONGO_IP_PORT}/metltv_chat`;
 
 if (process.env.NODE_ENV === 'production') {
-    mongoDB = `mongodb://${encodeURIComponent(process.env.MONGO_USER)}:${encodeURIComponent(process.env.MONGO_PASS)}@${process.env.MONGO_IP_PORT}/metltv_chat`;
+    mongoDB = `mongodb://${encodeURIComponent(process.env.MONGO_USER)}:${encodeURIComponent(process.env.MONGO_PASS)}@${process.env.MONGO_IP_PORT}/admin`;
 }
 
 
