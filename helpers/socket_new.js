@@ -215,6 +215,26 @@ let socket = (io) => {
             })
         });
 
+        socket.on('unreadLastMessages', async (data) => {
+            console.log('unread messages!!!')
+            let {from_username, to_username} = data;
+            if (!data.group) {
+
+                let toUserSocketId = getSocketId(to_username);
+                let fromUserSocketId = getSocketId(from_username);
+
+                await directChatController.unreadMessages(data);
+                data.direct_messages = await directChatController.getConnectionMessages(
+                    {return: true, connection_id: data.connection_id}
+                );
+
+                console.log(toUserSocketId, fromUserSocketId)
+                io.to(toUserSocketId).emit('getSeen', data)
+                io.to(fromUserSocketId).emit('getSeen', data)
+
+            }
+        });
+
         socket.on('setSeen', async (data) => {
             console.log('set seen', data)
 
@@ -224,7 +244,6 @@ let socket = (io) => {
                 console.log('direct seen!!!')
                 let fromUserSocketId = getSocketId(from_username);
                 let toUserSocketId = getSocketId(to_username);
-
 
                 await directChatController.updateSeen(data);
                 data.direct_messages = await directChatController.getConnectionMessages(
