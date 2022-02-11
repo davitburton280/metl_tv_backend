@@ -215,6 +215,34 @@ let socket = (io) => {
             })
         });
 
+        socket.on('setSeen', async (data) => {
+            console.log('set seen', data)
+
+            let {from_username, to_username,connection_id, group_name} = data;
+
+            if (!group_name) {
+                console.log('direct seen!!!')
+                let fromUserSocketId = getSocketId(from_username);
+                let toUserSocketId = getSocketId(to_username);
+
+
+                await directChatController.updateSeen(data);
+                data.direct_messages = await directChatController.getConnectionMessages(
+                    {return: true, connection_id}
+                );
+                io.to(toUserSocketId).emit('getSeen', data)
+                io.to(fromUserSocketId).emit('getSeen', data)
+            } else {
+                console.log('group seen!!!', group_name)
+                await to(groupChatController.updateSeen(data));
+                data.group_messages = await groupChatController.getGroupMessages(
+                    {return: true, group_id: data.group_id}
+                );
+                io.sockets.in(group_name).emit('getSeen', data)
+            }
+
+        });
+
         socket.on('setTyping', async (data) => {
 
             let {from_username, to_username, group_name} = data;
@@ -224,14 +252,35 @@ let socket = (io) => {
                 let fromUserSocketId = getSocketId(from_username);
                 let toUserSocketId = getSocketId(to_username);
 
-                console.log('typing', to_username + '=>' + toUserSocketId, fromUserSocketId, data.message)
+                // console.log('typing', to_username + '=>' + toUserSocketId, fromUserSocketId, data.message)
                 io.to(toUserSocketId).emit('getTyping', data)
                 io.to(fromUserSocketId).emit('getTyping', data)
             } else {
                 // console.log('typing', groupsUsers)
-                console.log(await io.in(group_name).allSockets());
+                // console.log(await io.in(group_name).allSockets());
                 // io.to(group_name).emit('getTyping', data)
                 io.sockets.in(group_name).emit('getTyping', data)
+            }
+        });
+
+        socket.on('sendMessage', async (data) => {
+
+            let {from_username, to_username, group_name, group_id} = data;
+            // console.log(data)
+            if (!group_id) {
+
+                let fromUserSocketId = getSocketId(from_username);
+                let toUserSocketId = getSocketId(to_username);
+
+                data.direct_messages = await directChatController.saveDirectMessage(data)
+                console.log('DIRECT MESSAGE!!!', toUserSocketId, fromUserSocketId)
+                io.to(toUserSocketId).emit('newMessage', data)
+                io.to(fromUserSocketId).emit('newMessage', data)
+
+            } else {
+                data.group_messages = await groupChatController.saveGroupMessage(data);
+                console.log('GROUP MESSAGE!!!', group_name)
+                io.to(group_name).emit('newMessage', data)
             }
         });
     })
