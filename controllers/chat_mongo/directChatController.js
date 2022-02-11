@@ -127,7 +127,7 @@ exports.getDirectMessages = async (req, res) => {
 };
 
 exports.getConnectionMessages = async (req, res) => {
-    console.log(req)
+    // console.log(req)
     let {connection_id} = req || req.query;
     let messages = await DirectMessages.find({
         connection_id

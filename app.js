@@ -25,7 +25,8 @@ const io = require('socket.io')(server, {
         origin: '*'
     }
 });
-const {socket} = require('./helpers/socket');
+// const {socket} = require('./helpers/socket');
+const {socket} = require('./helpers/socket_new');
 socket(io);
 
 // const redis = require('redis');

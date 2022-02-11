@@ -66,9 +66,9 @@ const usersConnectionNotifsController = require('../controllers/notifications/us
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
-    console.log('OK')
-    console.log(req.query)
-    console.log('ROLE:' + role + '!!!!!')
+    // console.log('OK')
+    // console.log(req.query)
+    // console.log('ROLE:' + role + '!!!!!')
     let user = await Users.findOne({
         where: {email: email}
     }, res);
@@ -77,8 +77,8 @@ exports.getSession = async (req, res) => {
     const tokenOptions = {
         data: JSON.stringify({serverData: {username: user.username}}),
     };
-    console.log(tokenOptions)
-    console.log(mapSessions)
+    // console.log(tokenOptions)
+    // console.log(mapSessions)
 
 
     // console.log(tokenOptions)
@@ -451,7 +451,7 @@ exports.checkIfUsersConnected = async (req, res = null) => {
         ]
     });
 
-    console.log(JSON.parse(JSON.stringify(usersConnection)))
+    // console.log(JSON.parse(JSON.stringify(usersConnection)))
 
     let ret = usersConnection.find(t => t.connection_users.every(elem => {
         return [+user_id, +channel_user_id].includes(elem.id)
