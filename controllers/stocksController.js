@@ -178,7 +178,7 @@ exports.getCustomStocksChartData = async (req, res) => {
 exports.getUserStocks = async (req, res) => {
     let {user_id, type_id, sort_type} = req.query;
     let whereType = type_id ? {type_id: +type_id} : {};
-    console.log('get user stocks!!!!', req.query.close)
+    // console.log('get user stocks!!!!', req.query.close)
 
 
     let order = [[sequelize.col(`user_stocks->users_stocks.position_id`), 'asc']];
@@ -232,9 +232,9 @@ exports.getUserStocks = async (req, res) => {
                 }
             });
 
-            console.log(graphDataResponse.status)
+            // console.log(graphDataResponse.status)
             let result = {user_stocks: ret, stocks_order_type: userStocks.stocks_order_type};
-            console.log('result ready!!!')
+            // console.log('result ready!!!')
             res.json(result)
         } catch (error) {
             // const { response } = error;

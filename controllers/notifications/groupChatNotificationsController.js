@@ -7,7 +7,7 @@ const GroupChatNots = db.group_chat_notifications;
 const NotificationTypes = db.notification_types;
 
 exports.saveNotification = async (data) => {
-    console.log('aaa', data)
+    // console.log('aaa', data)
     let fields = {
         from_id: data.initiator_id,
         to_id: data.receiver_id,
@@ -50,7 +50,7 @@ exports.saveNotification = async (data) => {
 
 exports.getCurrentGroupUsersNotifications = async (data) => {
     data.group_ids = data.chat_group_members.map(group => group.id);
-    console.log('group_ids!!!', data.group_ids)
+    // console.log('group_ids!!!', data.group_ids)
     let t = await GroupChatNots.findAll({
         where: {
             group_id: {[Op.in]: data.group_ids},
@@ -71,7 +71,7 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
         order: ['created_at']
     });
 
-    console.log(JSON.parse(JSON.stringify(notifications)))
+    // console.log(JSON.parse(JSON.stringify(notifications)))
 
     return JSON.parse(JSON.stringify(notifications));
 

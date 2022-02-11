@@ -237,7 +237,7 @@ exports.getUserInfo = async (req, res) => {
     let excludeFields = ['password', 'role_id', 'status_id', 'verification_code', 'phone'];
 
     let userByUsername = await Users.findOne({where: {username}, attributes: ['id']});
-    console.log(userByUsername)
+    // console.log(userByUsername)
 
     let directConnectionsResult = await UsersConnectionMembers.findAll({
         where: {member_id: userByUsername.id},
