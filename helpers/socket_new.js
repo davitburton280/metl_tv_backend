@@ -33,8 +33,8 @@ let socket = (io) => {
                 socket.join(group);
             })
             io.emit('userConnected', getConnectedUserNames(usersGroups))
-            // console.log('USERS CONNECTED!!!')
-            // console.log(usersGroups)
+            console.log('USERS CONNECTED!!!')
+            console.log(usersGroups)
             // console.log(await getGroupSockets(io, chat_groups[0]))
         })
 
@@ -115,7 +115,6 @@ let socket = (io) => {
 
             let {from_user, to_user} = data;
             let toUserSocketId = getSocketId(to_user.username);
-            let fromUserSocketId = getSocketId(from_user.username);
 
             await usersController.declineConnection(data);
 
@@ -136,6 +135,40 @@ let socket = (io) => {
                 to_user,
                 notification_type: {name: 'declined_connection_request'}
             })
+        });
+
+        socket.on('disconnectUsers', async (data) => {
+
+            let {from_id, to_id,from_username, to_username} = data;
+            let fromUserSocketId = getSocketId(from_username);
+            let toUserSocketId = getSocketId(to_username);
+
+
+            await to(usersController.disconnectUsers(data));
+            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_id});
+
+            let notificationData = {
+                connection_id: data.connection_id,
+                initiator_id: from_id,
+                receiver_id: to_id,
+                msg: data.msg,
+            };
+
+            let n = await usersConnectionNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'break_connection'
+            });
+
+            console.log(data, toUserSocketId, fromUserSocketId)
+            io.to(toUserSocketId).emit('getDisconnectUsers', {
+                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                users_messages: toUserMessages
+            });
+
+            io.to(fromUserSocketId).emit('getDisconnectUsers', {
+                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                users_messages: toUserMessages
+            });
         });
     })
 }
