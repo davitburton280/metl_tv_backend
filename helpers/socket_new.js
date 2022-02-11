@@ -108,7 +108,7 @@ let socket = (io) => {
                 type: 'accept_connection_request'
             });
 
-            // console.log(fromUserSocketId, toUserSocketId)
+            console.log(fromUserSocketId, toUserSocketId)
             io.to(fromUserSocketId).emit('acceptedConnection', {
                 ...notificationData,
                 users_messages: fromUserMessages

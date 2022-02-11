@@ -12,13 +12,14 @@ const moment = require('moment');
 const to = require('../../helpers/getPromiseResult');
 const nl2br = require('../../helpers/nl2br');
 
+
 exports.create = async (req, res) => {
 
     this.getDirectMessages(req, res)
 };
 
 exports.saveDirectMessage = async (data) => {
-    // data.seen_at = '';
+    // data.seen_at = moment().format('YYYY-MM-DD, h:mm:ss a');
     data.message = nl2br(data.message, false);
     let newMsg = new DirectMessages(data);
     let result = await to(newMsg.save());
@@ -149,7 +150,7 @@ exports.updateSeen = async (data) => {
                 {seen: false},
                 {connection_id}
             ],
-        }, {$set: {seen: true, seen_at}}));
+        }, {$set: {seen: true, seen_at:  moment().format('YYYY-MM-DD, h:mm:ss a')}}));
 
     console.log('updated', updated)
 
