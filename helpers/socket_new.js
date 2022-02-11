@@ -188,7 +188,6 @@ let socket = (io) => {
             console.log('block/unblock user!!!', contact_username, toUserSocketId)
             // console.log(data)
 
-
             let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_id});
             let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_id});
             // console.log(fromUserMessages, toUserMessages)
@@ -216,7 +215,6 @@ let socket = (io) => {
             })
         });
     })
-
 
 }
 
