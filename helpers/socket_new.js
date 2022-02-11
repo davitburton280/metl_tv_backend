@@ -46,7 +46,6 @@ let socket = (io) => {
 
         socket.on('connectWithUser', async (data) => {
             let {authUser, channelUser} = data;
-            // console.log(channelUser.username, authUser.username)
 
             let channelUserSocketId = getSocketId(channelUser.username);
             let authUserSocketId = getSocketId(authUser.username);
@@ -69,6 +68,7 @@ let socket = (io) => {
             // console.log('users!!!', usersGroups, channelUserSocketId, usersGroups[authUserSocketId])
             // console.log('connection!!!', connection)
 
+            console.log("connection request from " + authUser.username + '=>', `${authUserSocketId}`, ' to ' + channelUser.username + '=>' + `${channelUserSocketId}`)
             io.to(channelUserSocketId).emit('getConnectWithUser', connection);
             io.to(authUserSocketId).emit('getConnectWithUser', connection)
         });
@@ -108,7 +108,8 @@ let socket = (io) => {
                 type: 'accept_connection_request'
             });
 
-            console.log(fromUserSocketId, toUserSocketId)
+            console.log('accept from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
+
             io.to(fromUserSocketId).emit('acceptedConnection', {
                 ...notificationData,
                 users_messages: fromUserMessages
@@ -167,7 +168,8 @@ let socket = (io) => {
                 type: 'break_connection'
             });
 
-            console.log(data, toUserSocketId, fromUserSocketId)
+            console.log('disconnect from ' + from_username + '=>' + fromUserSocketId, to_username + '=>', toUserSocketId)
+            // console.log(toUserMessages, toUserSocketId, fromUserSocketId)
             io.to(toUserSocketId).emit('getDisconnectUsers', {
                 ...notificationData, ...JSON.parse(JSON.stringify(n)),
                 users_messages: toUserMessages
@@ -238,7 +240,7 @@ let socket = (io) => {
         socket.on('setSeen', async (data) => {
             console.log('set seen', data)
 
-            let {from_username, to_username,connection_id, group_name} = data;
+            let {from_username, to_username, connection_id, group_name} = data;
 
             if (!group_name) {
                 console.log('direct seen!!!')

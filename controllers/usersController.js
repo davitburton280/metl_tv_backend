@@ -498,7 +498,7 @@ exports.createUsersConnection = async (data) => {
             from_user: authUser,
             to_user: channelUser,
             connection_id: connection.id,
-            type: 'connection_request',
+            type: 'users_connection_request',
             msg: `<strong>${authUser.first_name + ' ' + authUser.last_name}</strong> has sent a connection request to you`,
             ...checkAgain.toJSON(),
         };
