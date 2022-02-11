@@ -214,7 +214,28 @@ let socket = (io) => {
                 users_messages: fromUserMessages
             })
         });
+
+        socket.on('setTyping', async (data) => {
+
+            let {from_username, to_username, group_name} = data;
+
+            if (!group_name) {
+
+                let fromUserSocketId = getSocketId(from_username);
+                let toUserSocketId = getSocketId(to_username);
+
+                console.log('typing', to_username + '=>' + toUserSocketId, fromUserSocketId, data.message)
+                io.to(toUserSocketId).emit('getTyping', data)
+                io.to(fromUserSocketId).emit('getTyping', data)
+            } else {
+                // console.log('typing', groupsUsers)
+                console.log(await io.in(group_name).allSockets());
+                // io.to(group_name).emit('getTyping', data)
+                io.sockets.in(group_name).emit('getTyping', data)
+            }
+        });
     })
+
 
 }
 

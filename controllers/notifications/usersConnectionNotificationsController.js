@@ -7,7 +7,7 @@ const UserConnectionNots = db.users_connection_notifications;
 const NotificationTypes = db.notification_types;
 
 exports.saveNotification = async (data) => {
-    console.log(data)
+    // console.log(data)
     let fields = {
         from_id: data.initiator_id,
         to_id: data.receiver_id,
