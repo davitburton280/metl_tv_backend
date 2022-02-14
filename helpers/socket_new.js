@@ -348,7 +348,7 @@ let socket = (io) => {
 
         socket.on('inviteToNewGroup', async (data) => {
 
-            console.log('invite to new group!!!', data);
+            console.log('invite to new group!!!');
 
             let {inviter, invited_members, group} = data;
             let inviterName = inviter.first_name + ' ' + inviter.last_name;
@@ -376,19 +376,58 @@ let socket = (io) => {
                     // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});
                     console.log(username);
                     console.log(socketId)
-                    console.log(usersGroups)
+
                     io.to(socketId).emit('inviteToGroupSent', {
-                        msg: `You are invited to join the ${groupName} group`,
                         group_id: group.id,
                         ...notificationData,
                         ...n,
                         group_details: group
                     })
                 }))
-
-
-                // io.sockets.in(group.name).emit('inviteToGroupSent', data);
             }
+        });
+
+        socket.on('acceptJoinGroup', async (data) => {
+            console.log('joining group!!!');
+
+            let {user, group} = data;
+            let groupName = group.name;
+
+            let socketId = getSocketId(user.username); //socket.id
+            let theSocket = io.sockets.sockets.get(socketId);
+            theSocket.join(groupName);
+
+            // console.log(usersGroups)
+            Object.values(usersGroups).map(gu => {
+                console.log('aaaa', gu, gu.chat_groups.find(g => g === groupName))
+                if (gu.username === user.username && !gu.chat_groups.find(g => g === groupName)) {
+                    gu.chat_groups.push(groupName);
+                }
+            })
+
+            console.log(usersGroups)
+
+            let notificationData = {
+                group_id: group.id,
+                initiator_id: user.id,
+                msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has accepted to join the <strong>${group.name}</strong> group`,
+            };
+
+            let n = await groupChatNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'accept_group_invitation'
+            });
+
+            // data.groupsUsers = groupsUsers;
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            //
+            console.log(await io.in(groupName).allSockets());
+            //
+            io.sockets.in(groupName).emit('acceptedJoinGroup', {
+                ...data,
+                ...notificationData,
+                ...n,
+            });
         });
     })
 
