@@ -496,10 +496,22 @@ let socket = (io) => {
 
         socket.on('removeFromGroup', async (data) => {
             let {initiator, member, group} = data;
+            let groupName = group.name;
             console.log('remove from group!!!');
-            filteredGroupsUsers = groupsUsers.filter(u => u.group !== data.group);
-            groupsUsers = filteredGroupsUsers;
 
+            Object.values(usersGroups).map(gu => {
+
+                if (gu.username === member.username && gu.chat_groups.find(g => g === groupName)) {
+                    console.log(gu.chat_groups.filter(g => g !== groupName))
+                    gu.chat_groups = gu.chat_groups.filter(g => g !== groupName);
+                }
+            })
+
+            let socketId = getSocketId(member.username); //socket.id
+            let theSocket = io.sockets.sockets.get(socketId);
+            console.log(await io.in(groupName).allSockets());
+            // theSocket.leave(groupName);
+            console.log(await io.in(groupName).allSockets());
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             data.leftGroups = await groupChatController.getGroupsMessages({return: true, user_id: member.id});
@@ -508,7 +520,7 @@ let socket = (io) => {
                 group_id: group.id,
                 initiator_id: initiator.id,
                 msg: `<strong>${initiator.first_name + ' ' + initiator.last_name}</strong> removed  <strong>${member.name}</strong>
-                       from <strong>${group.name}</strong> group`,
+                       from <strong>${groupName}</strong> group`,
             };
 
             let n = await groupChatNotificationsController.saveNotification({
@@ -516,12 +528,13 @@ let socket = (io) => {
                 type: 'remove_from_group'
             });
 
-            console.log(group.name)
-            io.sockets.in(group.name).emit('removeFromGroupNotify', {
+            io.sockets.in(groupName).emit('removeFromGroupNotify', {
                 ...data,
                 ...notificationData,
                 ...n,
             });
+
+            theSocket.leave(groupName);
         });
     })
 
