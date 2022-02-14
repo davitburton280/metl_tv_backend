@@ -432,13 +432,8 @@ let socket = (io) => {
             console.log('decline joining group!!!');
 
             let {user, group} = data;
-            let socketId = getSocketId(user.username); //socket.id
-            // let theSocket = io.sockets.sockets.get(socketId)
+            let socketId = getSocketId(user.username);
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
-            // if (!groupsUsers.find(gu => gu.username === user.username && gu.group === group.name)) {
-            //     filteredGroupsUsers = groupsUsers.filter(u => u.username !== user.username || u.group !== group.name);
-            //     // groupsUsers.push({id: socketId, username: data.username, group: data.group});
-            // }
 
             let notificationData = {
                 group_id: group.id,
@@ -459,6 +454,74 @@ let socket = (io) => {
             io.to(socketId).emit('getDeclinedJoinGroup', {
                 ...data, initiator_id: user.id
             })
+        });
+
+        socket.on('leaveGroup', async (data) => {
+            console.log('leave group!!!')
+            let {user, group} = data;
+            let groupName = group.name;
+
+            Object.values(usersGroups).map(gu => {
+
+                if (gu.username === user.username && gu.chat_groups.find(g => g === groupName)) {
+                    console.log(gu.chat_groups.filter(g => g !== groupName))
+                    gu.chat_groups = gu.chat_groups.filter(g => g !== groupName);
+                }
+            })
+            console.log(usersGroups)
+            console.log(await io.in(groupName).allSockets());
+            socket.leave(groupName);
+
+
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+
+            let notificationData = {
+                group_id: group.id,
+                initiator_id: user.id,
+                msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has left the <strong>${group.name}</strong> group`,
+            };
+
+            let n = await groupChatNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'left_group'
+            });
+
+            console.log(await io.in(groupName).allSockets());
+            io.sockets.in(group.name).emit('leaveGroupNotify', {
+                ...data,
+                ...notificationData,
+                ...n,
+            });
+        });
+
+        socket.on('removeFromGroup', async (data) => {
+            let {initiator, member, group} = data;
+            console.log('remove from group!!!');
+            filteredGroupsUsers = groupsUsers.filter(u => u.group !== data.group);
+            groupsUsers = filteredGroupsUsers;
+
+
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            data.leftGroups = await groupChatController.getGroupsMessages({return: true, user_id: member.id});
+
+            let notificationData = {
+                group_id: group.id,
+                initiator_id: initiator.id,
+                msg: `<strong>${initiator.first_name + ' ' + initiator.last_name}</strong> removed  <strong>${member.name}</strong>
+                       from <strong>${group.name}</strong> group`,
+            };
+
+            let n = await groupChatNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'remove_from_group'
+            });
+
+            console.log(group.name)
+            io.sockets.in(group.name).emit('removeFromGroupNotify', {
+                ...data,
+                ...notificationData,
+                ...n,
+            });
         });
     })
 
