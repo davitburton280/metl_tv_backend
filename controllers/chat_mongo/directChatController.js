@@ -34,7 +34,7 @@ exports.getDirectMessages = async (req, res) => {
     let user_id, other_user_id;
     if (req.return) {
         user_id = req.user_id;
-        // console.log("USER ID:"+user_id)
+        console.log("USER ID:"+user_id)
     } else {
         let data = req.query;
         user_id = data.user_id;

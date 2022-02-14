@@ -155,6 +155,7 @@ let socket = (io) => {
 
             await to(usersController.disconnectUsers(data));
             let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_id});
+            let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_id});
 
             let notificationData = {
                 connection_id: data.connection_id,
@@ -169,7 +170,7 @@ let socket = (io) => {
             });
 
             console.log('disconnect from ' + from_username + '=>' + fromUserSocketId, to_username + '=>', toUserSocketId)
-            // console.log(toUserMessages, toUserSocketId, fromUserSocketId)
+            console.log(toUserMessages, toUserSocketId, fromUserSocketId, fromUserMessages)
             io.to(toUserSocketId).emit('getDisconnectUsers', {
                 ...notificationData, ...JSON.parse(JSON.stringify(n)),
                 users_messages: toUserMessages
@@ -177,7 +178,7 @@ let socket = (io) => {
 
             io.to(fromUserSocketId).emit('getDisconnectUsers', {
                 ...notificationData, ...JSON.parse(JSON.stringify(n)),
-                users_messages: toUserMessages
+                users_messages: fromUserMessages
             });
         });
 
