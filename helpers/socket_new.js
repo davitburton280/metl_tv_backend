@@ -33,11 +33,12 @@ let socket = (io) => {
         console.log('new connection made');
 
         socket.on('newUser', async ({username, chat_groups}) => {
+            console.log("USERNAME!!!!", username)
             usersGroups[username] = {username, socket_id: socket.id, chat_groups};
             chat_groups.map(group => {
                 socket.join(group);
             })
-            io.emit('userConnected', getConnectedUserNames(usersGroups))
+            io.emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
             console.log('USERS CONNECTED!!!')
             console.log(usersGroups)
             // console.log(await getGroupSockets(io, chat_groups[0]))
@@ -45,8 +46,8 @@ let socket = (io) => {
 
         socket.on('getConnectedUsers', ({username}) => {
             let socketId = getSocketId(username);
-            // console.log("online", getConnectedUserNames(usersGroups))
-            io.to(socketId).emit('usersConnected', getConnectedUserNames(usersGroups))
+            console.log("online", getConnectedUserNames(usersGroups))
+            io.to(socketId).emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
         });
 
         socket.on('connectWithUser', async (data) => {
@@ -539,11 +540,20 @@ let socket = (io) => {
         });
 
 
-        socket.on('forceDisconnect', (data) => {
-            console.log('force disconnect!!!', data);
-            console.log(usersGroups)
-            usersGroups = Object.values(usersGroups).filter(u => u.username !== data.username);
-            console.log(usersGroups)
+        socket.on('forceDisconnect', async (user) => {
+            console.log('force disconnect!!!');
+            // console.log(usersGroups)
+            delete usersGroups[user.username];
+            // usersGroups = Object.values(usersGroups).filter(u => u.username !== user.username);
+            let contacts = await usersController.getContacts({return: true, user_id: user.id});
+
+            contacts.map(contact => {
+                console.log('aaa', contact.username, getSocketId(contact.username))
+                let theSocket = io.sockets.sockets.get(getSocketId(contact.username));
+                theSocket?.emit('onLogout', user)
+            })
+            // console.log('CONTACTS:', contacts)
+            console.log(Object.values(usersGroups))
             //
             // delete users[data.username];
             //

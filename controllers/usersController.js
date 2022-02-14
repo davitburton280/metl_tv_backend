@@ -346,8 +346,15 @@ exports.getBlockedContactsIds = async (user_id, blocked = 0) => {
 
 exports.getContacts = async (req, res) => {
     console.log('get contacts!!!');
-    let {user_id, blocked} = req.query;
-    console.log(req.query)
+    let user_id;
+    if (req.return) {
+        user_id = req.user_id;
+        console.log("USER ID:" + user_id)
+    } else {
+        let data = req.query;
+        user_id = data.user_id;
+    }
+
     let where = [
         {
             user_id
@@ -407,8 +414,11 @@ exports.getContacts = async (req, res) => {
     // });
     //
     // console.log(ret)
-
-    res.json(contacts);
+    if (req.return) {
+        return JSON.parse(JSON.stringify(contacts));
+    } else {
+        res.json(contacts);
+    }
 };
 
 exports.checkIfUsersConnected = async (req, res = null) => {
@@ -577,7 +587,7 @@ exports.cancelUsersConnection = async (connection_id) => {
 exports.disconnectUsers = async (data) => {
     let {connection_id} = data;
     await to(UsersConnectionMembers.destroy({where: {connection_id}}));
-    await to(UsersConnection.destroy({where: {id:connection_id}}));
+    await to(UsersConnection.destroy({where: {id: connection_id}}));
 };
 
 exports.getUserConnections = async (req, res) => {
