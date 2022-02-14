@@ -355,11 +355,13 @@ let socket = (io) => {
             let groupName = data.group.name;
 
 
+
             if (groupName) {
                 await Promise.all(invited_members.map(async (member) => {
                     let username = member.username;
-                    let socketId = getSocketId(username);
-
+                    let invitedMemberSocketId = getSocketId(username);
+                    let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
+                    theSocket.join(groupName);
 
                     let notificationData = {
                         group_id: group.id,
@@ -375,9 +377,9 @@ let socket = (io) => {
 
                     // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});
                     console.log(username);
-                    console.log(socketId)
+                    console.log(invitedMemberSocketId)
 
-                    io.to(socketId).emit('inviteToGroupSent', {
+                    io.to(invitedMemberSocketId).emit('inviteToGroupSent', {
                         group_id: group.id,
                         ...notificationData,
                         ...n,
@@ -393,9 +395,9 @@ let socket = (io) => {
             let {user, group} = data;
             let groupName = group.name;
 
-            let socketId = getSocketId(user.username); //socket.id
-            let theSocket = io.sockets.sockets.get(socketId);
-            theSocket.join(groupName);
+            // let socketId = getSocketId(user.username); //socket.id
+            // let theSocket = io.sockets.sockets.get(socketId);
+            // theSocket.join(groupName);
 
             // console.log(usersGroups)
             Object.values(usersGroups).map(gu => {
@@ -511,7 +513,7 @@ let socket = (io) => {
             let theSocket = io.sockets.sockets.get(socketId);
             console.log(await io.in(groupName).allSockets());
             // theSocket.leave(groupName);
-            console.log(await io.in(groupName).allSockets());
+
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             data.leftGroups = await groupChatController.getGroupsMessages({return: true, user_id: member.id});
@@ -527,7 +529,7 @@ let socket = (io) => {
                 ...notificationData,
                 type: 'remove_from_group'
             });
-
+            console.log(await io.in(groupName).allSockets());
             io.sockets.in(groupName).emit('removeFromGroupNotify', {
                 ...data,
                 ...notificationData,
