@@ -23,6 +23,11 @@ getSocketId = (username) => {
     return usersGroups[username]?.socket_id;
 }
 
+// getUserGroupsByUsername = (username) => {
+//     return usersGroups[username];
+// }
+
+
 let socket = (io) => {
     io.on('connection', async (socket) => {
         console.log('new connection made');
@@ -304,6 +309,41 @@ let socket = (io) => {
                 console.log('GROUP MESSAGE!!!', group_name)
                 io.to(group_name).emit('newMessage', data)
             }
+        });
+
+        socket.on('setNewGroup', async ({username, ...data}) => {
+            console.log('set new group', data)
+            let userGroups = usersGroups[username];
+            // console.log(userGroups.chat_groups.find(g => g === data.name))
+            if (!userGroups.chat_groups.find(g => g === data.name)) {
+                userGroups.chat_groups.push(data.name);
+            }
+            socket.join(data.name);
+
+            console.log(userGroups, usersGroups)
+            data.groupsUsers = await groupChatController.getGroupsMessages({return: true, user_id: data.creator_id});
+            io.to(data.name).emit('chatNotification', {...data, group: data.name})
+        });
+
+        socket.on('removeGroup', async (data) => {
+            let {initiator, group} = data;
+            console.log('remove group!!!', initiator.username)
+
+            let userGroups = usersGroups[initiator.username];
+
+            console.log(usersGroups)
+            let filteredUserGroups = userGroups.chat_groups.filter(u => u !== group.name);
+            usersGroups[initiator.username].chat_groups = filteredUserGroups;
+            console.log(usersGroups)
+
+            data.groupsUsers = await groupChatController.getGroupsMessages({return: true, user_id: data.initiator.id});
+
+
+            io.sockets.in(group.name).emit('removeGroupNotify', data);
+            console.log(await io.in(group.name).allSockets());
+            io.in(group).socketsLeave(group.name);
+            console.log('sockets leaved the group!!!')
+            console.log(await io.in(group.name).allSockets());
         });
     })
 
