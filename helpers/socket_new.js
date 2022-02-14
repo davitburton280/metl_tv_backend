@@ -331,10 +331,10 @@ let socket = (io) => {
 
             let userGroups = usersGroups[initiator.username];
 
-            console.log(usersGroups)
+            // console.log(usersGroups)
             let filteredUserGroups = userGroups.chat_groups.filter(u => u !== group.name);
             usersGroups[initiator.username].chat_groups = filteredUserGroups;
-            console.log(usersGroups)
+            // console.log(usersGroups)
 
             data.groupsUsers = await groupChatController.getGroupsMessages({return: true, user_id: data.initiator.id});
 
@@ -344,6 +344,51 @@ let socket = (io) => {
             io.in(group).socketsLeave(group.name);
             console.log('sockets leaved the group!!!')
             console.log(await io.in(group.name).allSockets());
+        });
+
+        socket.on('inviteToNewGroup', async (data) => {
+
+            console.log('invite to new group!!!', data);
+
+            let {inviter, invited_members, group} = data;
+            let inviterName = inviter.first_name + ' ' + inviter.last_name;
+            let groupName = data.group.name;
+
+
+            if (groupName) {
+                await Promise.all(invited_members.map(async (member) => {
+                    let username = member.username;
+                    let socketId = getSocketId(username);
+
+
+                    let notificationData = {
+                        group_id: group.id,
+                        initiator_id: inviter.id,
+                        receiver_id: member.id,
+                        msg: `<strong>${inviterName}</strong> has sent an invitation to join the <strong>${groupName}</strong> group`,
+                    };
+
+                    let n = await groupChatNotificationsController.saveNotification({
+                        ...notificationData,
+                        type: 'group_join_invitation'
+                    });
+
+                    // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});
+                    console.log(username);
+                    console.log(socketId)
+                    console.log(usersGroups)
+                    io.to(socketId).emit('inviteToGroupSent', {
+                        msg: `You are invited to join the ${groupName} group`,
+                        group_id: group.id,
+                        ...notificationData,
+                        ...n,
+                        group_details: group
+                    })
+                }))
+
+
+                // io.sockets.in(group.name).emit('inviteToGroupSent', data);
+            }
         });
     })
 
