@@ -418,16 +418,47 @@ let socket = (io) => {
                 type: 'accept_group_invitation'
             });
 
-            // data.groupsUsers = groupsUsers;
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
-            //
             console.log(await io.in(groupName).allSockets());
-            //
+
             io.sockets.in(groupName).emit('acceptedJoinGroup', {
                 ...data,
                 ...notificationData,
                 ...n,
             });
+        });
+
+        socket.on('declineJoinGroup', async (data) => {
+            console.log('decline joining group!!!');
+
+            let {user, group} = data;
+            let socketId = getSocketId(user.username); //socket.id
+            // let theSocket = io.sockets.sockets.get(socketId)
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            // if (!groupsUsers.find(gu => gu.username === user.username && gu.group === group.name)) {
+            //     filteredGroupsUsers = groupsUsers.filter(u => u.username !== user.username || u.group !== group.name);
+            //     // groupsUsers.push({id: socketId, username: data.username, group: data.group});
+            // }
+
+            let notificationData = {
+                group_id: group.id,
+                initiator_id: user.id,
+                msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has declined joining the <strong>${group.name}</strong> group`,
+            };
+
+            let n = await groupChatNotificationsController.saveNotification({
+                ...notificationData,
+                type: 'decline_group_invitation'
+            });
+            console.log(await io.in(group.name).allSockets());
+            io.sockets.in(group.name).emit('getDeclinedJoinGroup', {
+                ...data,
+                ...notificationData,
+                ...n,
+            });
+            io.to(socketId).emit('getDeclinedJoinGroup', {
+                ...data, initiator_id: user.id
+            })
         });
     })
 
