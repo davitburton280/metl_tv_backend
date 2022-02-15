@@ -9,8 +9,8 @@ module.exports = {
     USER_CONNECTION_NOTIFICATION_TYPES: [
         'accept_connection_request', 'decline_connection_request', 'break_connection', 'block_connection'
     ],
-    // GROUP_CHAT_NOTIFICATION_TYPES: [
-    //     'accept_group_invitation', 'decline_group_invitation'
-    // ]
+    GROUP_CHAT_NOTIFICATION_TYPES: [
+        'group_join_invitation', 'accept_group_invitation', 'decline_group_invitation'
+    ]
 };
 

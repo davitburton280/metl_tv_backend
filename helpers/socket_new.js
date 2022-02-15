@@ -40,6 +40,20 @@ saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, typ
     return notification;
 }
 
+saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) => {
+    let notification = {
+        from_user,
+        to_user,
+        group_id,
+        read: false,
+        read_at: '',
+        type,
+        msg: msg
+    };
+
+    let n = await groupChatNotificationsController.saveNotification(notification);
+}
+
 
 let socket = (io) => {
     io.on('connection', async (socket) => {
@@ -311,10 +325,10 @@ let socket = (io) => {
 
         socket.on('inviteToNewGroup', async (data) => {
 
-            console.log('invite to new group!!!');
+            console.log('invite to new group!!!', data);
 
-            let {inviter, invited_members, group} = data;
-            let inviterName = inviter.first_name + ' ' + inviter.last_name;
+            let {from_user, invited_members, group} = data;
+            let inviterName = from_user.first_name + ' ' + from_user.last_name;
             let groupName = data.group.name;
 
 
@@ -325,20 +339,18 @@ let socket = (io) => {
                     let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
                     theSocket?.join(groupName);
 
-                    let notificationData = {
+                    let notification = {
                         group_id: group.id,
-                        from_id: inviter.id,
-                        from_avatar: inviter.avatar,
-                        from_first_name: inviter.first_name,
-                        from_last_name: inviter.last_name,
+                        from_user,
+                        to_user: member,
                         to_id: member.id,
                         msg: `<strong>${inviterName}</strong> has sent an invitation to join the <strong>${groupName}</strong> group`,
+                        type: 'group_join_invitation'
                     };
 
-                    let n = await groupChatNotificationsController.saveNotification({
-                        ...notificationData,
-                        type: 'group_join_invitation'
-                    });
+                    let savedNotification = await groupChatNotificationsController.saveNotification(notification);
+
+                    notification._id = savedNotification._id;
 
                     // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});
                     console.log(username);
@@ -346,8 +358,7 @@ let socket = (io) => {
 
                     io.to(invitedMemberSocketId).emit('inviteToGroupSent', {
                         group_id: group.id,
-                        ...notificationData,
-                        ...n,
+                        ...notification,
                         group_details: group
                     })
                 }))
@@ -402,21 +413,25 @@ let socket = (io) => {
             let socketId = getSocketId(user.username);
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
 
-            let notificationData = {
+            let notification = {
                 group_id: group.id,
-                initiator_id: user.id,
+                from_user: user,
+                // to_user: member,
+                // to_id: member.id,
                 msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has declined joining the <strong>${group.name}</strong> group`,
+                type: 'decline_group_invitation'
             };
 
-            let n = await groupChatNotificationsController.saveNotification({
-                ...notificationData,
-                type: 'decline_group_invitation'
-            });
+            let savedNotification = await groupChatNotificationsController.saveNotification(notification);
+
+            notification._id = savedNotification._id;
+
+            await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
+
             console.log(await io.in(group.name).allSockets());
             io.sockets.in(group.name).emit('getDeclinedJoinGroup', {
                 ...data,
-                ...notificationData,
-                ...n,
+                ...notification,
             });
             io.to(socketId).emit('getDeclinedJoinGroup', {
                 ...data, initiator_id: user.id
