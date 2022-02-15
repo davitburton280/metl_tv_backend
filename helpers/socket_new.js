@@ -123,7 +123,7 @@ let socket = (io) => {
                 users_messages: fromUserMessages
             });
             io.to(toUserSocketId).emit('acceptedConnection', {
-                ...notification, ...JSON.parse(JSON.stringify(n)),
+                ...notification, ...n,
                 users_messages: toUserMessages
             })
         });
@@ -158,36 +158,37 @@ let socket = (io) => {
 
         socket.on('disconnectUsers', async (data) => {
 
-            let {from_id, to_id, from_username, to_username} = data;
-            let fromUserSocketId = getSocketId(from_username);
-            let toUserSocketId = getSocketId(to_username);
+            let {from_user, to_user} = data;
+            let fromUserSocketId = getSocketId(from_user.username);
+            let toUserSocketId = getSocketId(to_user.username);
 
 
             await to(usersController.disconnectUsers(data));
-            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_id});
-            let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_id});
+            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
+            let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_user.id});
 
-            let notificationData = {
+
+            let notification = {
+                from_user, to_user,
                 connection_id: data.connection_id,
-                initiator_id: from_id,
-                receiver_id: to_id,
-                msg: data.msg,
+                read: false,
+                read_at: '',
+                type: 'break_connection',
+                msg: data.msg
             };
 
-            let n = await usersConnectionNotificationsController.saveNotification({
-                ...notificationData,
-                type: 'break_connection'
-            });
 
-            console.log('disconnect from ' + from_username + '=>' + fromUserSocketId, to_username + '=>', toUserSocketId)
+            let n = await usersConnectionNotificationsController.saveNotification(notification);
+
+            console.log('disconnect from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
             console.log(toUserMessages, toUserSocketId, fromUserSocketId, fromUserMessages)
             io.to(toUserSocketId).emit('getDisconnectUsers', {
-                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                ...notification, ...n,
                 users_messages: toUserMessages
             });
 
             io.to(fromUserSocketId).emit('getDisconnectUsers', {
-                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                ...notification, ...n,
                 users_messages: fromUserMessages
             });
         });

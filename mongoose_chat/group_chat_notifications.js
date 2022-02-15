@@ -2,24 +2,16 @@ let mongoose = require('mongoose')
 const moment = require('moment');
 
 let NotificationsSchema = new mongoose.Schema({
-    from_id: {
-        type: Number,
-        required: true
-    },
     group_id: {
         type: Number,
         required: true
     },
-    from_first_name: {
-        type: String,
-        required: true
-    },
-    from_last_name: {
-        type: String,
-        required: true
-    },
-    from_avatar: {
-        type: String
+    from_user: {
+        id: {type: Number},
+        avatar: {type: String},
+        username: {type: String},
+        first_name: {type: String},
+        last_name: {type: String},
     },
     msg: {
         type: String
@@ -31,8 +23,12 @@ let NotificationsSchema = new mongoose.Schema({
     //     type: String,
     //     required: true
     // },
-    to_id: {
-        type: Number,
+    to_user: {
+        avatar: {type: String},
+        username: {type: String},
+        first_name: {type: String},
+        last_name: {type: String},
+        id: {type: Number}
     },
     read: [
         {

@@ -87,20 +87,23 @@ exports.removeAllNotifications = async (user_id) => {
 
 exports.read = async (req, res) => {
     let {id} = req.body;
-    console.log(id)
-    await DirectChatNotifications.updateOne({read: true}, {id});
 
-    let currentNotification = await DirectChatNotifications.findOne({id});
+    let notification = await DirectChatNotifications.findById(id);
+    notification.read = true;
+    notification.save();
+
+    let currentNotification = await DirectChatNotifications.findById(id);
     return currentNotification.to_user.id;
 };
 
 exports.markAllAsRead = async (req, res) => {
     let {ids} = req.body;
-    let result = ids.map(async (id) => {
-        await DirectChatNotifications.updateOne({read: true}, {id});
-    });
-
-    await Promise.all(result);
+    let result = await Promise.all(ids.map(async (_id) => {
+        let notification = await DirectChatNotifications.findById(_id);
+        console.log(_id, notification._id)
+        notification.read = true;
+        notification.save();
+    }));
 
     return 'OK';
 
