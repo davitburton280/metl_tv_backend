@@ -28,7 +28,9 @@ exports.getGroupsMessages = async (req, res) => {
 
     console.log('get groups messages!!!')
 
-    let chatGroupsResult = await ChatGroupsMembers.findAll({where: {member_id: user_id}, attributes: ['group_id']});
+    let chatGroupsResult = await ChatGroupsMembers.findAll({
+        where: {member_id: user_id, confirmed: 1}, attributes: ['group_id']
+    });
 
     let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t => t.group_id);
 
@@ -48,6 +50,7 @@ exports.getGroupsMessages = async (req, res) => {
                         sequelize.fn('concat', sequelize.col('`chat_group_members.first_name`'), ' ', sequelize.col('`chat_group_members.last_name`')), 'name'
                     ]
                 ],
+                // where: sequelize.where(sequelize.col(`chat_group_members->chat_groups_members.confirmed`), 1)
                 // through: {attributes: ['confirmed']}
             },
         ]
