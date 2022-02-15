@@ -7,7 +7,7 @@ const GroupChatNotifications = require('../../mongoose_chat/group_chat_notificat
 const NotificationTypes = db.notification_types;
 
 exports.saveNotification = async (data) => {
-    console.log('aaa', data)
+    // console.log('aaa', data)
     // let fields = {
     //     from_id: data.initiator_id,
     //     to_id: data.receiver_id,
@@ -97,5 +97,5 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
 };
 
 exports.removeAllNotifications = async (user_id) => {
-    await GroupChatNotifications.destroy({where: {to_id: user_id}});
+    await GroupChatNotifications.deleteMany({"to_user.id": user_id});
 };
