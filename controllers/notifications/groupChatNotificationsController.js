@@ -64,12 +64,11 @@ exports.saveNotification = async (data) => {
 exports.getCurrentGroupUsersNotifications = async (data) => {
     data.group_ids = data.chat_group_members.map(group => group.id);
     // console.log('group_ids!!!', data.group_ids)
-    let t = await GroupChatNotifications.find({
+    let notifications = await GroupChatNotifications.find({
 
         group_id: {'$in': data.group_ids}
 
-        // order: ['created_at']
-    });
+    }).sort({'created_at': 1});
 
 
     // let notifications = await GroupChatNots.findAll({
@@ -88,7 +87,7 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
 
     // return JSON.parse(JSON.stringify(notifications));
 
-    return t;
+    return notifications;
     //
     // let notifications = JSON.parse(JSON.stringify(t)).map(n => {
     //     n.type = 'group_chat_notifications';

@@ -69,6 +69,6 @@ exports.remove = async (req, res) => {
 exports.removeAll = async (req, res) => {
     let {user_id} = req.query;
     await usersConnectionNotificationsController.removeAllNotifications(user_id);
-    await groupChatNotificationsController.removeAllNotifications(user_id);
+    // await groupChatNotificationsController.removeAllNotifications(user_id);
     this.get(req, res);
 };

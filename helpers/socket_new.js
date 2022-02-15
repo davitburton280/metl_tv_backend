@@ -59,9 +59,14 @@ let socket = (io) => {
             let connection = await to(usersController.createUsersConnection(data));
 
             let notificationData = {
+                from_id: authUser.id,
+                from_avatar: authUser.avatar,
+                from_first_name: authUser.first_name,
+                from_last_name: authUser.last_name,
                 connection_id: connection?.id,
-                initiator_id: authUser.id,
-                receiver_id: channelUser.id,
+                to_id: channelUser.id,
+                seen: false,
+                seen_at: '',
                 msg: `<strong>${authUser.first_name + ' ' + authUser.last_name}</strong> has sent a connection request to you`
             };
 
