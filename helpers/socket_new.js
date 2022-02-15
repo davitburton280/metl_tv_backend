@@ -101,8 +101,8 @@ let socket = (io) => {
                 return: true,
                 user_id: from_user.id
             });
-            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
 
+            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
             await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
 
             let notification = await saveDirectChatNotification({...data, type: 'accept_connection_request'});
@@ -150,7 +150,7 @@ let socket = (io) => {
             let notification = await saveDirectChatNotification({...data, type: 'break_connection'});
 
             console.log('disconnect from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
-            console.log(toUserMessages, toUserSocketId, fromUserSocketId, fromUserMessages)
+            // console.log(toUserMessages, toUserSocketId, fromUserSocketId, fromUserMessages)
             io.to(toUserSocketId).emit('getDisconnectUsers', {
                 ...notification,
                 users_messages: toUserMessages
