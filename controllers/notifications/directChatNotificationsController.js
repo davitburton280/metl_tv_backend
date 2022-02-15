@@ -7,7 +7,7 @@ const DirectChatNotifications = require('../../mongoose_chat/direct_chat_notific
 const NotificationTypes = db.notification_types;
 
 exports.saveNotification = async (data) => {
-    console.log(data)
+    // console.log(data)
 
     let foundNotificationType = await NotificationTypes.findOne({
         where: {name: data.type}
@@ -74,9 +74,9 @@ exports.removeNotification = async (req, res) => {
     } else {
         id = req.query.id;
     }
+    console.log('notification id!!!', req)
     let currentNotification = await DirectChatNotifications.findOne({id});
-    console.log('notification id!!!', currentNotification)
-    let t = await DirectChatNotifications.deleteOne({id});
+    let t = await DirectChatNotifications.deleteOne({_id: id});
     return currentNotification?.to_id;
 };
 
@@ -98,11 +98,14 @@ exports.read = async (req, res) => {
 
 exports.markAllAsRead = async (req, res) => {
     let {ids} = req.body;
+    console.log('ids!!!', ids)
     let result = await Promise.all(ids.map(async (_id) => {
         let notification = await DirectChatNotifications.findById(_id);
-        console.log(_id, notification._id)
-        notification.read = true;
-        notification.save();
+            console.log(_id, notification?._id)
+        if (notification) {
+            notification.read = true;
+            notification.save();
+        }
     }));
 
     return 'OK';
