@@ -23,9 +23,22 @@ getSocketId = (username) => {
     return usersGroups[username]?.socket_id;
 }
 
-// getUserGroupsByUsername = (username) => {
-//     return usersGroups[username];
-// }
+saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, type}) => {
+    let notification = {
+        from_user,
+        to_user,
+        connection_id,
+        read: false,
+        read_at: '',
+        type,
+        msg: msg
+    };
+
+    let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
+
+    notification._id = savedNotification._id;
+    return notification;
+}
 
 
 let socket = (io) => {
@@ -51,32 +64,18 @@ let socket = (io) => {
         });
 
         socket.on('connectWithUser', async (data) => {
-            let {authUser, channelUser} = data;
+            let {from_user, to_user} = data;
 
-            let channelUserSocketId = getSocketId(channelUser.username);
-            let authUserSocketId = getSocketId(authUser.username);
+            let channelUserSocketId = getSocketId(to_user.username);
+            let authUserSocketId = getSocketId(from_user.username);
 
             let connection = await to(usersController.createUsersConnection(data));
+            let notification = await saveDirectChatNotification({
+                ...data, ...connection,
+                type: 'users_connection_request'
+            });
 
-            let notification = {
-                from_user: authUser,
-                to_user: channelUser,
-                connection_id: connection?.id,
-                read: false,
-                read_at: '',
-                type: 'users_connection_request',
-                msg: `<strong>${authUser.first_name + ' ' + authUser.last_name}</strong> has sent a connection request to you`
-            };
-
-            let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
-
-            notification._id = savedNotification._id;
-
-            // console.log('connect!!!', username, socketId)
-            // console.log('users!!!', usersGroups, channelUserSocketId, usersGroups[authUserSocketId])
-            console.log('connection!!!', connection)
-
-            console.log("connection request from " + authUser.username + '=>', `${authUserSocketId}`, ' to ' + channelUser.username + '=>' + `${channelUserSocketId}`)
+            console.log("connection request from " + from_user.username + '=>', `${authUserSocketId}`, ' to ' + to_user.username + '=>' + `${channelUserSocketId}`)
             io.to(channelUserSocketId).emit('getConnectWithUser', {notification});
             io.to(authUserSocketId).emit('getConnectWithUser', {connection, notification})
         });
@@ -97,7 +96,6 @@ let socket = (io) => {
             let toUserSocketId = getSocketId(data.to_user.username);
             let fromUserSocketId = getSocketId(from_user.username);
 
-
             let confirmedConnection = await usersController.confirmConnection(data);
             let fromUserMessages = await directChatController.getDirectMessages({
                 return: true,
@@ -105,21 +103,9 @@ let socket = (io) => {
             });
             let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
 
-            let notification = {
-                from_user, to_user,
-                connection_id: data.connection_id,
-                read: false,
-                read_at: '',
-                type: 'accept_connection_request',
-                msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has accepted your connection request`
-            };
-
             await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
 
-            let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
-
-            notification._id = savedNotification._id;
-
+            let notification = await saveDirectChatNotification({...data, type: 'accept_connection_request'});
             console.log('accept from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
 
             io.to(fromUserSocketId).emit('acceptedConnection', {
@@ -139,22 +125,9 @@ let socket = (io) => {
 
             await usersController.declineConnection(data);
 
-            let notification = {
-                from_user, to_user,
-                connection_id: data.connection_id,
-                read: false,
-                read_at: '',
-                type: 'decline_connection_request',
-                msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has declined your connection request`
-            };
-            console.log(data)
+            let notification = await saveDirectChatNotification({...data, type: 'decline_connection_request'});
+
             await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
-
-
-            let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
-
-            notification._id = savedNotification._id;
-
             io.to(toUserSocketId).emit('declinedConnection', {
                 ...notification, from_user,
                 to_user,
@@ -174,18 +147,7 @@ let socket = (io) => {
             let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_user.id});
 
 
-            let notification = {
-                from_user, to_user,
-                connection_id: data.connection_id,
-                read: false,
-                read_at: '',
-                type: 'break_connection',
-                msg: data.msg
-            };
-
-            let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
-
-            notification._id = savedNotification._id;
+            let notification = await saveDirectChatNotification({...data, type: 'break_connection'});
 
             console.log('disconnect from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
             console.log(toUserMessages, toUserSocketId, fromUserSocketId, fromUserMessages)
@@ -207,26 +169,12 @@ let socket = (io) => {
             let toUserSocketId = getSocketId(to_user.username);
 
             console.log('block/unblock user!!!', to_user.username, toUserSocketId)
-            // console.log(data)
 
             let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_user.id});
             let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
-            // console.log(fromUserMessages, toUserMessages)
 
 
-            let notification = {
-                from_user, to_user,
-                connection_id: data.connection_id,
-                read: false,
-                read_at: '',
-                type: 'block_connection',
-                msg: data.msg
-            };
-
-
-            let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
-
-            notification._id = savedNotification._id;
+            let notification = await saveDirectChatNotification({...data, type: 'block_connection'});
 
             io.to(toUserSocketId).emit('getBlockUnblockUser', {
                 ...notification,

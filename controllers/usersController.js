@@ -476,40 +476,40 @@ exports.checkIfUsersConnected = async (req, res = null) => {
 
 exports.createUsersConnection = async (data) => {
 
-    let {authUser, channelUser} = data;
+    let {from_user, to_user} = data;
     let params = {
-        channel_user_id: channelUser.id,
-        user_id: authUser.id
+        channel_user_id: to_user.id,
+        user_id: from_user.id
     };
 
     let checkIfConnected = await this.checkIfUsersConnected(params);
 
     if (!checkIfConnected) {
         let connection = await to(UsersConnection.create({
-            from_id: authUser.id,
-            to_id: channelUser.id,
+            from_id: from_user.id,
+            to_id: to_user.id,
         }));
 
         if (connection) {
             await UsersConnectionMembers.create({
-                member_id: authUser.id,
+                member_id: from_user.id,
                 connection_id: connection.id
             });
             await UsersConnectionMembers.create({
-                member_id: channelUser.id,
+                member_id: to_user.id,
                 connection_id: connection.id
             });
         }
 
         let checkAgain = await this.checkIfUsersConnected(params)
         let returnData = {
-            initiator_id: authUser.id,
-            receiver_id: channelUser.id,
-            from_user: authUser,
-            to_user: channelUser,
+            initiator_id: from_user.id,
+            receiver_id: to_user.id,
+            from_user,
+            to_user,
             connection_id: connection.id,
             type: 'users_connection_request',
-            msg: `<strong>${authUser.first_name + ' ' + authUser.last_name}</strong> has sent a connection request to you`,
+            msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has sent a connection request to you`,
             ...checkAgain.toJSON(),
         };
         return returnData;
