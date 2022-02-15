@@ -46,7 +46,7 @@ let socket = (io) => {
 
         socket.on('getConnectedUsers', ({username}) => {
             let socketId = getSocketId(username);
-            console.log("online", getConnectedUserNames(usersGroups))
+            // console.log("online", getConnectedUserNames(usersGroups))
             io.to(socketId).emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
         });
 
@@ -109,6 +109,9 @@ let socket = (io) => {
                 receiver_id: to_user.id,
                 msg: `<strong>${from_user.first_name} ${from_user.last_name}</strong> has accepted your connection request`,
             };
+
+            await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
+
             let n = await usersConnectionNotificationsController.saveNotification({
                 ...notificationData,
                 type: 'accept_connection_request'
@@ -139,6 +142,9 @@ let socket = (io) => {
                 receiver_id: to_user.id,
                 msg: `<strong>${from_user.first_name} ${from_user.last_name}</strong> has declined your connection request`,
             };
+
+            await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
+
 
             let n = await usersConnectionNotificationsController.saveNotification({
                 ...notificationData,
