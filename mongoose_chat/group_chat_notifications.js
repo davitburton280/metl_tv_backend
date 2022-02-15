@@ -24,6 +24,9 @@ let NotificationsSchema = new mongoose.Schema({
     msg: {
         type: String
     },
+    type: {
+        type: String
+    },
     // to_user: {
     //     type: String,
     //     required: true

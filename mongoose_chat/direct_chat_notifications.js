@@ -6,14 +6,24 @@ let NotificationsSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    from_first_name: {
+        type: String,
+        required: true
+    },
+    from_last_name: {
+        type: String,
+        required: true
+    },
+    from_avatar: {
+        type: String
+    },
     connection_id: {
         type: Number,
         required: true
     },
-    // from_user_id: {
-    //     type: Number,
-    //     required: true
-    // },
+    type: {
+        type: String
+    },
     msg: {
         type: String
     },
