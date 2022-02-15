@@ -526,11 +526,11 @@ exports.confirmConnection = async (data) => {
         }
     });
 
-    await UserConnectionNots.destroy({
-        where: {
-            id: data.notification_id
-        }
-    });
+    // await UserConnectionNots.destroy({
+    //     where: {
+    //         id: data.notification_id
+    //     }
+    // });
 
     let confirmedConnection = await UsersConnection.findOne({
         where: {
@@ -557,11 +557,11 @@ exports.declineConnection = async (data) => {
         }
     });
 
-    await UserConnectionNots.destroy({
-        where: {
-            id: data.notification_id
-        }
-    });
+    // await UserConnectionNots.destroy({
+    //     where: {
+    //         id: data.notification_id
+    //     }
+    // });
 };
 
 exports.cancelUsersConnection = async (connection_id) => {

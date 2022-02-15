@@ -58,30 +58,25 @@ let socket = (io) => {
 
             let connection = await to(usersController.createUsersConnection(data));
 
-            let notificationData = {
-                from_id: authUser.id,
-                from_avatar: authUser.avatar,
-                from_first_name: authUser.first_name,
-                from_last_name: authUser.last_name,
+            let notification = {
+                from_user: authUser,
+                to_user: channelUser,
                 connection_id: connection?.id,
-                to_id: channelUser.id,
-                seen: false,
-                seen_at: '',
+                read: false,
+                read_at: '',
+                type: 'users_connection_request',
                 msg: `<strong>${authUser.first_name + ' ' + authUser.last_name}</strong> has sent a connection request to you`
             };
 
-            await usersConnectionNotificationsController.saveNotification({
-                ...notificationData,
-                type: 'users_connection_request'
-            });
+            await usersConnectionNotificationsController.saveNotification(notification);
 
             // console.log('connect!!!', username, socketId)
             // console.log('users!!!', usersGroups, channelUserSocketId, usersGroups[authUserSocketId])
-            // console.log('connection!!!', connection)
+            console.log('connection!!!', connection)
 
             console.log("connection request from " + authUser.username + '=>', `${authUserSocketId}`, ' to ' + channelUser.username + '=>' + `${channelUserSocketId}`)
-            io.to(channelUserSocketId).emit('getConnectWithUser', connection);
-            io.to(authUserSocketId).emit('getConnectWithUser', connection)
+            io.to(channelUserSocketId).emit('getConnectWithUser', {notification});
+            io.to(authUserSocketId).emit('getConnectWithUser', {connection, notification})
         });
 
         socket.on('cancelUsersConnection', async ({authUser, channelUser, connection_id}) => {
@@ -97,7 +92,7 @@ let socket = (io) => {
         socket.on('acceptConnection', async (data) => {
 
             let {from_user, to_user} = data;
-            let toUserSocketId = getSocketId(to_user.username);
+            let toUserSocketId = getSocketId(data.to_user.username);
             let fromUserSocketId = getSocketId(from_user.username);
 
 
@@ -108,28 +103,27 @@ let socket = (io) => {
             });
             let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
 
-            let notificationData = {
+            let notification = {
+                from_user, to_user,
                 connection_id: data.connection_id,
-                initiator_id: from_user.id,
-                receiver_id: to_user.id,
-                msg: `<strong>${from_user.first_name} ${from_user.last_name}</strong> has accepted your connection request`,
+                read: false,
+                read_at: '',
+                type: 'accept_connection_request',
+                msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has accepted your connection request`
             };
 
             await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
 
-            let n = await usersConnectionNotificationsController.saveNotification({
-                ...notificationData,
-                type: 'accept_connection_request'
-            });
+            let n = await usersConnectionNotificationsController.saveNotification(notification);
 
             console.log('accept from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
 
             io.to(fromUserSocketId).emit('acceptedConnection', {
-                ...notificationData,
+                ...notification,
                 users_messages: fromUserMessages
             });
             io.to(toUserSocketId).emit('acceptedConnection', {
-                ...notificationData, ...JSON.parse(JSON.stringify(n)),
+                ...notification, ...JSON.parse(JSON.stringify(n)),
                 users_messages: toUserMessages
             })
         });
@@ -141,23 +135,22 @@ let socket = (io) => {
 
             await usersController.declineConnection(data);
 
-            let notificationData = {
+            let notification = {
+                from_user, to_user,
                 connection_id: data.connection_id,
-                initiator_id: from_user.id,
-                receiver_id: to_user.id,
-                msg: `<strong>${from_user.first_name} ${from_user.last_name}</strong> has declined your connection request`,
+                read: false,
+                read_at: '',
+                type: 'decline_connection_request',
+                msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has declined your connection request`
             };
 
             await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
 
 
-            let n = await usersConnectionNotificationsController.saveNotification({
-                ...notificationData,
-                type: 'decline_connection_request'
-            });
+            let n = await usersConnectionNotificationsController.saveNotification(notification);
 
             io.to(toUserSocketId).emit('declinedConnection', {
-                ...notificationData, from_user,
+                ...notification, from_user,
                 to_user,
                 notification_type: {name: 'declined_connection_request'}
             })

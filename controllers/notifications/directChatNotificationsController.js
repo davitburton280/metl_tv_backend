@@ -59,11 +59,10 @@ exports.getCurrentUserNotifications = async (data) => {
 
     let notifications = await DirectChatNotifications.find({
 
-        to_id: data.user_id
+        "to_user.id": data.user_id
 
         // order: ['created_at']
     }).sort({'created_at': 1});
-
     return notifications;
 };
 
@@ -75,29 +74,30 @@ exports.removeNotification = async (req, res) => {
     } else {
         id = req.query.id;
     }
-    let currentNotification = await UserConnectionNots.findOne({where: {id}, attributes: ['to_id']});
+    let currentNotification = await DirectChatNotifications.findOne({id});
     console.log('notification id!!!', currentNotification)
-    let t = await UserConnectionNots.destroy({where: {id}});
+    let t = await DirectChatNotifications.deleteOne({id});
     return currentNotification?.to_id;
 };
 
 exports.removeAllNotifications = async (user_id) => {
-    await UserConnectionNots.destroy({where: {to_id: user_id}});
+    console.log('remove all', user_id)
+    await DirectChatNotifications.deleteMany({"to_user.id": user_id});
 };
 
 exports.read = async (req, res) => {
     let {id} = req.body;
     console.log(id)
-    await UserConnectionNots.update({read: '1'}, {where: {id}});
+    await DirectChatNotifications.updateOne({read: true}, {id});
 
-    let currentNotification = await UserConnectionNots.findOne({where: {id}, attributes: ['to_id']});
-    return currentNotification.to_id;
+    let currentNotification = await DirectChatNotifications.findOne({id});
+    return currentNotification.to_user.id;
 };
 
 exports.markAllAsRead = async (req, res) => {
     let {ids} = req.body;
     let result = ids.map(async (id) => {
-        await UserConnectionNots.update({read: '1'}, {where: {id}});
+        await DirectChatNotifications.updateOne({read: true}, {id});
     });
 
     await Promise.all(result);
