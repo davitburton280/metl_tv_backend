@@ -4,7 +4,7 @@ let filteredGroupsUsers = [];
 let groupChatController = require('../controllers/chat_mongo/groupChatController');
 let usersController = require('../controllers/usersController');
 let directChatController = require('../controllers/chat_mongo/directChatController');
-let usersConnectionNotificationsController = require('../controllers/notifications/usersConnectionNotificationsController');
+let usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController');
 let groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController');
 
 

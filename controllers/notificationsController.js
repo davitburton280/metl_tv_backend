@@ -1,4 +1,4 @@
-const usersConnectionNotificationsController = require('./notifications/usersConnectionNotificationsController');
+const usersConnectionNotificationsController = require('./notifications/directChatNotificationsController');
 const groupChatNotificationsController = require('./notifications/groupChatNotificationsController');
 
 const sequelize = require('sequelize');

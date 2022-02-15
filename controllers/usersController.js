@@ -62,7 +62,7 @@ const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 const to = require('../helpers/getPromiseResult');
 const getFullName = require('../helpers/getFullNameCol');
 
-const usersConnectionNotifsController = require('../controllers/notifications/usersConnectionNotificationsController');
+const usersConnectionNotifsController = require('./notifications/directChatNotificationsController');
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
