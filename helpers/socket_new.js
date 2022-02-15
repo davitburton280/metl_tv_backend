@@ -371,8 +371,11 @@ let socket = (io) => {
 
                     let notificationData = {
                         group_id: group.id,
-                        initiator_id: inviter.id,
-                        receiver_id: member.id,
+                        from_id: inviter.id,
+                        from_avatar: inviter.avatar,
+                        from_first_name: inviter.first_name,
+                        from_last_name: inviter.last_name,
+                        to_id: member.id,
                         msg: `<strong>${inviterName}</strong> has sent an invitation to join the <strong>${groupName}</strong> group`,
                     };
 
