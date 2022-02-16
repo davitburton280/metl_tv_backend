@@ -2,6 +2,9 @@ let mongoose = require('mongoose')
 const moment = require('moment');
 
 let NotificationsSchema = new mongoose.Schema({
+    group_name: {
+        type: String
+    },
     group_id: {
         type: Number,
         required: true

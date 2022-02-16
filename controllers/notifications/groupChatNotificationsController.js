@@ -96,6 +96,19 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
     // return notifications;
 };
 
+exports.removeNotification = async (req, res) => {
+    let id;
+    if (req.return) {
+        id = req.id;
+    } else {
+        id = req.query.id;
+    }
+    console.log('notification id!!!', req)
+    let currentNotification = await GroupChatNotifications.findOne({id});
+    let t = await GroupChatNotifications.deleteOne({_id: id});
+    return currentNotification?.to_id;
+};
+
 exports.removeAllNotifications = async (user_id) => {
     await GroupChatNotifications.deleteMany({"to_user.id": user_id});
 };

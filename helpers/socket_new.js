@@ -341,6 +341,7 @@ let socket = (io) => {
 
                     let notification = {
                         group_id: group.id,
+                        group_name: groupName,
                         from_user,
                         to_user: member,
                         to_id: member.id,
@@ -377,7 +378,7 @@ let socket = (io) => {
 
             // console.log(usersGroups)
             Object.values(usersGroups).map(gu => {
-                console.log('aaaa', gu, gu.chat_groups.find(g => g === groupName))
+                // console.log('aaaa', gu, gu.chat_groups.find(g => g === groupName))
                 if (gu.username === user.username && !gu.chat_groups.find(g => g === groupName)) {
                     gu.chat_groups.push(groupName);
                 }
@@ -385,24 +386,28 @@ let socket = (io) => {
 
             console.log(usersGroups)
 
-            let notificationData = {
+            let notification = {
                 group_id: group.id,
-                initiator_id: user.id,
+                group_name: groupName,
+                from_user: user,
+                // to_user: member,
+                // to_id: member.id,
                 msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has accepted to join the <strong>${group.name}</strong> group`,
+                type: 'accept_group_invitation'
             };
 
-            let n = await groupChatNotificationsController.saveNotification({
-                ...notificationData,
-                type: 'accept_group_invitation'
-            });
+            let savedNotification = await groupChatNotificationsController.saveNotification(notification);
+
+            notification._id = savedNotification._id;
+
+            await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             console.log(await io.in(groupName).allSockets());
 
             io.sockets.in(groupName).emit('acceptedJoinGroup', {
                 ...data,
-                ...notificationData,
-                ...n,
+                ...notification
             });
         });
 
@@ -426,7 +431,7 @@ let socket = (io) => {
 
             notification._id = savedNotification._id;
 
-            await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
+            await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
 
             console.log(await io.in(group.name).allSockets());
             io.sockets.in(group.name).emit('getDeclinedJoinGroup', {
