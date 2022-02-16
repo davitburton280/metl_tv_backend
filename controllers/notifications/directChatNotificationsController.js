@@ -90,7 +90,7 @@ exports.read = async (req, res) => {
 
     let notification = await DirectChatNotifications.findById(id);
     notification.read = true;
-    notification.save();
+    await notification.save();
 
     let currentNotification = await DirectChatNotifications.findById(id);
     return currentNotification.to_user.id;
@@ -104,7 +104,7 @@ exports.markAllAsRead = async (req, res) => {
             console.log(_id, notification?._id)
         if (notification) {
             notification.read = true;
-            notification.save();
+            await notification.save();
         }
     }));
 

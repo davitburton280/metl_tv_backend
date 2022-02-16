@@ -438,9 +438,9 @@ let socket = (io) => {
                 ...data,
                 ...notification,
             });
-            io.to(socketId).emit('getDeclinedJoinGroup', {
-                ...data, initiator_id: user.id
-            })
+            // io.to(socketId).emit('getDeclinedJoinGroup', {
+            //     ...data, initiator_id: user.id
+            // })
         });
 
         socket.on('leaveGroup', async (data) => {

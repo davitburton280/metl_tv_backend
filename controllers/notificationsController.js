@@ -25,22 +25,23 @@ exports.get = async (req, res) => {
     let usersConnectionNotifs = await usersConnectionNotificationsController.getCurrentUserNotifications(data);
     let groupChatNotifs = await groupChatNotificationsController.getCurrentGroupUsersNotifications(user.toJSON());
     let ret = [...new Set([...usersConnectionNotifs, ...groupChatNotifs])];
-    //
+
     res.json(ret);
 };
 
 exports.read = async (req, res) => {
-    let {type, id} = req.body;
+    let {type, id, read_by} = req.body;
     let userNotificationsResult;
 
     if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
         userNotificationsResult = await usersConnectionNotificationsController.read(req, res);
         req.query.user_id = userNotificationsResult;
     } else if (c.GROUP_CHAT_NOTIFICATION_TYPES.includes(type)) {
-        console.log('OK')
+        userNotificationsResult = await groupChatNotificationsController.read(req, res);
+        req.query.user_id = read_by.id;
     }
-
-    // this.get(req, res);
+console.log(req.query.user_id)
+    this.get(req, res);
     // console.log(req.body)
 };
 

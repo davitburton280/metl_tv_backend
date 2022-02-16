@@ -6,6 +6,8 @@ const Users = db.users;
 const GroupChatNotifications = require('../../mongoose_chat/group_chat_notifications');
 const NotificationTypes = db.notification_types;
 
+const moment = require('moment');
+
 exports.saveNotification = async (data) => {
     // console.log('aaa', data)
     // let fields = {
@@ -62,6 +64,7 @@ exports.saveNotification = async (data) => {
 };
 
 exports.getCurrentGroupUsersNotifications = async (data) => {
+    // console.log(data)
     data.group_ids = data.chat_group_members.map(group => group.id);
     // console.log('group_ids!!!', data.group_ids)
     let notifications = await GroupChatNotifications.find({
@@ -70,30 +73,15 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
 
     }).sort({'created_at': 1});
 
+    let ret = [];
 
-    // let notifications = await GroupChatNots.findAll({
-    //     include: [
-    //         {model: Users, as: 'from_user', attributes: ['id', 'username', 'avatar', 'first_name', 'last_name']},
-    //         {model: Users, as: 'to_user', attributes: ['id', 'username', 'avatar', 'first_name', 'last_name']},
-    //         {model: NotificationTypes, as: 'notification_type'}
-    //     ],
-    //     where: {
-    //         group_id: {[Op.in]: data.group_ids},
-    //     },
-    //     order: ['created_at']
-    // });
+    notifications.map(n => {
+        let found = !!n.read.find(r => r.read_by.id === data.id)
+        delete n.read;
+        ret.push({...n.toObject(), read: found});
+    })
 
-    // console.log(JSON.parse(JSON.stringify(notifications)))
-
-    // return JSON.parse(JSON.stringify(notifications));
-
-    return notifications;
-    //
-    // let notifications = JSON.parse(JSON.stringify(t)).map(n => {
-    //     n.type = 'group_chat_notifications';
-    //     return n;
-    // });
-    // return notifications;
+    return ret;
 };
 
 exports.removeNotification = async (req, res) => {
@@ -111,4 +99,35 @@ exports.removeNotification = async (req, res) => {
 
 exports.removeAllNotifications = async (user_id) => {
     await GroupChatNotifications.deleteMany({"to_user.id": user_id});
+};
+
+
+exports.read = async (req, res) => {
+    let {id, read_by} = req.body;
+    console.log('read!!!!')
+
+    let notification = await GroupChatNotifications.findById(id);
+    if (!notification.read.find(r => r.read_by.id === read_by.id)) {
+        notification.read.push({read_by, read_at: moment().format('YYYY-MM-DD, h:mm:ss a')});
+    }
+    await notification.save();
+
+    let currentNotification = await GroupChatNotifications.findById(id);
+    return currentNotification;
+};
+
+exports.markAllAsRead = async (req, res) => {
+    let {ids, read_by} = req.body;
+    console.log('ids!!!', ids)
+    let result = await Promise.all(ids.map(async (_id) => {
+        let notification = await GroupChatNotifications.findById(_id);
+        if (!notification.read.find(r => r.read_by.id === read_by.id)) {
+            notification.read.push({read_by, read_at: moment().format('YYYY-MM-DD, h:mm:ss a')});
+        }
+        await notification.save();
+    }));
+
+    return 'OK';
+
+
 };
