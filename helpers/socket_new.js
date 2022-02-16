@@ -325,7 +325,7 @@ let socket = (io) => {
 
         socket.on('inviteToNewGroup', async (data) => {
 
-            console.log('invite to new group!!!', data);
+            console.log('invite to new group!!!');
 
             let {from_user, invited_members, group} = data;
             let inviterName = from_user.first_name + ' ' + from_user.last_name;
@@ -405,7 +405,7 @@ let socket = (io) => {
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             console.log(await io.in(groupName).allSockets());
 
-            io.sockets.in(groupName).emit('acceptedJoinGroup', {
+            socket.broadcast.to(groupName).emit('acceptedJoinGroup', {
                 ...data,
                 ...notification
             });
