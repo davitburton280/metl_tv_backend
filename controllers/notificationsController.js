@@ -31,6 +31,7 @@ exports.get = async (req, res) => {
 
 exports.read = async (req, res) => {
     let {type, id, read_by} = req.body;
+    console.log(type)
     let userNotificationsResult;
 
     if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
@@ -40,7 +41,7 @@ exports.read = async (req, res) => {
         userNotificationsResult = await groupChatNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     }
-    console.log(req.query.user_id)
+    console.log('mark as read', req.query)
     this.get(req, res);
     // console.log(req.body)
 };
@@ -62,7 +63,7 @@ exports.markAllAsRead = async (req, res) => {
 
 
     req.query.user_id = user_id;
-    console.log(req.query)
+    console.log('mark all as read', req.query)
     this.get(req, res);
 };
 

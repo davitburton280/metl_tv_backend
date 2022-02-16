@@ -110,7 +110,7 @@ exports.removeAllNotifications = async (user_id) => {
 
 exports.read = async (req, res) => {
     let {id, read_by} = req.body;
-    console.log('read!!!!')
+    console.log('read!!!!', read_by)
 
     let notification = await GroupChatNotifications.findById(id);
     if (!notification.read.find(r => r.read_by.id === read_by.id)) {
