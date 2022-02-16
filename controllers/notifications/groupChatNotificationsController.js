@@ -68,8 +68,14 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
     data.group_ids = data.chat_group_members.map(group => group.id);
     // console.log('group_ids!!!', data.group_ids)
     let notifications = await GroupChatNotifications.find({
-
-        group_id: {'$in': data.group_ids}
+        "$and": [
+            {
+                group_id: {'$in': data.group_ids}
+            },
+            {
+                "from_user.id": {'$ne': data.id}
+            }
+        ],
 
     }).sort({'created_at': 1});
 
@@ -117,10 +123,11 @@ exports.read = async (req, res) => {
 };
 
 exports.markAllAsRead = async (req, res) => {
-    let {ids, read_by} = req.body;
-    console.log('ids!!!', ids)
-    let result = await Promise.all(ids.map(async (_id) => {
-        let notification = await GroupChatNotifications.findById(_id);
+    let {notifications, read_by} = req.body;
+    // console.log('ids!!!', ids)
+    let result = await Promise.all(notifications.map(async ({id}) => {
+        let notification = await GroupChatNotifications.findById(id);
+        console.log('check to find!!!', !notification.read.find(r => r.read_by.id === read_by.id))
         if (!notification.read.find(r => r.read_by.id === read_by.id)) {
             notification.read.push({read_by, read_at: moment().format('YYYY-MM-DD, h:mm:ss a')});
         }

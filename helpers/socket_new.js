@@ -462,22 +462,23 @@ let socket = (io) => {
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
 
-            let notificationData = {
+            let notification = {
                 group_id: group.id,
-                initiator_id: user.id,
+                from_user: user,
+                // to_user: member,
+                // to_id: member.id,
                 msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has left the <strong>${group.name}</strong> group`,
+                type: 'left_group'
             };
 
-            let n = await groupChatNotificationsController.saveNotification({
-                ...notificationData,
-                type: 'left_group'
-            });
+            let savedNotification = await groupChatNotificationsController.saveNotification(notification);
+
+            notification._id = savedNotification._id;
 
             console.log(await io.in(groupName).allSockets());
             io.sockets.in(group.name).emit('leaveGroupNotify', {
                 ...data,
-                ...notificationData,
-                ...n,
+                ...notification,
             });
         });
 

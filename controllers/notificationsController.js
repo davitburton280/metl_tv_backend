@@ -40,14 +40,27 @@ exports.read = async (req, res) => {
         userNotificationsResult = await groupChatNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     }
-console.log(req.query.user_id)
+    console.log(req.query.user_id)
     this.get(req, res);
     // console.log(req.body)
 };
 
 exports.markAllAsRead = async (req, res) => {
-    let {user_id} = req.body;
-    await usersConnectionNotificationsController.markAllAsRead(req, res);
+    let {user_id, read_by, notifications} = req.body;
+    let userNotificationsResult;
+
+    await Promise.all(notifications.map(async (n) => {
+
+        if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(n.type)) {
+            userNotificationsResult = await usersConnectionNotificationsController.markAllAsRead(req, res);
+            req.query.user_id = userNotificationsResult;
+        } else if (c.GROUP_CHAT_NOTIFICATION_TYPES.includes(n.type)) {
+            userNotificationsResult = await groupChatNotificationsController.markAllAsRead(req, res);
+            req.query.user_id = read_by.id;
+        }
+    }))
+
+
     req.query.user_id = user_id;
     console.log(req.query)
     this.get(req, res);
