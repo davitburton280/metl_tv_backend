@@ -221,7 +221,7 @@ let socket = (io) => {
         });
 
         socket.on('setSeen', async (data) => {
-            console.log('set seen', data)
+            console.log('set seen')
 
             let {from_username, to_username, connection_id, group_name} = data;
 
@@ -278,6 +278,7 @@ let socket = (io) => {
 
                 data.direct_messages = await directChatController.saveDirectMessage(data)
                 console.log('DIRECT MESSAGE!!!', toUserSocketId, fromUserSocketId)
+                console.log(data.direct_messages)
                 io.to(toUserSocketId).emit('newMessage', data)
                 io.to(fromUserSocketId).emit('newMessage', data)
 
