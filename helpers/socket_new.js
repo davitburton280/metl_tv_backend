@@ -278,7 +278,7 @@ let socket = (io) => {
 
                 data.direct_messages = await directChatController.saveDirectMessage(data)
                 console.log('DIRECT MESSAGE!!!', toUserSocketId, fromUserSocketId)
-                console.log(data.direct_messages)
+                // console.log(data.direct_messages)
                 io.to(toUserSocketId).emit('newMessage', data)
                 io.to(fromUserSocketId).emit('newMessage', data)
 
