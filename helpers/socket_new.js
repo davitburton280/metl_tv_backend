@@ -408,8 +408,8 @@ let socket = (io) => {
             console.log('accepted!!!')
 
             io.sockets.in(group.name).emit('acceptedJoinGroup', {
-                ...data,
-                ...notification
+                rest: data,
+                notification
             });
             // socket.broadcast.to(groupName).emit('acceptedJoinGroup', {
             //     ...data,
