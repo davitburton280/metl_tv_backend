@@ -405,11 +405,16 @@ let socket = (io) => {
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             console.log(await io.in(groupName).allSockets());
+            console.log('accepted!!!')
 
-            socket.broadcast.to(groupName).emit('acceptedJoinGroup', {
+            io.sockets.in(group.name).emit('acceptedJoinGroup', {
                 ...data,
                 ...notification
             });
+            // socket.broadcast.to(groupName).emit('acceptedJoinGroup', {
+            //     ...data,
+            //     ...notification
+            // });
         });
 
         socket.on('declineJoinGroup', async (data) => {
@@ -458,7 +463,6 @@ let socket = (io) => {
             })
             console.log(usersGroups)
             console.log(await io.in(groupName).allSockets());
-
 
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});

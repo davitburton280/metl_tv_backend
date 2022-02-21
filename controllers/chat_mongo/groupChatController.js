@@ -120,7 +120,7 @@ exports.getGroupMembers = async (req, res) => {
     });
 
     if (req.return) {
-        return members;
+        return JSON.parse(JSON.stringify(members));
     } else {
 
         res.json(members);
