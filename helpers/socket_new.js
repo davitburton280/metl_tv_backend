@@ -123,11 +123,11 @@ let socket = (io) => {
             console.log('accept from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
 
             io.to(fromUserSocketId).emit('acceptedConnection', {
-                ...notification,
+                notification,
                 users_messages: fromUserMessages
             });
             io.to(toUserSocketId).emit('acceptedConnection', {
-                ...notification,
+                notification,
                 users_messages: toUserMessages
             })
         });
@@ -465,7 +465,8 @@ let socket = (io) => {
             console.log(await io.in(groupName).allSockets());
 
 
-            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            let groupMembers = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            data.group.chat_group_members = groupMembers?.chat_group_members;
 
             let notification = {
                 group_id: group.id,

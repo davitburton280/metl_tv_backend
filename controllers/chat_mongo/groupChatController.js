@@ -98,7 +98,7 @@ exports.removeGroup = async (req, res) => {
 };
 
 
-exports.getGroupMembers = async (req, res) => {
+ exports.getGroupMembers = async (req, res) => {
     console.log('get group members!!!');
     let group_id;
     if (req.return) {
