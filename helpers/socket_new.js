@@ -315,7 +315,7 @@ let socket = (io) => {
             // console.log(usersGroups)
 
             data.groupsUsers = await groupChatController.getGroupsMessages({return: true, user_id: data.initiator.id});
-
+            console.log(data.groupsUsers)
 
             io.sockets.in(group.name).emit('removeGroupNotify', data);
             console.log(await io.in(group.name).allSockets());
