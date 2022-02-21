@@ -98,7 +98,7 @@ exports.removeGroup = async (req, res) => {
 };
 
 
- exports.getGroupMembers = async (req, res) => {
+exports.getGroupMembers = async (req, res) => {
     console.log('get group members!!!');
     let group_id;
     if (req.return) {
@@ -107,7 +107,7 @@ exports.removeGroup = async (req, res) => {
         group_id = req.query.group_id;
     }
 
-    let members = await ChatGroups.findOne({
+    let groupMembers = await ChatGroups.findOne({
         include: [
             {
                 model: Users,
@@ -119,11 +119,24 @@ exports.removeGroup = async (req, res) => {
         where: {id: group_id}
     });
 
+    if(groupMembers){
+
+        groupMembers = JSON.parse(JSON.stringify(groupMembers));
+
+        // Gets messages from MongoDb
+        let messages = await GroupsMessages.find({
+            group_id
+        }).sort({'created_at': 1});
+
+        groupMembers.group_messages = messages;
+    }
+
+
     if (req.return) {
-        return JSON.parse(JSON.stringify(members));
+        return JSON.parse(JSON.stringify(groupMembers));
     } else {
 
-        res.json(members);
+        res.json(groupMembers);
     }
 };
 
