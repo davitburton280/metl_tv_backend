@@ -61,14 +61,17 @@ let socket = (io) => {
 
         socket.on('newUser', async ({username, chat_groups}) => {
             console.log("USERNAME!!!!", username)
-            usersGroups[username] = {username, socket_id: socket.id, chat_groups};
-            chat_groups.map(group => {
-                socket.join(group);
-            })
-            io.emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
-            console.log('USERS CONNECTED!!!')
-            console.log(usersGroups)
-            // console.log(await getGroupSockets(io, chat_groups[0]))
+            if (username) {
+                usersGroups[username] = {username, socket_id: socket.id, chat_groups};
+                chat_groups.map(group => {
+                    socket.join(group);
+                })
+                io.emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
+                console.log('USERS CONNECTED!!!')
+                console.log(usersGroups)
+                // console.log(await getGroupSockets(io, chat_groups[0]))
+            }
+
         })
 
         socket.on('getConnectedUsers', ({username}) => {
@@ -541,7 +544,7 @@ let socket = (io) => {
             let contacts = await usersController.getContacts({return: true, user_id: user.id});
 
             contacts.map(contact => {
-                console.log('aaa', contact.username, getSocketId(contact.username))
+                // console.log('aaa', contact.username, getSocketId(contact.username))
                 let theSocket = io.sockets.sockets.get(getSocketId(contact.username));
                 theSocket?.emit('onLogout', user)
             })
@@ -583,7 +586,7 @@ let socket = (io) => {
             // // console.log('END OF LEFT!!!')
             // data.users = Object.keys(users);
             // io.sockets.emit('chatNotification', data);
-            socket.disconnect();
+            socket.leave();
         });
 
 
