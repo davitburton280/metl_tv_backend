@@ -15,6 +15,18 @@ getGroupSockets = async (io, group) => {
     return await io.in(group).allSockets();
 }
 
+getGroupUsernames = (groupName) => {
+    let groupUsernames = [];
+    // console.log(Object.values(usersGroups))
+    Object.values(usersGroups).map(gu => {
+        if (gu.chat_groups.find(g => g === groupName)) {
+            groupUsernames.push(gu.username)
+        }
+    })
+
+    return groupUsernames;
+}
+
 getConnectedUserNames = (usersGroups) => {
     return Object.keys(usersGroups);
 }
@@ -63,12 +75,17 @@ let socket = (io) => {
             console.log("USERNAME!!!!", username)
             if (username) {
                 usersGroups[username] = {username, socket_id: socket.id, chat_groups};
-                chat_groups.map(group => {
+                chat_groups.map((group) => {
                     socket.join(group);
-                })
-                io.emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
+                    let groupUsernames = getGroupUsernames(group)
+                    console.log('group usernames ', group, ' => ', groupUsernames)
+                    io.sockets.in(group).emit('onGetOnlineMembers', {group, members: groupUsernames})
+                });
+
                 console.log('USERS CONNECTED!!!')
-                console.log(usersGroups)
+                console.log(getConnectedUserNames(usersGroups))
+                io.emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
+                // console.log(usersGroups)
                 // console.log(await getGroupSockets(io, chat_groups[0]))
             }
 
@@ -292,6 +309,21 @@ let socket = (io) => {
             }
         });
 
+        socket.on('getConnectedGroupMembers', async ({group_name, username}) => {
+            let onlineMembers = [];
+            Object.values(usersGroups).map(uGroups => {
+                if (uGroups.chat_groups.find(cg => cg === group_name)) {
+                    onlineMembers.push(uGroups.username);
+                }
+            });
+            let socketId = getSocketId(username);
+            console.log(socketId, onlineMembers)
+            // console.log(await io.in(group_name).allSockets());
+            // console.log("online", getConnectedUserNames(usersGroups))
+            io.to(group_name).emit('onGetOnlineMembers', {group: group_name, members: onlineMembers})
+        })
+        ;
+
         socket.on('setNewGroup', async ({username, ...data}) => {
             console.log('set new group', data)
             let userGroups = usersGroups[username];
@@ -302,7 +334,10 @@ let socket = (io) => {
             socket.join(data.name);
 
             console.log(userGroups, usersGroups)
-            data.groupsUsers = await groupChatController.getGroupsMessages({return: true, user_id: data.creator_id});
+            data.groupsUsers = await groupChatController.getGroupsMessages({
+                return: true,
+                user_id: data.creator_id
+            });
             io.to(data.name).emit('chatNotification', {...data, group: data.name})
         });
 
@@ -317,7 +352,10 @@ let socket = (io) => {
             usersGroups[initiator.username].chat_groups = filteredUserGroups;
             // console.log(usersGroups)
 
-            data.groupsUsers = await groupChatController.getGroupsMessages({return: true, user_id: data.initiator.id});
+            data.groupsUsers = await groupChatController.getGroupsMessages({
+                return: true,
+                user_id: data.initiator.id
+            });
             console.log(data.groupsUsers)
 
             io.sockets.in(group.name).emit('removeGroupNotify', data);
@@ -542,14 +580,22 @@ let socket = (io) => {
             delete usersGroups[user.username];
             // usersGroups = Object.values(usersGroups).filter(u => u.username !== user.username);
             let contacts = await usersController.getContacts({return: true, user_id: user.id});
+            let groups = await groupChatController.getGroupsMessages({return: true, user_id: user.id});
+            // console.log('GROUPS:', groups)
 
             contacts.map(contact => {
                 // console.log('aaa', contact.username, getSocketId(contact.username))
                 let theSocket = io.sockets.sockets.get(getSocketId(contact.username));
                 theSocket?.emit('onLogout', user)
             })
+
+            if (groups) {
+                groups.map(group => {
+                    io.sockets.in(group.name).emit('onLogout', user)
+                })
+            }
             // console.log('CONTACTS:', contacts)
-            console.log(Object.values(usersGroups))
+            // console.log(Object.values(usersGroups))
             //
             // delete users[data.username];
             //
