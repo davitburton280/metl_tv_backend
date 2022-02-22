@@ -129,7 +129,7 @@ exports.markAllAsRead = async (req, res) => {
         let notification = await GroupChatNotifications.findById(id);
         if (notification) {
 
-            console.log('check to find!!!', !notification.read.find(r => r.read_by.id === read_by.id))
+            // console.log('check to find!!!', !notification.read.find(r => r.read_by.id === read_by.id))
             if (!notification.read.find(r => r.read_by.id === read_by.id)) {
                 notification.read.push({read_by, read_at: moment().format('YYYY-MM-DD, h:mm:ss a')});
             }

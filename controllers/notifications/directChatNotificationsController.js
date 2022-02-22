@@ -101,7 +101,7 @@ exports.markAllAsRead = async (req, res) => {
     // console.log('ids!!!', notifications)
     let result = await Promise.all(notifications.map(async ({id}) => {
         let notification = await DirectChatNotifications.findById(id);
-            console.log(id, notification?._id)
+            // console.log(id, notification?._id)
         if (notification) {
             notification.read = true;
             await notification.save();
