@@ -61,6 +61,8 @@ exports.getGroupsMessages = async (req, res) => {
         group_id: chatGroups
     }).sort({'created_at': 1});
 
+    console.log("MESSAGES", messages)
+
     let result = JSON.parse(JSON.stringify(groupsMessages)).map(uc => {
         let group_id = uc.id;
         uc.group_messages = messages.filter(msg => msg.toObject().group_id === group_id);
