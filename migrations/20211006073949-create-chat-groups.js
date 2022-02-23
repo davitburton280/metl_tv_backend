@@ -20,6 +20,9 @@ module.exports = {
             avatar: {
                 type: Sequelize.STRING,
             },
+            cover: {
+                type: Sequelize.STRING,
+            },
             created_at: {
                 allowNull: false,
                 type: Sequelize.DATE,
