@@ -602,44 +602,7 @@ let socket = (io) => {
                     io.sockets.in(group.name).emit('onLogout', user)
                 })
             }
-            // console.log('CONTACTS:', contacts)
-            // console.log(Object.values(usersGroups))
-            //
-            // delete users[data.username];
-            //
-            // // if (data.leavingGroup) {
-            //
-            //
-            // let disconnectedUserGroups = groupsUsers.filter(u => u.username === data.username)
-            //
-            // filteredGroupsUsers = groupsUsers.filter(u => u.username !== data.username);
-            //
-            // disconnectedUserGroups.map(u => {
-            //     data.msg = `${data.username} has left the chat`;
-            //     data.groupsUsers = filteredGroupsUsers;
-            //
-            //     data.group = u.group;
-            //     io.sockets.in(u.group).emit('chatNotification', data);
-            // });
-            //
-            // groupsUsers = filteredGroupsUsers;
-            //
-            // console.log('DISCONNECTED USER GROUPS!!!')
-            // console.log(disconnectedUserGroups)
-            // console.log('DISCONNECTED USER GROUPS!!!')
-            //
-            // // } else {
-            // //
-            // // }
-            //
-            //
-            // // console.log('LEFT!!! GROUP USERS:')
-            // // console.log(groupsUsers)
-            // // console.log('FILTERED GROUP USERS:')
-            // // console.log(filteredGroupsUsers)
-            // // console.log('END OF LEFT!!!')
-            // data.users = Object.keys(users);
-            // io.sockets.emit('chatNotification', data);
+            
             socket.leave();
         });
 
