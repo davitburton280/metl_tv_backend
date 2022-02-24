@@ -386,7 +386,7 @@ let socket = (io) => {
                         from_user,
                         to_user: member,
                         to_id: member.id,
-                        msg: `<strong>${inviterName}</strong> has sent an invitation to join the <strong>${groupName}</strong> group`,
+                        msg: data.msg,
                         type: 'group_join_invitation'
                     };
 
@@ -429,7 +429,6 @@ let socket = (io) => {
                 }
             })
 
-            console.log(usersGroups)
 
             let notification = {
                 group_id: group.id,
@@ -437,9 +436,11 @@ let socket = (io) => {
                 from_user: user,
                 // to_user: member,
                 // to_id: member.id,
-                msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has accepted to join the <strong>${group.name}</strong> group`,
+                msg: data.msg,
+                link: data.link,
                 type: 'accept_group_invitation'
             };
+            console.log(notification)
 
             let savedNotification = await groupChatNotificationsController.saveNotification(notification);
 
@@ -602,7 +603,7 @@ let socket = (io) => {
                     io.sockets.in(group.name).emit('onLogout', user)
                 })
             }
-            
+
             socket.leave();
         });
 

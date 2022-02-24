@@ -19,6 +19,9 @@ let NotificationsSchema = new mongoose.Schema({
     msg: {
         type: String
     },
+    link: {
+        type:String
+    },
     type: {
         type: String
     },
