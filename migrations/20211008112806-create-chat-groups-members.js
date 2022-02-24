@@ -14,6 +14,10 @@ module.exports = {
             group_id: {
                 type: Sequelize.INTEGER
             },
+            accepted: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
             confirmed: {
                 type: Sequelize.INTEGER,
                 defaultValue: 0
