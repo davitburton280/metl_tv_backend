@@ -80,7 +80,7 @@ exports.getDirectMessages = async (req, res) => {
         });
 
         directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
-    // console.log(directConnectionIds)
+    console.log(directConnectionIds)
     }
 
 
@@ -105,7 +105,7 @@ exports.getDirectMessages = async (req, res) => {
 
                 where: {
                     id: {[Op.in]: directConnectionIds},
-                    confirmed: 1
+                    // confirmed: 1
                 },
                 through: {attributes: []},
             }

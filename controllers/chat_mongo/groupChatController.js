@@ -175,7 +175,7 @@ exports.leaveGroup = async (req, res) => {
 
 exports.acceptGroupJoin = async (req, res) => {
     const {group_id, member_id} = req.body;
-    await ChatGroupsMembers.update({confirmed: 1}, {where: {group_id, member_id}});
+    await ChatGroupsMembers.update({accepted: 1}, {where: {group_id, member_id}});
     req.query.user_id = member_id;
     this.getGroupsMessages(req, res);
 };
