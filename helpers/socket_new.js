@@ -321,8 +321,7 @@ let socket = (io) => {
             // console.log(await io.in(group_name).allSockets());
             // console.log("online", getConnectedUserNames(usersGroups))
             io.to(group_name).emit('onGetOnlineMembers', {group: group_name, members: onlineMembers})
-        })
-        ;
+        });
 
         socket.on('setNewGroup', async ({username, ...data}) => {
             console.log('set new group', data)
