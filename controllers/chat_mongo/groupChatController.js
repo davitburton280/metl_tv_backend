@@ -194,6 +194,15 @@ exports.confirmJoinGroup = async (req, res) => {
     this.getGroupsMessages(req, res);
 }
 
+exports.ignoreJoinGroup = async (req, res) => {
+    const {group_id, member_id} = req.body;
+    await ChatGroupsMembers.destroy({where: {group_id, member_id}});
+    let group = await ChatGroups.findOne({where: {id: group_id}});
+    console.log(group)
+    req.query.user_id = group.creator_id;
+    this.getGroupsMessages(req, res);
+}
+
 exports.changeGroupAvatar = async (req, res) => {
 
     uploadGroupAvatar(req, res, async (err) => {

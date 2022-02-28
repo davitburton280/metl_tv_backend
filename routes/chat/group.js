@@ -12,8 +12,9 @@ router.post('/add-group-members', groupChatController.addGroupMembers);
 router.delete('/remove-group-member', groupChatController.removeGroupMember);
 
 router.put('/accept-join-group', groupChatController.acceptGroupJoin);
-router.put('/decline-join-group', groupChatController.declineGroupJoin);
 router.put('/confirm-join-group', groupChatController.confirmJoinGroup);
+router.put('/decline-join-group', groupChatController.declineGroupJoin);
+router.put('/ignore-join-group', groupChatController.ignoreJoinGroup);
 router.delete('/leave-group', groupChatController.leaveGroup);
 
 
