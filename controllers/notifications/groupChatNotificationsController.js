@@ -90,6 +90,38 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
     return ret;
 };
 
+exports.getNotificationByTypeUser = async (req, res) => {
+    let group_id;
+    let to_id;
+    if (req.return) {
+        group_id = req.group_id;
+        to_id = req.to_id
+        console.log("GROUP ID:" + group_id)
+    } else {
+        let data = req.query;
+        group_id = data.group_id;
+    }
+
+    let notification = await GroupChatNotifications.findOne({
+        "$and": [
+            {
+                group_id: {'$in': group_id}
+            },
+            {
+                type: 'group_join_invitation'
+            },
+            {
+                "to_user.id": to_id
+            }
+        ],
+
+    }).sort({'created_at': 1});
+
+    console.log(notification)
+
+    return notification;
+}
+
 exports.removeNotification = async (req, res) => {
     let id;
     if (req.return) {

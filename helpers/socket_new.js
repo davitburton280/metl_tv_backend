@@ -7,6 +7,7 @@ let groupChatController = require('../controllers/chat_mongo/groupChatController
 
 let usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController');
 let groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController');
+let notificationsController = require('../controllers/notificationsController');
 
 const to = require('../helpers/getPromiseResult');
 
@@ -633,7 +634,8 @@ let socket = (io) => {
 
             let socketId = getSocketId(member.username); //socket.id
             let theSocket = io.sockets.sockets.get(socketId);
-            console.log(await io.in(groupName).allSockets());
+            // console.log(await io.in(groupName).allSockets());
+
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             data.leftGroups = await groupChatController.getGroupsMessages({return: true, user_id: member.id});
@@ -652,10 +654,13 @@ let socket = (io) => {
 
             notification._id = savedNotification._id;
 
-            console.log(await io.in(groupName).allSockets());
+            let currentUserNotifications = await notificationsController.get({return: true, user_id: member.id});
+
+
+            console.log(currentUserNotifications);
             socket.broadcast.to(groupName).emit('removeFromGroupNotify', {
                 ...data,
-                ...notification
+                currentUserNotifications
             });
 
             theSocket.leave(groupName);

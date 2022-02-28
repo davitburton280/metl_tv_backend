@@ -46,7 +46,7 @@ exports.saveNotification = async (data) => {
     return savedNotification;
 };
 
-exports.getCurrentUserNotifications = async (data) => {
+exports.getCurrentUserNotifications = async (user_id) => {
     // let notifications = await UserConnectionNots.findAll({
     //     include: [
     //         {model: Users, as: 'from_user', attributes: ['id', 'username', 'avatar', 'first_name', 'last_name']},
@@ -59,7 +59,7 @@ exports.getCurrentUserNotifications = async (data) => {
 
     let notifications = await DirectChatNotifications.find({
 
-        "to_user.id": data.user_id
+        "to_user.id": user_id
 
         // order: ['created_at']
     }).sort({'created_at': 1});
@@ -87,12 +87,14 @@ exports.removeAllNotifications = async (user_id) => {
 
 exports.read = async (req, res) => {
     let {id} = req.body;
+    console.log("body", req.body.id)
 
     let notification = await DirectChatNotifications.findById(id);
     notification.read = true;
     await notification.save();
 
     let currentNotification = await DirectChatNotifications.findById(id);
+    console.log(currentNotification)
     return currentNotification.to_user.id;
 };
 
@@ -101,7 +103,7 @@ exports.markAllAsRead = async (req, res) => {
     // console.log('ids!!!', notifications)
     let result = await Promise.all(notifications.map(async ({id}) => {
         let notification = await DirectChatNotifications.findById(id);
-            // console.log(id, notification?._id)
+        // console.log(id, notification?._id)
         if (notification) {
             notification.read = true;
             await notification.save();

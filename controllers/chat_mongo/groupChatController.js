@@ -13,6 +13,7 @@ const to = require('../../helpers/getPromiseResult');
 const nl2br = require('../../helpers/nl2br');
 
 const showIfErrors = require('../../helpers/showIfErrors');
+const groupChatNotificationsController = require('../notifications/groupChatNotificationsController');
 
 
 exports.getGroupsMessages = async (req, res) => {
@@ -156,6 +157,13 @@ exports.addGroupMembers = async (req, res) => {
 exports.removeGroupMember = async (req, res) => {
     const {group_id, member_id} = req.query;
     await ChatGroupsMembers.destroy({where: {group_id, member_id}});
+    let invitationNotif = await groupChatNotificationsController.getNotificationByTypeUser(
+        {return: true, group_id, to_id: member_id}
+    );
+    console.log("NOTIFICATION ID:", invitationNotif)
+    if (invitationNotif) {
+        await groupChatNotificationsController.removeNotification({return: true, id: invitationNotif._id});
+    }
     this.getGroupMembers(req, res);
 };
 

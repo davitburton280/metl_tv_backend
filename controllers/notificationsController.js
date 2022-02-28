@@ -13,20 +13,30 @@ const ChatGroupsMembers = db.chat_groups_members;
 const c = require('../config/constants');
 
 exports.get = async (req, res) => {
-    let data = req.query;
+    let user_id;
+    if (req.return) {
+        user_id = req.user_id;
+    } else {
+        let data = req.query;
+        user_id = data.user_id
+    }
     let user = await Users.findOne({
-        where: {id: data.user_id},
+        where: {id: user_id},
         include: [
             {model: Channels, as: 'channel'},
             {model: ChatGroups, as: 'chat_group_members'}
         ]
     });
 
-    let usersConnectionNotifs = await usersConnectionNotificationsController.getCurrentUserNotifications(data);
+    let usersConnectionNotifs = await usersConnectionNotificationsController.getCurrentUserNotifications(user_id);
     let groupChatNotifs = await groupChatNotificationsController.getCurrentGroupUsersNotifications(user.toJSON());
     let ret = [...new Set([...usersConnectionNotifs, ...groupChatNotifs])];
 
-    res.json(ret);
+    if (req.return) {
+        return ret;
+    } else {
+        res.json(ret);
+    }
 };
 
 exports.read = async (req, res) => {
