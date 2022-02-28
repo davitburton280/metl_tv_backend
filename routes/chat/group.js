@@ -13,6 +13,7 @@ router.delete('/remove-group-member', groupChatController.removeGroupMember);
 
 router.put('/accept-join-group', groupChatController.acceptGroupJoin);
 router.put('/decline-join-group', groupChatController.declineGroupJoin);
+router.put('/confirm-join-group', groupChatController.confirmJoinGroup);
 router.delete('/leave-group', groupChatController.leaveGroup);
 
 

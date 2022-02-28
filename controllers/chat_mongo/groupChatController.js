@@ -82,7 +82,7 @@ exports.createGroup = async (req, res) => {
         let data = req.body;
         let group = await ChatGroups.create(data);
         console.log(data)
-        await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id, confirmed: 1}));
+        await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id, accepted: 1, confirmed: 1}));
         req.query.user_id = data.creator_id;
         // this.getChatGroups(req, res);
         this.getGroupsMessages(req, res);
@@ -121,7 +121,7 @@ exports.getGroupMembers = async (req, res) => {
         where: {id: group_id}
     });
 
-    if(groupMembers){
+    if (groupMembers) {
 
         groupMembers = JSON.parse(JSON.stringify(groupMembers));
 
@@ -145,7 +145,7 @@ exports.getGroupMembers = async (req, res) => {
 exports.addGroupMembers = async (req, res) => {
     const {group_id, member_ids} = req.body;
     let list = member_ids?.map(async (member) => {
-        await to(ChatGroupsMembers.create({group_id, member_id: member.id, ...{confirmed: 0}}));
+        await to(ChatGroupsMembers.create({group_id, member_id: member.id, ...{accepted: 0, confirmed: 0}}));
     });
 
     await Promise.all(list);
@@ -186,6 +186,13 @@ exports.declineGroupJoin = async (req, res) => {
     req.query.user_id = member_id;
     this.getGroupsMessages(req, res);
 };
+
+exports.confirmJoinGroup = async (req, res) => {
+    const {group_id, member_id} = req.body;
+    await ChatGroupsMembers.update({confirmed: 1}, {where: {group_id, member_id}});
+    req.query.user_id = member_id;
+    this.getGroupsMessages(req, res);
+}
 
 exports.changeGroupAvatar = async (req, res) => {
 
