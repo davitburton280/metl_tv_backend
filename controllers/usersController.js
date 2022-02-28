@@ -239,55 +239,57 @@ exports.getUserInfo = async (req, res) => {
     let userByUsername = await Users.findOne({where: {username}, attributes: ['id']});
     // console.log(userByUsername)
 
-    let directConnectionsResult = await UsersConnectionMembers.findAll({
-        where: {member_id: userByUsername.id},
-        attributes: ['connection_id']
-    });
+    if (userByUsername) {
+        let directConnectionsResult = await UsersConnectionMembers.findAll({
+            where: {member_id: userByUsername.id},
+            attributes: ['connection_id']
+        });
 
-    let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
+        let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
 
 
-    let user = await Users.findOne({
-        where:
-            [
-                sequelize.where(sequelize.fn('BINARY', sequelize.col('username')), username),
-                // {name: sequelize.col('videos->privacy.name')}
-                // {'$videos.privacy.name$': 'Public'}
-                // [{model: PrivacyTypes}, sequelize.col(`name`), 'Public']
-            ]
-        ,
-        attributes: {exclude: excludeFields},
-        include: [
-            {model: Channels, as: 'channel'},
-            {
-                model: Videos,
-                as: 'videos',
-                include: [
-                    {model: Tags, as: 'tags'},
-                    {model: PrivacyTypes, as: 'privacy'}
-                ],
-                // where: sequelize.where(sequelize.col('`videos`.`privacy`.`name`'), 'Public')
-            },
-            {
-                model: UsersConnection, as: 'users_connections',
-                required: false,
-                where: {
-                    id: {[Op.in]: directConnectionIds},
-                    // confirmed: 1
+        let user = await Users.findOne({
+            where:
+                [
+                    sequelize.where(sequelize.fn('BINARY', sequelize.col('username')), username),
+                    // {name: sequelize.col('videos->privacy.name')}
+                    // {'$videos.privacy.name$': 'Public'}
+                    // [{model: PrivacyTypes}, sequelize.col(`name`), 'Public']
+                ]
+            ,
+            attributes: {exclude: excludeFields},
+            include: [
+                {model: Channels, as: 'channel'},
+                {
+                    model: Videos,
+                    as: 'videos',
+                    include: [
+                        {model: Tags, as: 'tags'},
+                        {model: PrivacyTypes, as: 'privacy'}
+                    ],
+                    // where: sequelize.where(sequelize.col('`videos`.`privacy`.`name`'), 'Public')
                 },
-            }
-        ],
-        order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
-    });
+                {
+                    model: UsersConnection, as: 'users_connections',
+                    required: false,
+                    where: {
+                        id: {[Op.in]: directConnectionIds},
+                        // confirmed: 1
+                    },
+                }
+            ],
+            order: [[{model: Videos}, sequelize.col(`created_at`), 'desc']]
+        });
 
-    if (user) {
-        let {videos, ...rest} = user.toJSON();
-        if (!+own_channel) {
-            console.log('not own channel')
-            let ret = {videos: videos.filter(t => t.privacy.name === 'Public'), ...rest};
-            res.json(ret);
-        } else {
-            res.json(user)
+        if (user) {
+            let {videos, ...rest} = user.toJSON();
+            if (!+own_channel) {
+                console.log('not own channel')
+                let ret = {videos: videos.filter(t => t.privacy.name === 'Public'), ...rest};
+                res.json(ret);
+            } else {
+                res.json(user)
+            }
         }
     } else {
         res.status(500).json({msg: 'The channel is not found'})
