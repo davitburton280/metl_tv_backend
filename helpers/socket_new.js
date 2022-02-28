@@ -511,7 +511,6 @@ let socket = (io) => {
             //     }
             // })
 
-
             let notification = {
                 group_id: group.id,
                 group_name: groupName,
@@ -541,6 +540,42 @@ let socket = (io) => {
             let groupUsernames = getGroupUsernames(groupName);
             io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
         });
+
+        socket.on('ignoreJoinGroup', async (data) => {
+            console.log('ignored joining group!!!');
+
+            let {user, group, member} = data;
+            let groupName = group.name;
+
+            let notification = {
+                group_id: group.id,
+                group_name: groupName,
+                from_user: user,
+                // to_user: member,
+                // to_id: member.id,
+                msg: data.msg,
+                link: data.link,
+                type: 'ignore_group_invitation'
+            };
+
+            let savedNotification = await groupChatNotificationsController.saveNotification(notification);
+
+            notification._id = savedNotification._id;
+
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            console.log(await io.in(groupName).allSockets());
+            console.log('ignored!!!')
+            console.log(io.in(group.name).allSockets())
+            console.log(usersGroups)
+            io.sockets.in(group.name).emit('ignoredJoinGroup', {
+                rest: data,
+                notification
+            });
+
+            let groupUsernames = getGroupUsernames(groupName);
+            io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
+        });
+
 
         socket.on('leaveGroup', async (data) => {
             console.log('leave group!!!')
