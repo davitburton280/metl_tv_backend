@@ -563,6 +563,7 @@ let socket = (io) => {
             notification._id = savedNotification._id;
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+            data.leftGroups = await groupChatController.getGroupsMessages({return: true, user_id: member.id});
             console.log(await io.in(groupName).allSockets());
             console.log('ignored!!!')
             console.log(io.in(group.name).allSockets())
