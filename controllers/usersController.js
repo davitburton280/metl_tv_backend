@@ -447,7 +447,7 @@ exports.checkIfUsersConnected = async (req, res = null) => {
 
 
     let directConnectionsResult = await UsersConnectionMembers.findAll({
-        where: {member_id: user_id},
+        where: {member_id: channel_user_id},
         attributes: ['connection_id']
     });
 
