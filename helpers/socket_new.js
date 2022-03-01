@@ -137,6 +137,10 @@ let socket = (io) => {
                 user_id: from_user.id
             });
 
+            console.log('FROM USER MESSAGES!!!')
+            console.log(fromUserMessages.map(f=> f.username))
+            console.log('FROM USER MESSAGES!!!')
+
             let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
             await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
 

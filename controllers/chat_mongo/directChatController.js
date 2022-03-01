@@ -34,7 +34,7 @@ exports.getDirectMessages = async (req, res) => {
     let user_id, other_user_id;
     if (req.return) {
         user_id = req.user_id;
-        console.log("USER ID:"+user_id)
+        console.log("USER ID:" + user_id)
     } else {
         let data = req.query;
         user_id = data.user_id;
@@ -80,9 +80,8 @@ exports.getDirectMessages = async (req, res) => {
         });
 
         directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
-    console.log(directConnectionIds)
+        console.log(directConnectionIds)
     }
-
 
 
     // Gets messages from MongoDb
@@ -150,7 +149,7 @@ exports.updateSeen = async (data) => {
                 {seen: false},
                 {connection_id}
             ],
-        }, {$set: {seen: true, seen_at:  moment().format('YYYY-MM-DD, h:mm:ss a')}}));
+        }, {$set: {seen: true, seen_at: moment().format('YYYY-MM-DD, h:mm:ss a')}}));
 
     console.log('updated', updated)
 
