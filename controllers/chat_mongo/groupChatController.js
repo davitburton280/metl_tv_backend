@@ -122,6 +122,8 @@ exports.getGroupMembers = async (req, res) => {
         where: {id: group_id}
     });
 
+    console.log(JSON.parse(JSON.stringify(groupMembers)))
+
     if (groupMembers) {
 
         groupMembers = JSON.parse(JSON.stringify(groupMembers));
@@ -145,8 +147,8 @@ exports.getGroupMembers = async (req, res) => {
 
 exports.addGroupMembers = async (req, res) => {
     const {group_id, member_ids} = req.body;
-    let list = member_ids?.map(async (member) => {
-        await to(ChatGroupsMembers.create({group_id, member_id: member.id, ...{accepted: 0, confirmed: 0}}));
+    let list = member_ids?.map(async (member_id) => {
+        await to(ChatGroupsMembers.create({group_id, member_id, ...{accepted: 0, confirmed: 0}}));
     });
 
     await Promise.all(list);

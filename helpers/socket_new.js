@@ -444,7 +444,7 @@ let socket = (io) => {
                 link: data.link,
                 type: 'accept_group_invitation'
             };
-            console.log(notification)
+            // console.log(notification)
 
             let savedNotification = await groupChatNotificationsController.saveNotification(notification);
 
@@ -453,7 +453,7 @@ let socket = (io) => {
             await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
-            console.log(await io.in(groupName).allSockets());
+            // console.log(await io.in(groupName).allSockets());
             console.log('accepted!!!')
 
             io.sockets.in(group.name).emit('acceptedJoinGroup', {
