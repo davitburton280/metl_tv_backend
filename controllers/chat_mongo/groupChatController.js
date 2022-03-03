@@ -46,11 +46,7 @@ exports.getGroupsMessages = async (req, res) => {
             {
                 model: Users,
                 as: 'chat_group_members',
-                attributes: ['id', 'avatar', 'username',
-                    [
-                        sequelize.fn('concat', sequelize.col('`chat_group_members.first_name`'), ' ', sequelize.col('`chat_group_members.last_name`')), 'name'
-                    ]
-                ],
+                attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
                 // where: sequelize.where(sequelize.col(`chat_group_members->chat_groups_members.confirmed`), 1)
                 // through: {attributes: ['confirmed']}
             },
@@ -62,7 +58,7 @@ exports.getGroupsMessages = async (req, res) => {
         group_id: chatGroups
     }).sort({'created_at': 1});
 
-    console.log("MESSAGES", messages)
+    // console.log("MESSAGES", messages)
 
     let result = JSON.parse(JSON.stringify(groupsMessages)).map(uc => {
         let group_id = uc.id;
