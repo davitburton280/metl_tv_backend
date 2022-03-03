@@ -649,7 +649,7 @@ let socket = (io) => {
                 from_user: initiator,
                 // to_user: member,
                 // to_id: member.id,
-                msg: `<strong>${initiator.first_name + ' ' + initiator.last_name}</strong> removed  <strong>${member.name}</strong>
+                msg: `<strong>${initiator.first_name + ' ' + initiator.last_name}</strong> removed  <strong>${member.first_name + ' ' + member.last_name}</strong>
                        from <strong>${groupName}</strong> group`,
                 type: 'remove_from_group'
             };

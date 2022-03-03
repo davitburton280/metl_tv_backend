@@ -74,6 +74,26 @@ exports.getGroupsMessages = async (req, res) => {
 
 };
 
+exports.getGroupByCustomName = async (req, res) => {
+    let {custom_name} = req.query;
+
+    let groupMembers = await ChatGroups.findOne({
+        where: {custom_name},
+        attributes: ['id', 'name', 'custom_name', 'avatar', 'creator_id'],
+        include: [
+            {
+                model: Users,
+                as: 'chat_group_members',
+                attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
+                // where: sequelize.where(sequelize.col(`chat_group_members->chat_groups_members.confirmed`), 1)
+                // through: {attributes: ['confirmed']}
+            },
+        ]
+    });
+
+    res.json(groupMembers);
+}
+
 exports.createGroup = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
@@ -111,7 +131,7 @@ exports.getGroupMembers = async (req, res) => {
             {
                 model: Users,
                 as: 'chat_group_members',
-                attributes: ['id', 'avatar', [sequelize.fn('concat', sequelize.col('first_name'), ' ', sequelize.col('last_name')), 'name'], 'username'],
+                attributes: ['id', 'avatar', 'first_name', 'last_name', 'username'],
                 // through: {attributes: ['confirmed']}
             }
         ],

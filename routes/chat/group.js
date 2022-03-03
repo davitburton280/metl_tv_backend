@@ -4,6 +4,7 @@ const groupChatController = require('../../controllers/chat_mongo/groupChatContr
 const validateChatGroupName = require('../../validators/validateChatGroupName');
 
 router.get('/get-groups-messages', groupChatController.getGroupsMessages);
+router.get('/get-group-by-name', groupChatController.getGroupByCustomName);
 router.post('/create-group', validateChatGroupName.rules, groupChatController.createGroup);
 router.delete('/remove-group', groupChatController.removeGroup);
 

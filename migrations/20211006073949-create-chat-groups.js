@@ -14,6 +14,9 @@ module.exports = {
             name: {
                 type: Sequelize.STRING
             },
+            custom_name: {
+                type: Sequelize.STRING
+            },
             description: {
                 type: Sequelize.TEXT
             },

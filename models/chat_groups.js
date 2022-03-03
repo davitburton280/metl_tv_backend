@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         avatar: DataTypes.STRING,
         cover: DataTypes.STRING,
         name: DataTypes.STRING,
+        custom_name: DataTypes.STRING,
         description: DataTypes.TEXT
     }, {
         sequelize,
