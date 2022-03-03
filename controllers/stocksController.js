@@ -203,7 +203,7 @@ exports.getUserStocks = async (req, res) => {
         order: order
     });
 
-    console.log(userStocks)
+    // console.log(userStocks)
 
     if (userStocks) {
         let stocks = '';
