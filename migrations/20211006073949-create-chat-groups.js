@@ -17,6 +17,9 @@ module.exports = {
             custom_name: {
                 type: Sequelize.STRING
             },
+            privacy: {
+                type: Sequelize.INTEGER
+            },
             description: {
                 type: Sequelize.TEXT
             },

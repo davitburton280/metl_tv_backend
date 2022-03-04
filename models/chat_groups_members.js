@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     chat_group_members.init({
         member_id: DataTypes.INTEGER,
         group_id: DataTypes.INTEGER,
+        is_admin: DataTypes.INTEGER,
         accepted: DataTypes.INTEGER,
         confirmed: DataTypes.INTEGER
     }, {

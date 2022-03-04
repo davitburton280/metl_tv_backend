@@ -41,7 +41,7 @@ exports.getGroupsMessages = async (req, res) => {
 
     let groupsMessages = await ChatGroups.findAll({
         where,
-        attributes: ['id', 'name', 'avatar', 'creator_id'],
+        attributes: ['id', 'name', 'avatar', 'creator_id', 'privacy'],
         include: [
             {
                 model: Users,
@@ -99,7 +99,12 @@ exports.createGroup = async (req, res) => {
         let data = req.body;
         let group = await ChatGroups.create(data);
         console.log(data)
-        await to(ChatGroupsMembers.create({group_id: group.id, member_id: data.creator_id, accepted: 1, confirmed: 1}));
+        await to(ChatGroupsMembers.create({
+            group_id: group.id,
+            member_id: data.creator_id,
+            accepted: 1,
+            confirmed: 1
+        }));
         req.query.user_id = data.creator_id;
         // this.getChatGroups(req, res);
         this.getGroupsMessages(req, res);

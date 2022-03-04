@@ -138,7 +138,7 @@ let socket = (io) => {
             });
 
             console.log('FROM USER MESSAGES!!!')
-            console.log(fromUserMessages.map(f=> f.username))
+            console.log(fromUserMessages.map(f => f.username))
             console.log('FROM USER MESSAGES!!!')
 
             let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
@@ -329,12 +329,12 @@ let socket = (io) => {
         });
 
         socket.on('setNewGroup', async ({username, ...data}) => {
-            console.log('set new group', data)
-            let userGroups = usersGroups[username];
+            let userGroups = usersGroups[username]?.chat_groups;
+            console.log('set new group', data, usersGroups)
             let newGroupName = data.name;
 
-            if (!userGroups.chat_groups.find(g => g === newGroupName)) {
-                userGroups.chat_groups.push(newGroupName);
+            if (!userGroups.find(g => g === newGroupName)) {
+                userGroups.push(newGroupName);
                 socket.join(newGroupName);
             }
 
