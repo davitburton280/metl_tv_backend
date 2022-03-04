@@ -454,7 +454,7 @@ let socket = (io) => {
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
             // console.log(await io.in(groupName).allSockets());
-            console.log('accepted!!!')
+            console.log('accepted!!!', user.id, data.group)
 
             io.sockets.in(group.name).emit('acceptedJoinGroup', {
                 rest: data,
@@ -506,7 +506,7 @@ let socket = (io) => {
         socket.on('confirmJoinGroup', async (data) => {
             console.log('confirmed joining group!!!');
 
-            let {user, group} = data;
+            let {user, group, member} = data;
             let groupName = group.name;
 
             // // console.log(usersGroups)
@@ -533,9 +533,20 @@ let socket = (io) => {
             notification._id = savedNotification._id;
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
-            console.log(await io.in(groupName).allSockets());
+
+            let invitedMemberSocketId = getSocketId(member.username);
+            let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
+            let groupSockets = await getGroupSockets(io, group.name);
+            let gSockets = [...groupSockets];
+            if (!gSockets.includes(theSocket)) {
+                console.log('exist', member.username)
+                theSocket?.join(group.name);
+            }
+
+
+            console.log(gSockets);
             console.log('confirmed!!!')
-            console.log(io.in(group.name).allSockets())
+            console.log(await io.in(group.name).allSockets())
             console.log(usersGroups)
             io.sockets.in(group.name).emit('confirmedJoinGroup', {
                 rest: data,
