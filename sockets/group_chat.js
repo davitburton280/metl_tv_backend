@@ -35,3 +35,32 @@ exports.sendMessage = async (data, io) => {
     console.log('GROUP MESSAGE!!!', group_name)
     io.to(group_name).emit('newMessage', data)
 }
+
+exports.getConnectedGroupMembers = async ({group_name, username}, usersGroups, io) => {
+    let onlineMembers = [];
+    Object.values(usersGroups).map(uGroups => {
+        if (uGroups.chat_groups.find(cg => cg === group_name)) {
+            onlineMembers.push(uGroups.username);
+        }
+    });
+    let socketId = h.getSocketId(username);
+    console.log(socketId, onlineMembers)
+    // console.log(await io.in(group_name).allSockets());
+    // console.log("online", getConnectedUserNames(usersGroups))
+    io.to(group_name).emit('onGetOnlineMembers', {group: group_name, members: onlineMembers})
+}
+
+exports.setNewGroup = async ({username, ...data}, usersGroups, socket, io) => {
+    let userGroups = usersGroups[username]?.chat_groups || [];
+    console.log(username, usersGroups, userGroups)
+    console.log('set new group', data, userGroups)
+    let newGroupName = data.name;
+
+    if (!userGroups?.find(g => g === newGroupName)) {
+        userGroups?.push(newGroupName);
+        socket.join(newGroupName);
+    }
+
+    let groupUsernames = h.getGroupUsernames(newGroupName);
+    io.to(newGroupName).emit('onGetOnlineMembers', {members: groupUsernames, group: newGroupName})
+}

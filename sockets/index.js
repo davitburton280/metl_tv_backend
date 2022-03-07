@@ -82,33 +82,12 @@ let socket = (io) => {
             }
         });
 
-        socket.on('getConnectedGroupMembers', async ({group_name, username}) => {
-            let onlineMembers = [];
-            Object.values(usersGroups).map(uGroups => {
-                if (uGroups.chat_groups.find(cg => cg === group_name)) {
-                    onlineMembers.push(uGroups.username);
-                }
-            });
-            let socketId = getSocketId(username);
-            console.log(socketId, onlineMembers)
-            // console.log(await io.in(group_name).allSockets());
-            // console.log("online", getConnectedUserNames(usersGroups))
-            io.to(group_name).emit('onGetOnlineMembers', {group: group_name, members: onlineMembers})
+        socket.on('getConnectedGroupMembers', async (data) => {
+            await groupChat.getConnectedGroupMembers(data, io);
         });
 
-        socket.on('setNewGroup', async ({username, ...data}) => {
-            let userGroups = usersGroups[username]?.chat_groups || [];
-            console.log(username, usersGroups, userGroups)
-            console.log('set new group', data, userGroups)
-            let newGroupName = data.name;
-
-            if (!userGroups?.find(g => g === newGroupName)) {
-                userGroups?.push(newGroupName);
-                socket.join(newGroupName);
-            }
-
-            let groupUsernames = getGroupUsernames(newGroupName);
-            io.to(newGroupName).emit('onGetOnlineMembers', {members: groupUsernames, group: newGroupName})
+        socket.on('setNewGroup', async (data) => {
+            await groupChat.setNewGroup(data, socket, io)
         });
 
         socket.on('removeGroup', async (data) => {
