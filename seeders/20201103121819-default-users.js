@@ -25,7 +25,7 @@ console.log(process.env.DEV_PASS)
                 last_name: 'Doe',
                 birthday: '1986-03-30',
                 gender: 'female',
-                email: 'test@gmail.com',
+                email: 'jane@gmail.com',
                 password: bcrypt.hashSync(process.env.DEV_PASS, 10),
                 stocks_order_type_id: 1,
                 username: 'jane',
