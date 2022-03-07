@@ -20,14 +20,14 @@ exports.get = async (req, res) => {
         user_id = data.user_id;
     }
 
-    let chatGroupsResult = await GroupsMembers.findAll({
+    let groupsResult = await GroupsMembers.findAll({
         where: {member_id: user_id, confirmed: 1}, attributes: ['group_id']
     });
 
-    let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t => t.group_id);
+    let groupIds = JSON.parse(JSON.stringify(groupsResult)).map(t => t.group_id);
 
     let where = {
-        id: {[Op.in]: chatGroups}
+        id: {[Op.in]: groupIds}
     };
 
     let groups = await Groups.findAll({
@@ -54,7 +54,7 @@ exports.getGroupByCustomName = async (req, res) => {
         include: [
             {
                 model: Users,
-                as: 'chat_group_members',
+                as: 'group_members',
                 attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
             },
         ]
@@ -75,7 +75,6 @@ exports.createGroup = async (req, res) => {
             confirmed: 1
         }));
         req.query.user_id = data.creator_id;
-        // this.getChatGroups(req, res);
         this.get(req, res);
     }
 
@@ -103,7 +102,7 @@ exports.getGroupMembers = async (req, res) => {
         include: [
             {
                 model: Users,
-                as: 'chat_group_members',
+                as: 'group_members',
                 attributes: ['id', 'avatar', 'first_name', 'last_name', 'username'],
                 // through: {attributes: ['confirmed']}
             }
