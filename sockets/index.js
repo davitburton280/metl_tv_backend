@@ -122,8 +122,6 @@ let socket = (io) => {
             console.log('user disconnected');
         });
     })
-
-
 }
 
 
