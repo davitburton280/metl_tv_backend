@@ -42,3 +42,27 @@ exports.setSeen = async (data, io) => {
     io.to(toUserSocketId).emit('getSeen', data)
     io.to(fromUserSocketId).emit('getSeen', data)
 }
+
+exports.setTyping = async (data, io) => {
+    let {from_username, to_username} = data;
+
+    let fromUserSocketId = h.getSocketId(from_username);
+    let toUserSocketId = h.getSocketId(to_username);
+
+    // console.log('typing', to_username + '=>' + toUserSocketId, fromUserSocketId, data.message)
+    io.to(toUserSocketId).emit('getTyping', data)
+    io.to(fromUserSocketId).emit('getTyping', data)
+}
+
+exports.sendMessage = async (data, io) => {
+
+    let {from_username, to_username} = data;
+    let fromUserSocketId = h.getSocketId(from_username);
+    let toUserSocketId = h.getSocketId(to_username);
+
+    data.direct_messages = await directChatController.saveDirectMessage(data)
+    console.log('DIRECT MESSAGE!!!', toUserSocketId, fromUserSocketId)
+    // console.log(data.direct_messages)
+    io.to(toUserSocketId).emit('newMessage', data)
+    io.to(fromUserSocketId).emit('newMessage', data)
+}

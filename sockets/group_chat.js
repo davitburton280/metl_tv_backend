@@ -18,3 +18,20 @@ exports.setSeen = async (data, io) => {
     );
     io.sockets.in(group_name).emit('getSeen', data)
 }
+
+exports.setTyping = async (data, io) => {
+
+    let {group_name} = data;
+
+    // console.log('typing', groupsUsers)
+    // console.log(await io.in(group_name).allSockets());
+    // io.to(group_name).emit('getTyping', data)
+    io.sockets.in(group_name).emit('getTyping', data)
+}
+
+exports.sendMessage = async (data, io) => {
+    let {group_name} = data;
+    data.group_messages = await groupChatController.saveGroupMessage(data);
+    console.log('GROUP MESSAGE!!!', group_name)
+    io.to(group_name).emit('newMessage', data)
+}

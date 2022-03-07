@@ -61,49 +61,24 @@ let socket = (io) => {
             if (!data.group_name) {
                 await directChat.setSeen(data, io);
             } else {
-
+                await groupChat.setSeen(data, io);
             }
         });
 
         socket.on('setTyping', async (data) => {
-
-            let {from_username, to_username, group_name} = data;
-
-            if (!group_name) {
-
-                let fromUserSocketId = getSocketId(from_username);
-                let toUserSocketId = getSocketId(to_username);
-
-                // console.log('typing', to_username + '=>' + toUserSocketId, fromUserSocketId, data.message)
-                io.to(toUserSocketId).emit('getTyping', data)
-                io.to(fromUserSocketId).emit('getTyping', data)
+            if (!data.group_name) {
+                await directChat.setTyping(data, io);
             } else {
-                // console.log('typing', groupsUsers)
-                // console.log(await io.in(group_name).allSockets());
-                // io.to(group_name).emit('getTyping', data)
-                io.sockets.in(group_name).emit('getTyping', data)
+                await groupChat.setTyping(data, io);
             }
+
         });
 
         socket.on('sendMessage', async (data) => {
-
-            let {from_username, to_username, group_name, group_id} = data;
-            // console.log(data)
-            if (!group_id) {
-
-                let fromUserSocketId = getSocketId(from_username);
-                let toUserSocketId = getSocketId(to_username);
-
-                data.direct_messages = await directChatController.saveDirectMessage(data)
-                console.log('DIRECT MESSAGE!!!', toUserSocketId, fromUserSocketId)
-                // console.log(data.direct_messages)
-                io.to(toUserSocketId).emit('newMessage', data)
-                io.to(fromUserSocketId).emit('newMessage', data)
-
+            if (!data.group_name) {
+                await directChat.sendMessage(data, io);
             } else {
-                data.group_messages = await groupChatController.saveGroupMessage(data);
-                console.log('GROUP MESSAGE!!!', group_name)
-                io.to(group_name).emit('newMessage', data)
+                await groupChat.sendMessage(data, io);
             }
         });
 
