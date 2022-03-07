@@ -11,265 +11,58 @@ let notificationsController = require('../controllers/notificationsController');
 
 const to = require('../helpers/getPromiseResult');
 
-
-getGroupSockets = async (io, group) => {
-    return await io.in(group).allSockets();
-}
-
-getGroupUsernames = (groupName) => {
-    let groupUsernames = [];
-    // console.log(Object.values(usersGroups))
-    Object.values(usersGroups).map(gu => {
-        if (gu.chat_groups.find(g => g === groupName)) {
-            groupUsernames.push(gu.username)
-        }
-    })
-
-    return groupUsernames;
-}
-
-getConnectedUserNames = (usersGroups) => {
-    return Object.keys(usersGroups);
-}
-
-getSocketId = (username) => {
-    return usersGroups[username]?.socket_id;
-}
-
-saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, type}) => {
-    let notification = {
-        from_user,
-        to_user,
-        connection_id,
-        read: false,
-        read_at: '',
-        type,
-        msg: msg
-    };
-
-    let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
-
-    notification._id = savedNotification._id;
-    return notification;
-}
-
-saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) => {
-    let notification = {
-        from_user,
-        to_user,
-        group_id,
-        read: false,
-        read_at: '',
-        type,
-        msg: msg
-    };
-
-    let n = await groupChatNotificationsController.saveNotification(notification);
-}
+let h = require('./helpers');
+let users = require('./users');
+let directChat = require('./direct_chat');
+let groupChat = require('./group_chat');
 
 
 let socket = (io) => {
     io.on('connection', async (socket) => {
         console.log('new connection made');
 
-        socket.on('newUser', async ({username, chat_groups}) => {
-            console.log("USERNAME!!!!", username)
-            if (username) {
-                usersGroups[username] = {username, socket_id: socket.id, chat_groups};
-                chat_groups.map((group) => {
-                    socket.join(group);
-                    let groupUsernames = getGroupUsernames(group)
-                    console.log('group usernames ', group, ' => ', groupUsernames)
-                    io.sockets.in(group).emit('onGetOnlineMembers', {group, members: groupUsernames})
-                });
-
-                console.log('USERS CONNECTED!!!')
-                console.log(usersGroups)
-                io.emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
-                // console.log(usersGroups)
-                // console.log(await getGroupSockets(io, chat_groups[0]))
-            }
-
+        socket.on('newUser', (data) => {
+            users.newUser(data, usersGroups, socket, io)
         })
 
-        socket.on('getConnectedUsers', ({username}) => {
-            let socketId = getSocketId(username);
-            // console.log("online", getConnectedUserNames(usersGroups))
-            io.to(socketId).emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
+        socket.on('getConnectedUsers', (data) => {
+            users.getConnectedUsers(data, usersGroups, io);
         });
 
         socket.on('connectWithUser', async (data) => {
-            let {from_user, to_user} = data;
-
-            let channelUserSocketId = getSocketId(to_user.username);
-            let authUserSocketId = getSocketId(from_user.username);
-
-            let connection = await to(usersController.createUsersConnection(data));
-            let notification = await saveDirectChatNotification({
-                ...data, ...connection,
-                type: 'users_connection_request'
-            });
-
-            console.log("connection request from " + from_user.username + '=>', `${authUserSocketId}`, ' to ' + to_user.username + '=>' + `${channelUserSocketId}`)
-            io.to(channelUserSocketId).emit('getConnectWithUser', {notification});
-            io.to(authUserSocketId).emit('getConnectWithUser', {connection, notification})
+            await users.connectWithUser(data, usersGroups, io);
         });
 
-        socket.on('cancelUsersConnection', async ({authUser, channelUser, connection_id}) => {
-            let authUserSocketId = getSocketId(authUser.username);
-            let channelUserSocketId = getSocketId(channelUser.username);
-
-            let connection = await to(usersController.cancelUsersConnection(connection_id));
-
-            io.to(channelUserSocketId).emit('cancelledUsersConnection', connection)
-            io.to(authUserSocketId).emit('cancelledUsersConnection', connection)
+        socket.on('cancelUsersConnection', async (data) => {
+            await users.cancelUsersConnection(data, io);
         });
 
         socket.on('acceptConnection', async (data) => {
-
-            let {from_user, to_user} = data;
-            let toUserSocketId = getSocketId(data.to_user.username);
-            let fromUserSocketId = getSocketId(from_user.username);
-
-            let confirmedConnection = await usersController.confirmConnection(data);
-            let fromUserMessages = await directChatController.getDirectMessages({
-                return: true,
-                user_id: from_user.id
-            });
-
-            console.log('FROM USER MESSAGES!!!')
-            console.log(fromUserMessages.map(f => f.username))
-            console.log('FROM USER MESSAGES!!!')
-
-            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
-            await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
-
-            let notification = await saveDirectChatNotification({...data, type: 'accept_connection_request'});
-            console.log('accept from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
-
-            io.to(fromUserSocketId).emit('acceptedConnection', {
-                notification,
-                users_messages: fromUserMessages
-            });
-            io.to(toUserSocketId).emit('acceptedConnection', {
-                notification,
-                users_messages: toUserMessages
-            })
+            await users.acceptConnection(data, io);
         });
 
         socket.on('declineConnection', async (data) => {
-
-            let {from_user, to_user} = data;
-            let toUserSocketId = getSocketId(to_user.username);
-
-            await usersController.declineConnection(data);
-
-            let notification = await saveDirectChatNotification({...data, type: 'decline_connection_request'});
-
-            await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
-            io.to(toUserSocketId).emit('declinedConnection', {
-                ...notification, from_user,
-                to_user,
-                notification_type: {name: 'declined_connection_request'}
-            })
+            await users.declineConnection(data, io);
         });
 
         socket.on('disconnectUsers', async (data) => {
-
-            let {from_user, to_user} = data;
-            let fromUserSocketId = getSocketId(from_user.username);
-            let toUserSocketId = getSocketId(to_user.username);
-
-
-            await to(usersController.disconnectUsers(data));
-            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
-            let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_user.id});
-
-
-            let notification = await saveDirectChatNotification({...data, type: 'break_connection'});
-
-            console.log('disconnect from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
-            // console.log(toUserMessages, toUserSocketId, fromUserSocketId, fromUserMessages)
-            io.to(toUserSocketId).emit('getDisconnectUsers', {
-                ...notification,
-                users_messages: toUserMessages
-            });
-
-            io.to(fromUserSocketId).emit('getDisconnectUsers', {
-                ...notification,
-                users_messages: fromUserMessages
-            });
+            await users.disconnectUsers(data, io);
         });
 
         socket.on('blockUnblockUser', async (data) => {
-
-            let {from_user, to_user} = data;
-            let fromUserSocketId = getSocketId(from_user.username);
-            let toUserSocketId = getSocketId(to_user.username);
-
-            console.log('block/unblock user!!!', to_user.username, toUserSocketId)
-
-            let fromUserMessages = await directChatController.getDirectMessages({return: true, user_id: from_user.id});
-            let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
-
-
-            let notification = await saveDirectChatNotification({...data, type: 'block_connection'});
-
-            io.to(toUserSocketId).emit('getBlockUnblockUser', {
-                ...notification,
-                users_messages: toUserMessages
-            });
-            io.to(fromUserSocketId).emit('getBlockUnblockUser', {
-                ...notification,
-                users_messages: fromUserMessages
-            })
+            await users.blockUnblockUser(data, io);
         });
 
         socket.on('unreadLastMessages', async (data) => {
-            console.log('unread messages!!!')
-            let {from_username, to_username} = data;
-            if (!data.group) {
-
-                let toUserSocketId = getSocketId(to_username);
-                let fromUserSocketId = getSocketId(from_username);
-
-                await directChatController.unreadMessages(data);
-                data.direct_messages = await directChatController.getConnectionMessages(
-                    {return: true, connection_id: data.connection_id}
-                );
-
-                console.log(toUserSocketId, fromUserSocketId)
-                io.to(toUserSocketId).emit('getSeen', data)
-                io.to(fromUserSocketId).emit('getSeen', data)
-
-            }
+            await directChat.unreadLastMessages(data, io);
         });
 
         socket.on('setSeen', async (data) => {
-            console.log('set seen')
-
-            let {from_username, to_username, connection_id, group_name} = data;
-
-            if (!group_name) {
-                console.log('direct seen!!!')
-                let fromUserSocketId = getSocketId(from_username);
-                let toUserSocketId = getSocketId(to_username);
-
-                await directChatController.updateSeen(data);
-                data.direct_messages = await directChatController.getConnectionMessages(
-                    {return: true, connection_id}
-                );
-                io.to(toUserSocketId).emit('getSeen', data)
-                io.to(fromUserSocketId).emit('getSeen', data)
+            if (!data.group_name) {
+                await directChat.setSeen(data, io);
             } else {
-                console.log('group seen!!!', group_name)
-                await to(groupChatController.updateSeen(data));
-                data.group_messages = await groupChatController.getGroupMessages(
-                    {return: true, group_id: data.group_id}
-                );
-                io.sockets.in(group_name).emit('getSeen', data)
-            }
 
+            }
         });
 
         socket.on('setTyping', async (data) => {
