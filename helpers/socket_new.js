@@ -84,7 +84,7 @@ let socket = (io) => {
                 });
 
                 console.log('USERS CONNECTED!!!')
-                console.log(getConnectedUserNames(usersGroups))
+                console.log(usersGroups)
                 io.emit('onGetOnlineUsers', getConnectedUserNames(usersGroups))
                 // console.log(usersGroups)
                 // console.log(await getGroupSockets(io, chat_groups[0]))
@@ -330,10 +330,11 @@ let socket = (io) => {
 
         socket.on('setNewGroup', async ({username, ...data}) => {
             let userGroups = usersGroups[username]?.chat_groups;
-            console.log('set new group', data, usersGroups)
+            console.log(username, usersGroups, userGroups)
+            console.log('set new group', data, userGroups)
             let newGroupName = data.name;
 
-            if (!userGroups.find(g => g === newGroupName)) {
+            if (!userGroups?.find(g => g === newGroupName)) {
                 userGroups.push(newGroupName);
                 socket.join(newGroupName);
             }
@@ -414,6 +415,41 @@ let socket = (io) => {
                 }))
             }
         });
+
+        socket.on('joinGroup', async (data) => {
+            let {user, group} = data;
+            let groupName = group.name;
+
+            let memberSocketId = getSocketId(user.username);
+            let theSocket = io.sockets.sockets.get(memberSocketId);
+            let groupSockets = await getGroupSockets(io, groupName);
+            let gSockets = [...groupSockets];
+            if (!gSockets.includes(theSocket)) {
+                theSocket?.join(groupName);
+                groupSockets = await getGroupSockets(io, groupName);
+            }
+
+            data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+
+            let notification = {
+                group_id: group.id,
+                group_name: groupName,
+                from_user: user,
+                msg: data.msg,
+                link: data.link,
+                type: 'join_group_invitation'
+            };
+
+            let savedNotification = await groupChatNotificationsController.saveNotification(notification);
+
+            notification._id = savedNotification._id;
+
+            io.sockets.in(groupName).emit('getJoinGroup', {
+                rest: data,
+                notification
+            });
+
+        })
 
         socket.on('acceptJoinGroup', async (data) => {
             console.log('joining group!!!');
@@ -534,17 +570,7 @@ let socket = (io) => {
 
             data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
 
-            let invitedMemberSocketId = getSocketId(member.username);
-            let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
-            let groupSockets = await getGroupSockets(io, group.name);
-            let gSockets = [...groupSockets];
-            if (!gSockets.includes(theSocket)) {
-                console.log('exist', member.username)
-                theSocket?.join(group.name);
-            }
 
-
-            console.log(gSockets);
             console.log('confirmed!!!')
             console.log(await io.in(group.name).allSockets())
             console.log(usersGroups)
