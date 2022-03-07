@@ -87,33 +87,11 @@ let socket = (io) => {
         });
 
         socket.on('setNewGroup', async (data) => {
-            await groupChat.setNewGroup(data, socket, io)
+            await groupChat.setNewGroup(data, usersGroups, socket, io)
         });
 
         socket.on('removeGroup', async (data) => {
-            let {initiator, group} = data;
-            let inviterUsername = initiator.username;
-            let groupName = group.name;
-            console.log('remove group!!!', initiator.username)
-
-            let userGroups = usersGroups[inviterUsername];
-
-            // console.log(usersGroups)
-            let filteredUserGroups = userGroups.chat_groups.filter(ug => ug !== groupName);
-            usersGroups[inviterUsername].chat_groups = filteredUserGroups;
-            // console.log(usersGroups)
-
-            data.groupsUsers = await groupChatController.getGroupsMessages({
-                return: true,
-                user_id: initiator.id
-            });
-            console.log(data.groupsUsers)
-
-            io.sockets.in(groupName).emit('removeGroupNotify', data);
-            console.log(await io.in(groupName).allSockets());
-            io.in(groupName).socketsLeave(groupName);
-            console.log('sockets left the group!!!')
-            console.log(await io.in(groupName).allSockets());
+            await groupChat.removeGroup(data, usersGroups, io)
         });
 
         socket.on('inviteToNewGroup', async (data) => {
@@ -365,7 +343,6 @@ let socket = (io) => {
             let groupUsernames = getGroupUsernames(groupName);
             io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
         });
-
 
         socket.on('leaveGroup', async (data) => {
             console.log('leave group!!!')
