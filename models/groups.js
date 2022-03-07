@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
+      groups.belongsToMany(models.users, {
+        as: 'group_members',
+        through: models.groups_members,
+        foreignKey: 'group_id'
+      });
     }
   };
   groups.init({
@@ -24,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'groups',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
   return groups;
 };

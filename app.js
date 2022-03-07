@@ -124,6 +124,7 @@ app.use('/playlists', require('./routes/playlists'));
 app.use('/channels', require('./routes/channels'));
 app.use('/stocks', require('./routes/stocks'));
 app.use('/cards', require('./routes/cards'));
+app.use('/groups', require('./routes/groups'));
 app.use('/webhooks', require('./routes/webhooks'));
 app.use('/stripe/customers', require('./routes/stripe/customers'));
 app.use('/stripe/accounts', require('./routes/stripe/accounts'));
