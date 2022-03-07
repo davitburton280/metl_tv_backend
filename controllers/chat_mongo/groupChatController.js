@@ -121,7 +121,6 @@ exports.removeGroup = async (req, res) => {
     this.getGroupsMessages(req, res);
 };
 
-
 exports.getGroupMembers = async (req, res) => {
     console.log('get group members!!!');
     let group_id;

@@ -329,13 +329,13 @@ let socket = (io) => {
         });
 
         socket.on('setNewGroup', async ({username, ...data}) => {
-            let userGroups = usersGroups[username]?.chat_groups;
+            let userGroups = usersGroups[username]?.chat_groups || [];
             console.log(username, usersGroups, userGroups)
             console.log('set new group', data, userGroups)
             let newGroupName = data.name;
 
             if (!userGroups?.find(g => g === newGroupName)) {
-                userGroups.push(newGroupName);
+                userGroups?.push(newGroupName);
                 socket.join(newGroupName);
             }
 
