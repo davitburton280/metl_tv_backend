@@ -2,9 +2,9 @@ let h = require('./helpers');
 const to = require('../helpers/getPromiseResult');
 
 let usersController = require('../controllers/usersController');
+let groupChatController = require('../controllers/chat_mongo/groupChatController');
 let directChatController = require('../controllers/chat_mongo/directChatController');
 let usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController');
-
 
 
 exports.newUser = async ({username, chat_groups}, usersGroups, socket, io) => {
@@ -59,7 +59,7 @@ exports.cancelUsersConnection = async ({authUser, channelUser, connection_id}, i
     io.to(authUserSocketId).emit('cancelledUsersConnection', connection)
 }
 
-exports.acceptConnection = async (data, io)=>{
+exports.acceptConnection = async (data, io) => {
     let {from_user, to_user} = data;
     let toUserSocketId = h.getSocketId(data.to_user.username);
     let fromUserSocketId = h.getSocketId(from_user.username);
@@ -90,7 +90,7 @@ exports.acceptConnection = async (data, io)=>{
     })
 }
 
-exports.declineConnection = async (data, io) =>{
+exports.declineConnection = async (data, io) => {
     let {from_user, to_user} = data;
     let toUserSocketId = h.getSocketId(to_user.username);
 
@@ -106,7 +106,7 @@ exports.declineConnection = async (data, io) =>{
     })
 }
 
-exports.disconnectUsers = async (data, io) =>{
+exports.disconnectUsers = async (data, io) => {
     let {from_user, to_user} = data;
     let fromUserSocketId = h.getSocketId(from_user.username);
     let toUserSocketId = h.getSocketId(to_user.username);
@@ -132,7 +132,7 @@ exports.disconnectUsers = async (data, io) =>{
     });
 }
 
-exports.blockUnblockUser = async (data, io) =>{
+exports.blockUnblockUser = async (data, io) => {
     let {from_user, to_user} = data;
     let fromUserSocketId = h.getSocketId(from_user.username);
     let toUserSocketId = h.getSocketId(to_user.username);
@@ -153,4 +153,28 @@ exports.blockUnblockUser = async (data, io) =>{
         ...notification,
         users_messages: fromUserMessages
     })
+}
+
+exports.forceDisconnect = async (user, usersGroups, socket, io) => {
+    console.log('force disconnect!!!');
+    // console.log(usersGroups)
+    delete usersGroups[user.username];
+    // usersGroups = Object.values(usersGroups).filter(u => u.username !== user.username);
+    let contacts = await usersController.getContacts({return: true, user_id: user.id});
+    let groups = await groupChatController.getGroupsMessages({return: true, user_id: user.id});
+    // console.log('GROUPS:', groups)
+
+    contacts.map(contact => {
+        // console.log('aaa', contact.username, getSocketId(contact.username))
+        let theSocket = io.sockets.sockets.get(h.getSocketId(contact.username));
+        theSocket?.emit('onLogout', user)
+    })
+
+    if (groups) {
+        groups.map(group => {
+            io.sockets.in(group.name).emit('onLogout', user)
+        })
+    }
+
+    socket.leave();
 }
