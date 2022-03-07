@@ -49,9 +49,9 @@ exports.connectWithUser = async (data, usersGroups, io) => {
     io.to(authUserSocketId).emit('getConnectWithUser', {connection, notification})
 }
 
-exports.cancelUsersConnection = async ({authUser, channelUser, connection_id}, io) => {
-    let authUserSocketId = h.getSocketId(authUser.username);
-    let channelUserSocketId = h.getSocketId(channelUser.username);
+exports.cancelUsersConnection = async ({authUser, channelUser, connection_id}, usersGroups, io) => {
+    let authUserSocketId = h.getSocketId(authUser.username, usersGroups);
+    let channelUserSocketId = h.getSocketId(channelUser.username, usersGroups);
 
     let connection = await to(usersController.cancelUsersConnection(connection_id));
 
@@ -59,10 +59,10 @@ exports.cancelUsersConnection = async ({authUser, channelUser, connection_id}, i
     io.to(authUserSocketId).emit('cancelledUsersConnection', connection)
 }
 
-exports.acceptConnection = async (data, io) => {
+exports.acceptConnection = async (data, usersGroups, io) => {
     let {from_user, to_user} = data;
-    let toUserSocketId = h.getSocketId(data.to_user.username);
-    let fromUserSocketId = h.getSocketId(from_user.username);
+    let toUserSocketId = h.getSocketId(data.to_user.username, usersGroups);
+    let fromUserSocketId = h.getSocketId(from_user.username, usersGroups);
 
     let confirmedConnection = await usersController.confirmConnection(data);
     let fromUserMessages = await directChatController.getDirectMessages({
@@ -90,9 +90,9 @@ exports.acceptConnection = async (data, io) => {
     })
 }
 
-exports.declineConnection = async (data, io) => {
+exports.declineConnection = async (data, usersGroups, io) => {
     let {from_user, to_user} = data;
-    let toUserSocketId = h.getSocketId(to_user.username);
+    let toUserSocketId = h.getSocketId(to_user.username, usersGroups);
 
     await usersController.declineConnection(data);
 
@@ -106,10 +106,10 @@ exports.declineConnection = async (data, io) => {
     })
 }
 
-exports.disconnectUsers = async (data, io) => {
+exports.disconnectUsers = async (data, usersGroups, io) => {
     let {from_user, to_user} = data;
-    let fromUserSocketId = h.getSocketId(from_user.username);
-    let toUserSocketId = h.getSocketId(to_user.username);
+    let fromUserSocketId = h.getSocketId(from_user.username, usersGroups);
+    let toUserSocketId = h.getSocketId(to_user.username, usersGroups);
 
 
     await to(usersController.disconnectUsers(data));

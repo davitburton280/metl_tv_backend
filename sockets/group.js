@@ -30,7 +30,6 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
             };
 
             let savedNotification = await groupChatNotificationsController.saveNotification(notification);
-
             notification._id = savedNotification._id;
 
             // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});

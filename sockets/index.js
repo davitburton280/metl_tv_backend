@@ -22,32 +22,32 @@ let socket = (io) => {
         });
 
         socket.on('cancelUsersConnection', async (data) => {
-            await users.cancelUsersConnection(data, io);
+            await users.cancelUsersConnection(data, usersGroups, io);
         });
 
         socket.on('acceptConnection', async (data) => {
-            await users.acceptConnection(data, io);
+            await users.acceptConnection(data, usersGroups, io);
         });
 
         socket.on('declineConnection', async (data) => {
-            await users.declineConnection(data, io);
+            await users.declineConnection(data, usersGroups, io);
         });
 
         socket.on('disconnectUsers', async (data) => {
-            await users.disconnectUsers(data, io);
+            await users.disconnectUsers(data, usersGroups, io);
         });
 
         socket.on('blockUnblockUser', async (data) => {
-            await users.blockUnblockUser(data, io);
+            await users.blockUnblockUser(data, usersGroups, io);
         });
 
         socket.on('unreadLastMessages', async (data) => {
-            await directChat.unreadLastMessages(data, io);
+            await directChat.unreadLastMessages(data, usersGroups, io);
         });
 
         socket.on('setSeen', async (data) => {
             if (!data.group_name) {
-                await directChat.setSeen(data, io);
+                await directChat.setSeen(data, usersGroups, io);
             } else {
                 await groupChat.setSeen(data, io);
             }
@@ -55,7 +55,7 @@ let socket = (io) => {
 
         socket.on('setTyping', async (data) => {
             if (!data.group_name) {
-                await directChat.setTyping(data, io);
+                await directChat.setTyping(data, usersGroups, io);
             } else {
                 await groupChat.setTyping(data, io);
             }
@@ -64,14 +64,14 @@ let socket = (io) => {
 
         socket.on('sendMessage', async (data) => {
             if (!data.group_name) {
-                await directChat.sendMessage(data, io);
+                await directChat.sendMessage(data,usersGroups, io);
             } else {
                 await groupChat.sendMessage(data, io);
             }
         });
 
         socket.on('getConnectedGroupMembers', async (data) => {
-            await groupChat.getConnectedGroupMembers(data, io);
+            await groupChat.getConnectedGroupMembers(data, usersGroups, io);
         });
 
         socket.on('setNewGroup', async (data) => {

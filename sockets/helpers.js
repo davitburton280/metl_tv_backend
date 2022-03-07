@@ -1,3 +1,5 @@
+const usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController')
+const groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController')
 getGroupSockets = async (io, group) => {
     return await io.in(group).allSockets();
 }
