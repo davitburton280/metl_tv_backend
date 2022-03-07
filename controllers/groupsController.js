@@ -12,6 +12,7 @@ const to = require('../helpers/getPromiseResult');
 const nl2br = require('../helpers/nl2br');
 
 exports.get = async (req, res) => {
+    console.log('get only groups!!!')
     let user_id;
     if (req.return) {
         user_id = req.user_id;
