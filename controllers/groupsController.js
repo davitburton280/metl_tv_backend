@@ -64,6 +64,24 @@ exports.getGroupByCustomName = async (req, res) => {
     res.json(groupMembers);
 }
 
+exports.getGroupById = async (req, res) => {
+    let {group_id} = req.query;
+
+    let groupMembers = await Groups.findOne({
+        where: {id: group_id},
+        attributes: ['id', 'name', 'custom_name', 'avatar', 'creator_id', 'privacy'],
+        include: [
+            {
+                model: Users,
+                as: 'group_members',
+                attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
+            },
+        ]
+    });
+
+    res.json(groupMembers);
+}
+
 exports.createGroup = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
@@ -127,7 +145,7 @@ exports.addGroupMembers = async (req, res) => {
 
     await Promise.all(list);
     req.query.group_id = group_id;
-    this.get(req, res);
+    await this.getGroupById(req, res);
 };
 
 exports.removeGroupMember = async (req, res) => {

@@ -15,7 +15,7 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
     if (groupName) {
         await Promise.all(invited_members.map(async (member) => {
             let username = member.username;
-            let invitedMemberSocketId = h.getSocketId(username);
+            let invitedMemberSocketId = h.getSocketId(username, usersGroups);
             let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
             theSocket?.join(groupName);
 
@@ -42,8 +42,7 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
                 group_details: group
             })
 
-            let groupUsernames = h.getGroupUsernames(groupName);
-            console.log(usersGroups)
+            let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
             io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
         }))
     }
@@ -53,7 +52,7 @@ exports.joinGroup = async (data, usersGroups, io) => {
     let {user, group} = data;
     let groupName = group.name;
 
-    let memberSocketId = h.getSocketId(user.username);
+    let memberSocketId = h.getSocketId(user.username, usersGroups);
     let theSocket = io.sockets.sockets.get(memberSocketId);
     let groupSockets = await h.getGroupSockets(io, groupName);
     let gSockets = [...groupSockets];
@@ -129,7 +128,7 @@ exports.acceptJoinGroup = async (data, usersGroups, io) => {
         notification
     });
 
-    let groupUsernames = h.getGroupUsernames(groupName);
+    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 
 
@@ -143,7 +142,7 @@ exports.declineJoinGroup = async (data, usersGroups, io) => {
     console.log('decline joining group!!!');
 
     let {user, group} = data;
-    let socketId = h.getSocketId(user.username);
+    let socketId = h.getSocketId(user.username, usersGroups);
     data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
 
     let notification = {
@@ -211,7 +210,7 @@ exports.confirmJoinGroup = async (data, usersGroups, io) => {
         notification
     });
 
-    let groupUsernames = h.getGroupUsernames(groupName);
+    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 }
 
@@ -247,7 +246,7 @@ exports.ignoreJoinGroup = async (data, usersGroups, io) => {
         notification
     });
 
-    let groupUsernames = h.getGroupUsernames(groupName);
+    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 }
 
@@ -304,7 +303,7 @@ exports.removeFromGroup = async (data,usersGroups, socket,io) =>{
         }
     })
 
-    let socketId = h.getSocketId(member.username); //socket.id
+    let socketId = h.getSocketId(member.username, usersGroups); //socket.id
     let theSocket = io.sockets.sockets.get(socketId);
     // console.log(await io.in(groupName).allSockets());
 

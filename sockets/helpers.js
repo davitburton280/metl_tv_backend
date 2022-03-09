@@ -1,5 +1,7 @@
 const usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController')
-const groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController')
+const groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController');
+const groupNotificationsController = require('../controllers/notifications/groupNotificationsController')
+
 getGroupSockets = async (io, group) => {
     return await io.in(group).allSockets();
 }
@@ -55,10 +57,30 @@ saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) =>
     let n = await groupChatNotificationsController.saveNotification(notification);
 }
 
+saveGroupNotification = async ({from_user, to_user, member, group, msg, type}) => {
+    console.log(member)
+    let notification = {
+        group_id: group.id,
+        group_name: group.name,
+        from_user,
+        to_user: member,
+        to_id: member.id,
+        msg: msg,
+        type: 'group_join_invitation'
+    };
+
+    console.log(notification)
+
+    let savedNotification = await groupNotificationsController.saveNotification(notification);
+    notification._id = savedNotification._id;
+    return notification;
+}
+
 module.exports = {
     getGroupSockets,
     getGroupUsernames,
     getConnectedUserNames,
     getSocketId,
-    saveDirectChatNotification
+    saveDirectChatNotification,
+    saveGroupNotification
 }

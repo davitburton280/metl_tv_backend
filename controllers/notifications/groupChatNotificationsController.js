@@ -21,8 +21,6 @@ exports.saveNotification = async (data) => {
         where: {name: data.type}
     });
 
-
-    //
     let savedNotification;
 
     if (!foundNotificationType) {
