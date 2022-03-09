@@ -63,13 +63,12 @@ exports.joinGroup = async (data, usersGroups, io) => {
 exports.confirmJoinGroup = async (data, usersGroups, io) => {
     console.log('confirmed joining group!!!');
 
-    let {from_user, group, member} = data;
+    let {group, member} = data;
     let groupName = group.name;
 
     Object.values(usersGroups).map((gu, index) => {
         if (gu.username === member.username && !gu.page_groups.find(g => g === groupName)) {
             gu.page_groups.push(groupName);
-
         }
     })
 
@@ -90,6 +89,32 @@ exports.confirmJoinGroup = async (data, usersGroups, io) => {
         notification
     });
 
+
+    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
+    io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
+}
+
+exports.ignoreJoinGroup = async (data, usersGroups, io) => {
+    console.log('ignored joining group!!!');
+
+    let {group, member} = data;
+    let groupName = group.name;
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'ignore_group_invitation'
+    });
+
+    data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
+    data.leftGroups = await groupsController.get({return: true, user_id: member.id});
+    console.log(await io.in(groupName).allSockets());
+    console.log('ignored!!!')
+    console.log(io.in(group.name).allSockets())
+    console.log(usersGroups)
+    io.sockets.in(groupName).emit('ignoredJoinGroup', {
+        rest: data,
+        notification
+    });
 
     let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})

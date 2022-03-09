@@ -108,7 +108,7 @@ let socket = (io) => {
         });
 
         socket.on('ignoreJoinGroup', async (data) => {
-            await chatGroups.ignoreJoinGroup(data, usersGroups, io);
+            await pageGroups.ignoreJoinGroup(data, usersGroups, io);
         });
 
         socket.on('leaveGroup', async (data) => {

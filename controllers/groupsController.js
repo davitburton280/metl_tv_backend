@@ -43,7 +43,11 @@ exports.get = async (req, res) => {
         ]
     });
 
-    res.json(groups);
+    if (req.return) {
+        return groups;
+    } else {
+        res.json(groups)
+    }
 }
 
 exports.getGroupByCustomName = async (req, res) => {
@@ -132,7 +136,6 @@ exports.getGroupMembers = async (req, res) => {
     if (req.return) {
         return JSON.parse(JSON.stringify(groupMembers));
     } else {
-
         res.json(groupMembers);
     }
 };
