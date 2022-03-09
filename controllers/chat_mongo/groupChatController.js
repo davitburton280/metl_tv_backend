@@ -30,7 +30,7 @@ exports.getGroupsMessages = async (req, res) => {
     console.log('get groups messages!!!')
 
     let chatGroupsResult = await ChatGroupsMembers.findAll({
-        where: {member_id: user_id, confirmed: 1}, attributes: ['group_id']
+        where: {member_id: user_id, accepted: 1}, attributes: ['group_id']
     });
 
     let chatGroups = JSON.parse(JSON.stringify(chatGroupsResult)).map(t => t.group_id);
@@ -168,8 +168,10 @@ exports.getGroupMembers = async (req, res) => {
 exports.addGroupMembers = async (req, res) => {
     const {group_id, member_ids, accepted} = req.body;
     let list = member_ids?.map(async (member_id) => {
+        console.log('OKK', member_id)
         await to(ChatGroupsMembers.create({group_id, member_id, ...{accepted, confirmed: 0}}));
     });
+
 
     await Promise.all(list);
     req.query.group_id = group_id;
