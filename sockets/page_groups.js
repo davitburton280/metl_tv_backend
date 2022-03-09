@@ -44,6 +44,7 @@ exports.joinGroup = async (data, usersGroups, io) => {
         theSocket?.join(groupName);
         groupSockets = await h.getGroupSockets(io, groupName);
         console.log('joined', groupSockets)
+        console.log('groupName:', groupName, usersGroups)
     }
 
     let notification = await h.saveGroupNotification({
@@ -57,4 +58,39 @@ exports.joinGroup = async (data, usersGroups, io) => {
         rest: data,
         notification
     });
+}
+
+exports.confirmJoinGroup = async (data, usersGroups, io) => {
+    console.log('confirmed joining group!!!');
+
+    let {from_user, group, member} = data;
+    let groupName = group.name;
+
+    Object.values(usersGroups).map((gu, index) => {
+        if (gu.username === member.username && !gu.page_groups.find(g => g === groupName)) {
+            gu.page_groups.push(groupName);
+
+        }
+    })
+
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'confirm_group_invitation'
+    });
+
+    data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
+
+
+    console.log('confirmed!!!')
+    console.log(await io.in(group.name).allSockets())
+    // console.log(usersGroups)
+    io.sockets.in(group.name).emit('confirmedJoinGroup', {
+        rest: data,
+        notification
+    });
+
+
+    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
+    io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 }

@@ -104,7 +104,7 @@ let socket = (io) => {
         });
 
         socket.on('confirmJoinGroup', async (data) => {
-            await chatGroups.confirmJoinGroup(data, usersGroups, io);
+            await pageGroups.confirmJoinGroup(data, usersGroups, io);
         });
 
         socket.on('ignoreJoinGroup', async (data) => {

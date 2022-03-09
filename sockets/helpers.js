@@ -57,14 +57,15 @@ saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) =>
     let n = await groupChatNotificationsController.saveNotification(notification);
 }
 
-saveGroupNotification = async ({from_user, to_user, member, group, msg, type}) => {
+saveGroupNotification = async ({from_user, to_user, member, group, msg, type, link}) => {
 
     let notification = {
         group_id: group.id,
         group_name: group.name,
         from_user,
         msg,
-        type
+        type,
+        link,
     };
 
     if (member) {

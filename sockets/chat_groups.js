@@ -138,49 +138,7 @@ exports.declineJoinGroup = async (data, usersGroups, io) => {
     // })
 }
 
-exports.confirmJoinGroup = async (data, usersGroups, io) => {
-    console.log('confirmed joining group!!!');
 
-    let {user, group, member} = data;
-    let groupName = group.name;
-
-    // // console.log(usersGroups)
-    // Object.values(usersGroups).map(gu => {
-    //     if (gu.username === user.username && !gu.chat_groups.find(g => g === groupName)) {
-    //         gu.chat_groups.push(groupName);
-    //     }
-    // })
-
-    let notification = {
-        group_id: group.id,
-        group_name: groupName,
-        from_user: user,
-        // to_user: member,
-        // to_id: member.id,
-        msg: data.msg,
-        link: data.link,
-        type: 'confirm_group_invitation'
-    };
-    console.log(notification)
-
-    let savedNotification = await groupChatNotificationsController.saveNotification(notification);
-
-    notification._id = savedNotification._id;
-
-    data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
-
-
-    console.log('confirmed!!!')
-    console.log(await io.in(group.name).allSockets())
-    console.log(usersGroups)
-    io.sockets.in(group.name).emit('confirmedJoinGroup', {
-        rest: data,
-        notification
-    });
-
-    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
-    io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
-}
 
 exports.ignoreJoinGroup = async (data, usersGroups, io) => {
     console.log('ignored joining group!!!');
