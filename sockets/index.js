@@ -92,7 +92,7 @@ let socket = (io) => {
         });
 
         socket.on('joinGroup', async (data) => {
-            await chatGroups.joinGroup(data, usersGroups, io);
+            await pageGroups.joinGroup(data, usersGroups, io);
         })
 
         socket.on('acceptJoinGroup', async (data) => {

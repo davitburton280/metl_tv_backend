@@ -7,11 +7,18 @@ let directChatController = require('../controllers/chat_mongo/directChatControll
 let usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController');
 
 
-exports.newUser = async ({username, chat_groups}, usersGroups, socket, io) => {
+exports.newUser = async ({username, chat_groups, page_groups}, usersGroups, socket, io) => {
     console.log("USERNAME!!!!", username)
     if (username) {
-        usersGroups[username] = {username, socket_id: socket.id, chat_groups};
+        usersGroups[username] = {username, socket_id: socket.id, chat_groups, page_groups};
         chat_groups.map((group) => {
+            socket.join(group);
+            let groupUsernames = h.getGroupUsernames(group, usersGroups)
+            console.log('group usernames ', group, ' => ', groupUsernames)
+            io.sockets.in(group).emit('onGetOnlineMembers', {group, members: groupUsernames})
+        });
+
+        page_groups.map((group) => {
             socket.join(group);
             let groupUsernames = h.getGroupUsernames(group, usersGroups)
             console.log('group usernames ', group, ' => ', groupUsernames)

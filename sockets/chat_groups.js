@@ -48,39 +48,7 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
     }
 }
 
-exports.joinGroup = async (data, usersGroups, io) => {
-    let {user, group} = data;
-    let groupName = group.name;
 
-    let memberSocketId = h.getSocketId(user.username, usersGroups);
-    let theSocket = io.sockets.sockets.get(memberSocketId);
-    let groupSockets = await h.getGroupSockets(io, groupName);
-    let gSockets = [...groupSockets];
-    if (!gSockets.includes(theSocket)) {
-        theSocket?.join(groupName);
-        groupSockets = await h.getGroupSockets(io, groupName);
-    }
-
-    data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
-
-    let notification = {
-        group_id: group.id,
-        group_name: groupName,
-        from_user: user,
-        msg: data.msg,
-        link: data.link,
-        type: 'join_group_invitation'
-    };
-
-    let savedNotification = await groupChatNotificationsController.saveNotification(notification);
-
-    notification._id = savedNotification._id;
-
-    io.sockets.in(groupName).emit('getJoinGroup', {
-        rest: data,
-        notification
-    });
-}
 
 exports.acceptJoinGroup = async (data, usersGroups, io) => {
     console.log('joining group!!!');

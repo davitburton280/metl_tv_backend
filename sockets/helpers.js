@@ -63,11 +63,14 @@ saveGroupNotification = async ({from_user, to_user, member, group, msg, type}) =
         group_id: group.id,
         group_name: group.name,
         from_user,
-        to_user: member,
-        to_id: member.id,
-        msg: msg,
-        type: 'group_join_invitation'
+        msg,
+        type
     };
+
+    if (member) {
+        notification.to_user = member;
+        notification.to_id = member.id
+    }
 
     console.log(notification)
 
