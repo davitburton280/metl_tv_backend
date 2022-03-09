@@ -40,15 +40,11 @@ exports.joinGroup = async (data, usersGroups, io) => {
     let theSocket = io.sockets.sockets.get(newUserSocketId);
     let groupSockets = await h.getGroupSockets(io, groupName);
     let gSockets = [...groupSockets];
-    console.log(newUserSocketId)
-    console.log(gSockets)
     if (!gSockets.includes(theSocket)) {
         theSocket?.join(groupName);
         groupSockets = await h.getGroupSockets(io, groupName);
         console.log('joined', groupSockets)
     }
-
-
 
     let notification = await h.saveGroupNotification({
         ...data,
@@ -56,7 +52,6 @@ exports.joinGroup = async (data, usersGroups, io) => {
     });
 
     data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
-    console.log('GROUP', data.group)
 
     io.sockets.in(groupName).emit('getJoinGroup', {
         rest: data,
