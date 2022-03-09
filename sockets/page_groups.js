@@ -119,3 +119,36 @@ exports.ignoreJoinGroup = async (data, usersGroups, io) => {
     let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 }
+
+exports.leaveGroup = async (data, usersGroups, socket, io) => {
+    console.log('leave group!!!')
+    let {from_user, group} = data;
+    let groupName = group.name;
+
+    Object.values(usersGroups).map(gu => {
+
+        if (gu.username === from_user.username && gu.page_groups.find(g => g === groupName)) {
+            console.log(gu.page_groups.filter(g => g !== groupName))
+            gu.page_groups = gu.page_groups.filter(g => g !== groupName);
+        }
+    })
+    console.log(usersGroups)
+    console.log(await io.in(groupName).allSockets());
+
+
+    let groupMembers = await groupsController.getGroupMembers({return: true, group_id: group.id});
+    data.group.group_members = groupMembers?.group_members;
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'left_group'
+    });
+
+    console.log(await io.in(groupName).allSockets());
+    io.sockets.in(group.name).emit('leaveGroupNotify', {
+        ...data,
+        ...notification,
+    });
+
+    socket.leave(groupName);
+}

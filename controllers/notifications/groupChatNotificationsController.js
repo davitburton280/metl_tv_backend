@@ -143,7 +143,7 @@ exports.read = async (req, res) => {
     console.log('read!!!!', read_by)
 
     let notification = await GroupChatNotifications.findById(id);
-    if (!notification.read.find(r => r.read_by.id === read_by.id)) {
+    if (!notification?.read.find(r => r.read_by.id === read_by.id)) {
         notification.read.push({read_by, read_at: moment().format('YYYY-MM-DD, h:mm:ss a')});
     }
     await notification.save();

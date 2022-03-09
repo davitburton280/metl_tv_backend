@@ -144,12 +144,12 @@ exports.declineJoinGroup = async (data, usersGroups, io) => {
 
 exports.leaveGroup = async (data, usersGroups, socket, io) =>{
     console.log('leave group!!!')
-    let {user, group} = data;
+    let {from_user, group} = data;
     let groupName = group.name;
 
     Object.values(usersGroups).map(gu => {
 
-        if (gu.username === user.username && gu.chat_groups.find(g => g === groupName)) {
+        if (gu.username === from_user.username && gu.chat_groups.find(g => g === groupName)) {
             console.log(gu.chat_groups.filter(g => g !== groupName))
             gu.chat_groups = gu.chat_groups.filter(g => g !== groupName);
         }
@@ -163,10 +163,10 @@ exports.leaveGroup = async (data, usersGroups, socket, io) =>{
 
     let notification = {
         group_id: group.id,
-        from_user: user,
+        from_user,
         // to_user: member,
         // to_id: member.id,
-        msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has left the <strong>${group.name}</strong> group`,
+        msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has left the <strong>${group.name}</strong> group`,
         type: 'left_group'
     };
 
