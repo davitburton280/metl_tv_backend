@@ -121,7 +121,7 @@ exports.ignoreJoinGroup = async (data, usersGroups, io) => {
 }
 
 exports.leaveGroup = async (data, usersGroups, socket, io) => {
-    console.log('leave group!!!')
+    console.log('leave page group!!!')
     let {from_user, group} = data;
     let groupName = group.name;
 
@@ -151,4 +151,41 @@ exports.leaveGroup = async (data, usersGroups, socket, io) => {
     });
 
     socket.leave(groupName);
+}
+
+exports.removeFromGroup = async (data, usersGroups, socket, io) => {
+    let {member, group} = data;
+    let groupName = group.name;
+    console.log('remove from group!!!');
+
+    Object.values(usersGroups).map(gu => {
+
+        if (gu.username === member.username && gu.chat_groups.find(g => g === groupName)) {
+            gu.chat_groups = gu.chat_groups.filter(g => g !== groupName);
+        }
+    })
+
+    let socketId = h.getSocketId(member.username, usersGroups); //socket.id
+    let theSocket = io.sockets.sockets.get(socketId);
+    // console.log(await io.in(groupName).allSockets());
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'remove_from_group'
+    });
+
+
+    data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
+    data.leftGroups = await groupsController.get({return: true, user_id: member.id});
+
+    let currentUserNotifications = await notificationsController.get({return: true, user_id: member.id});
+
+
+    console.log(currentUserNotifications);
+    socket.broadcast.to(groupName).emit('removeFromGroupNotify', {
+        ...data,
+        currentUserNotifications
+    });
+
+    theSocket.leave(groupName);
 }

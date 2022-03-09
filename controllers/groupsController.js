@@ -153,9 +153,11 @@ exports.addGroupMembers = async (req, res) => {
 
 exports.removeGroupMember = async (req, res) => {
     const {group_id, member_id} = req.query;
+    console.log('remove group member', req.query)
     await GroupsMembers.destroy({where: {group_id, member_id}});
 
-    this.get(req, res);
+    req.query.group_id = group_id;
+    await this.getGroupById(req, res);
 };
 
 exports.leaveGroup = async (req, res) => {

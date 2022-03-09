@@ -120,7 +120,11 @@ let socket = (io) => {
         });
 
         socket.on('removeFromGroup', async (data) => {
-            await chatGroups.removeFromGroup(data, usersGroups, socket, io);
+            if (data.group_type === 'chat') {
+                await chatGroups.removeFromGroup(data, usersGroups, socket, io);
+            } else {
+                await pageGroups.removeFromGroup(data, usersGroups, socket, io);
+            }
         });
 
         socket.on('forceDisconnect', async (user) => {
