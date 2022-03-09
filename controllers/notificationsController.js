@@ -1,5 +1,6 @@
 const usersConnectionNotificationsController = require('./notifications/directChatNotificationsController');
 const groupChatNotificationsController = require('./notifications/groupChatNotificationsController');
+const groupNotificationsController = require('./notifications/groupNotificationsController');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
@@ -8,6 +9,7 @@ const db = require('../models');
 const Users = db.users;
 const Channels = db.channels;
 const ChatGroups = db.chat_groups;
+const PageGroups = db.groups;
 const ChatGroupsMembers = db.chat_groups_members;
 
 const c = require('../config/constants');
@@ -24,13 +26,15 @@ exports.get = async (req, res) => {
         where: {id: user_id},
         include: [
             {model: Channels, as: 'channel'},
-            {model: ChatGroups, as: 'chat_group_members'}
+            {model: ChatGroups, as: 'chat_group_members'},
+            {model: PageGroups, as: 'group_members'}
         ]
     });
 
     let usersConnectionNotifs = await usersConnectionNotificationsController.getCurrentUserNotifications(user_id);
     let groupChatNotifs = await groupChatNotificationsController.getCurrentGroupUsersNotifications(user.toJSON());
-    let ret = [...new Set([...usersConnectionNotifs, ...groupChatNotifs])];
+    let groupNotifs = await groupNotificationsController.getCurrentGroupNotifications(user.toJSON());
+    let ret = [...new Set([...usersConnectionNotifs, ...groupChatNotifs, ...groupNotifs])];
 
     if (req.return) {
         return ret;

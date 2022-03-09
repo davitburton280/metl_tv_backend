@@ -48,8 +48,6 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
     }
 }
 
-
-
 exports.acceptJoinGroup = async (data, usersGroups, io) => {
     console.log('joining group!!!');
 
@@ -137,10 +135,6 @@ exports.declineJoinGroup = async (data, usersGroups, io) => {
     //     ...data, initiator_id: user.id
     // })
 }
-
-
-
-
 
 exports.leaveGroup = async (data, usersGroups, socket, io) =>{
     console.log('leave group!!!')

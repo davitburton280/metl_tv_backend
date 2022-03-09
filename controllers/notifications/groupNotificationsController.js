@@ -31,3 +31,30 @@ exports.saveNotification = async (data) => {
 
     return savedNotification;
 }
+
+exports.getCurrentGroupNotifications = async (data) => {
+    // console.log(data)
+    data.group_ids = data.group_members.map(group => group.id);
+    // console.log('group_ids!!!', data.group_ids)
+    let notifications = await GroupNotifications.find({
+        "$and": [
+            {
+                group_id: {'$in': data.group_ids}
+            },
+            {
+                "from_user.id": {'$ne': data.id}
+            }
+        ],
+
+    }).sort({'created_at': 1});
+
+    let ret = [];
+
+    notifications.map(n => {
+        let found = !!n.read.find(r => r.read_by.id === data.id)
+        delete n.read;
+        ret.push({...n.toObject(), read: found});
+    })
+
+    return ret;
+};
