@@ -58,3 +58,16 @@ exports.getCurrentGroupNotifications = async (data) => {
 
     return ret;
 };
+
+exports.removeNotification = async (req, res) => {
+    let id;
+    if (req.return) {
+        id = req.id;
+    } else {
+        id = req.query.id;
+    }
+    console.log('notification id!!!', req)
+    let currentNotification = await GroupNotifications.findOne({id});
+    let t = await GroupNotifications.deleteOne({_id: id});
+    return currentNotification?.to_id;
+};

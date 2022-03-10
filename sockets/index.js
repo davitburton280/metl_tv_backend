@@ -83,32 +83,24 @@ let socket = (io) => {
             await groupChat.removeGroup(data, usersGroups, io)
         });
 
-        socket.on('inviteToNewGroup', async (data) => {
-            if (data.group_type === 'chat') {
-                await chatGroups.inviteToNewGroup(data, usersGroups, io);
-            } else {
-                await pageGroups.inviteToNewGroup(data, usersGroups, io);
-            }
+        socket.on('inviteToNewChatGroup', async (data) => {
+            await chatGroups.inviteToNewGroup(data, usersGroups, io);
         });
 
-        socket.on('joinGroup', async (data) => {
-            await pageGroups.joinGroup(data, usersGroups, io);
+        socket.on('inviteToNewPageGroup', async (data) => {
+            await pageGroups.inviteToNewGroup(data, usersGroups, io);
         })
 
         socket.on('acceptJoinGroup', async (data) => {
-            await chatGroups.acceptJoinGroup(data, usersGroups, io);
+            if (data.group_type === 'chat') {
+                await chatGroups.acceptJoinGroup(data, usersGroups, io);
+            } else {
+                await pageGroups.acceptJoinGroup(data, usersGroups, io);
+            }
         });
 
         socket.on('declineJoinGroup', async (data) => {
             await chatGroups.declineJoinGroup(data, usersGroups, io);
-        });
-
-        socket.on('confirmJoinGroup', async (data) => {
-            await pageGroups.confirmJoinGroup(data, usersGroups, io);
-        });
-
-        socket.on('ignoreJoinGroup', async (data) => {
-            await pageGroups.ignoreJoinGroup(data, usersGroups, io);
         });
 
         socket.on('leaveGroup', async (data) => {
@@ -126,6 +118,20 @@ let socket = (io) => {
                 await pageGroups.removeFromGroup(data, usersGroups, socket, io);
             }
         });
+
+
+        socket.on('joinGroup', async (data) => {
+            await pageGroups.joinGroup(data, usersGroups, io);
+        })
+
+        socket.on('confirmJoinGroup', async (data) => {
+            await pageGroups.confirmJoinGroup(data, usersGroups, io);
+        });
+
+        socket.on('ignoreJoinGroup', async (data) => {
+            await pageGroups.ignoreJoinGroup(data, usersGroups, io);
+        });
+
 
         socket.on('forceDisconnect', async (user) => {
             await users.forceDisconnect(user, usersGroups, socket, io);

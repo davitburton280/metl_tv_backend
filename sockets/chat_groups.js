@@ -8,9 +8,8 @@ let notificationsController = require('../controllers/notificationsController');
 exports.inviteToNewGroup = async (data, usersGroups, io) => {
     console.log('invite to new group!!!');
 
-    let {from_user, invited_members, group} = data;
-    let inviterName = from_user.first_name + ' ' + from_user.last_name;
-    let groupName = data.group.name;
+    let {invited_members, group} = data;
+    let groupName = group.name;
 
     if (groupName) {
         await Promise.all(invited_members.map(async (member) => {
@@ -19,24 +18,12 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
             let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
             theSocket?.join(groupName);
 
-            let notification = {
-                group_id: group.id,
-                group_name: groupName,
-                from_user,
-                to_user: member,
-                to_id: member.id,
-                msg: data.msg,
+            let notification = await h.saveGroupNotification({
+                ...data, ...{member},
                 type: 'group_join_invitation'
-            };
+            });
 
-            let savedNotification = await groupChatNotificationsController.saveNotification(notification);
-            notification._id = savedNotification._id;
-
-            // let userGroups = await groupChatController.getGroupsMessages({return: true, user_id: data.to_user_id});
-            console.log(username);
-            console.log(invitedMemberSocketId)
-
-            io.to(invitedMemberSocketId).emit('inviteToGroupSent', {
+            io.to(invitedMemberSocketId).emit('inviteToChatGroupSent', {
                 group_id: group.id,
                 ...notification,
                 group_details: group
@@ -136,7 +123,7 @@ exports.declineJoinGroup = async (data, usersGroups, io) => {
     // })
 }
 
-exports.leaveGroup = async (data, usersGroups, socket, io) =>{
+exports.leaveGroup = async (data, usersGroups, socket, io) => {
     console.log('leave group!!!')
     let {from_user, group} = data;
     let groupName = group.name;
@@ -177,7 +164,7 @@ exports.leaveGroup = async (data, usersGroups, socket, io) =>{
     socket.leave(groupName);
 }
 
-exports.removeFromGroup = async (data,usersGroups, socket,io) =>{
+exports.removeFromGroup = async (data, usersGroups, socket, io) => {
     let {initiator, member, group} = data;
     let groupName = group.name;
     console.log('remove from group!!!');
