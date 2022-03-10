@@ -18,7 +18,7 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
 
             let notification = await h.saveGroupNotification({
                 ...data, ...{member},
-                type: 'page_group_join_request'
+                type: 'page_group_join_invitation'
             });
 
             io.to(invitedMemberSocketId).emit('inviteToPageGroupSent', {

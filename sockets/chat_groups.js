@@ -20,7 +20,7 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
 
             let notification = await h.saveGroupNotification({
                 ...data, ...{member},
-                type: 'group_join_invitation'
+                type: 'chat_group_join_invitation'
             });
 
             io.to(invitedMemberSocketId).emit('inviteToChatGroupSent', {
@@ -62,7 +62,7 @@ exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
         // to_id: member.id,
         msg: data.msg,
         link: data.link,
-        type: 'accept_group_invitation'
+        type: 'accept_chat_group_invitation'
     };
     // console.log(notification)
 
@@ -101,7 +101,7 @@ exports.declineJoinChatGroup = async (data, usersGroups, io) => {
 
     let notification = await h.saveGroupNotification({
         ...data,
-        type: 'decline_group_invitation'
+        type: 'decline_chat_group_invitation'
     });
 
     await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
@@ -141,7 +141,7 @@ exports.leaveChatGroup = async (data, usersGroups, socket, io) => {
         // to_user: member,
         // to_id: member.id,
         msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has left the <strong>${group.name}</strong> group`,
-        type: 'left_cgat_group'
+        type: 'left_chat_group'
     };
 
     let savedNotification = await groupChatNotificationsController.saveNotification(notification);

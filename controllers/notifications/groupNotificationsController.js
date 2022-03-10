@@ -5,6 +5,8 @@ const db = require('../../models');
 const GroupNotifications = require('../../mongoose_chat/group_notifications');
 const NotificationTypes = db.notification_types;
 
+const moment = require('moment');
+
 exports.saveNotification = async (data) => {
     let foundNotificationType = await NotificationTypes.findOne({
         where: {name: data.type}
