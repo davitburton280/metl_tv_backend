@@ -119,7 +119,7 @@ let socket = (io) => {
             await chatGroups.removeFromChatGroup(data, usersGroups, socket, io);
         });
 
-        socket.on('removeFromChatGroup', async (data) => {
+        socket.on('removeFromPageGroup', async (data) => {
             await pageGroups.removeFromPageGroup(data, usersGroups, socket, io);
         });
 
