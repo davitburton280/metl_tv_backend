@@ -195,7 +195,7 @@ exports.removeFromGroup = async (data, usersGroups, socket, io) => {
     theSocket?.leave(groupName);
 }
 
-exports.acceptJoinGroup = async (data, usersGroups, io) => {
+exports.acceptJoinPageGroup = async (data, usersGroups, io) => {
     console.log('accept joining group!!!');
 
     let {from_user, group} = data;
@@ -215,7 +215,7 @@ exports.acceptJoinGroup = async (data, usersGroups, io) => {
 
     let notification = await h.saveGroupNotification({
         ...data,
-        type: 'accept_group_invitation'
+        type: 'accept_page_group_invitation'
     });
 
     await groupNotificationsController.removeNotification({return: true, id: data.notification_id});
@@ -224,7 +224,7 @@ exports.acceptJoinGroup = async (data, usersGroups, io) => {
     // console.log(await io.in(groupName).allSockets());
     console.log('accepted!!!', from_user.id, data.group)
 
-    io.sockets.in(group.name).emit('acceptedJoinGroup', {
+    io.sockets.in(group.name).emit('acceptedJoinPageGroup', {
         rest: data,
         notification
     });
@@ -237,4 +237,29 @@ exports.acceptJoinGroup = async (data, usersGroups, io) => {
     //     ...data,
     //     ...notification
     // });
+}
+
+exports.declineJoinPageGroup = async (data, usersGroups, io) => {
+    console.log('decline joining group!!!');
+
+    let {group} = data;
+    let socketId = h.getSocketId(user.username, usersGroups);
+    data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
+
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'decline_page_group_invitation'
+    });
+
+    await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
+
+    console.log(await io.in(group.name).allSockets());
+    io.sockets.in(group.name).emit('getDeclinedJoinPageGroup', {
+        ...data,
+        ...notification,
+    });
+    // io.to(socketId).emit('getDeclinedJoinGroup', {
+    //     ...data, initiator_id: user.id
+    // })
 }

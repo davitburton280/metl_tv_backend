@@ -91,16 +91,20 @@ let socket = (io) => {
             await pageGroups.inviteToNewGroup(data, usersGroups, io);
         })
 
-        socket.on('acceptJoinGroup', async (data) => {
-            if (data.group_type === 'chat') {
-                await chatGroups.acceptJoinGroup(data, usersGroups, io);
-            } else {
-                await pageGroups.acceptJoinGroup(data, usersGroups, io);
-            }
+        socket.on('acceptJoinChatGroup', async (data) => {
+            await chatGroups.acceptJoinChatGroup(data, usersGroups, io);
         });
 
-        socket.on('declineJoinGroup', async (data) => {
-            await chatGroups.declineJoinGroup(data, usersGroups, io);
+        socket.on('acceptJoinPageGroup', async (data) => {
+            await pageGroups.acceptJoinPageGroup(data, usersGroups, io);
+        });
+
+        socket.on('declineJoinChatGroup', async (data) => {
+            await chatGroups.declineJoinChatGroup(data, usersGroups, io);
+        });
+
+        socket.on('declineJoinPageGroup', async (data) => {
+            await pageGroups.declineJoinPageGroup(data, usersGroups, io);
         });
 
         socket.on('leaveGroup', async (data) => {

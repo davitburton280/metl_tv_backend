@@ -35,7 +35,7 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
     }
 }
 
-exports.acceptJoinGroup = async (data, usersGroups, io) => {
+exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
     console.log('joining group!!!');
 
     let {user, group} = data;
@@ -76,7 +76,7 @@ exports.acceptJoinGroup = async (data, usersGroups, io) => {
     // console.log(await io.in(groupName).allSockets());
     console.log('accepted!!!', user.id, data.group)
 
-    io.sockets.in(group.name).emit('acceptedJoinGroup', {
+    io.sockets.in(group.name).emit('acceptedJoinChatGroup', {
         rest: data,
         notification
     });
@@ -91,30 +91,23 @@ exports.acceptJoinGroup = async (data, usersGroups, io) => {
     // });
 }
 
-exports.declineJoinGroup = async (data, usersGroups, io) => {
+exports.declineJoinChatGroup = async (data, usersGroups, io) => {
     console.log('decline joining group!!!');
 
-    let {user, group} = data;
+    let {group} = data;
     let socketId = h.getSocketId(user.username, usersGroups);
     data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
 
-    let notification = {
-        group_id: group.id,
-        from_user: user,
-        // to_user: member,
-        // to_id: member.id,
-        msg: `<strong>${user.first_name + ' ' + user.last_name}</strong> has declined joining the <strong>${group.name}</strong> group`,
+
+    let notification = await h.saveGroupNotification({
+        ...data,
         type: 'decline_group_invitation'
-    };
-
-    let savedNotification = await groupChatNotificationsController.saveNotification(notification);
-
-    notification._id = savedNotification._id;
+    });
 
     await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
 
     console.log(await io.in(group.name).allSockets());
-    io.sockets.in(group.name).emit('getDeclinedJoinGroup', {
+    io.sockets.in(group.name).emit('getDeclinedJoinChatGroup', {
         ...data,
         ...notification,
     });
