@@ -10,7 +10,11 @@ module.exports = {
         'accept_connection_request', 'decline_connection_request', 'break_connection', 'block_connection'
     ],
     GROUP_CHAT_NOTIFICATION_TYPES: [
-        'group_join_invitation', 'accept_group_invitation', 'decline_group_invitation', 'remove_from_group', 'left_group',
+        'group_join_invitation', 'accept_chat_group_invitation', 'decline_chat_group_invitation', 'remove_from_chat_group', 'left_chat_group',
+        'confirm_group_invitation', 'ignore_group_invitation', 'join_group_invitation'
+    ],
+    GROUP_NOTIFICATION_TYPES: [
+        'group_join_invitation', 'accept_page_group_invitation', 'decline_page_group_invitation', 'remove_from_page_group', 'left_page_group',
         'confirm_group_invitation', 'ignore_group_invitation', 'join_group_invitation'
     ]
 };

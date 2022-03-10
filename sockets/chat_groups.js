@@ -157,7 +157,7 @@ exports.leaveChatGroup = async (data, usersGroups, socket, io) => {
     socket.leave(groupName);
 }
 
-exports.removeFromGroup = async (data, usersGroups, socket, io) => {
+exports.removeFromChatGroup = async (data, usersGroups, socket, io) => {
     let {initiator, member, group} = data;
     let groupName = group.name;
     console.log('remove from group!!!');
@@ -184,7 +184,7 @@ exports.removeFromGroup = async (data, usersGroups, socket, io) => {
         // to_id: member.id,
         msg: `<strong>${initiator.first_name + ' ' + initiator.last_name}</strong> removed  <strong>${member.first_name + ' ' + member.last_name}</strong>
                        from <strong>${groupName}</strong> group`,
-        type: 'remove_from_group'
+        type: 'remove_from_chat_group'
     };
 
     let savedNotification = await groupChatNotificationsController.saveNotification(notification);
@@ -195,7 +195,7 @@ exports.removeFromGroup = async (data, usersGroups, socket, io) => {
 
 
     console.log(currentUserNotifications);
-    socket.broadcast.to(groupName).emit('removeFromGroupNotify', {
+    socket.broadcast.to(groupName).emit('removeFromChatGroupNotify', {
         ...data,
         currentUserNotifications
     });
