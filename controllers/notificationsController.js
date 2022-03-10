@@ -54,6 +54,9 @@ exports.read = async (req, res) => {
     } else if (c.GROUP_CHAT_NOTIFICATION_TYPES.includes(type)) {
         userNotificationsResult = await groupChatNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
+    } else if (c.GROUP_NOTIFICATION_TYPES.includes(type)) {
+        userNotificationsResult = await groupNotificationsController.read(req, res);
+        req.query.user_id = read_by.id;
     }
     console.log('mark as read', req.query)
     this.get(req, res);
@@ -71,6 +74,9 @@ exports.markAllAsRead = async (req, res) => {
             req.query.user_id = userNotificationsResult;
         } else if (c.GROUP_CHAT_NOTIFICATION_TYPES.includes(n.type)) {
             userNotificationsResult = await groupChatNotificationsController.markAllAsRead(req, res);
+            req.query.user_id = read_by.id;
+        } else if (c.GROUP_NOTIFICATION_TYPES.includes(n.type)) {
+            userNotificationsResult = await groupNotificationsController.read(req, res);
             req.query.user_id = read_by.id;
         }
     }))

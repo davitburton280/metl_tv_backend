@@ -71,3 +71,40 @@ exports.removeNotification = async (req, res) => {
     let t = await GroupNotifications.deleteOne({_id: id});
     return currentNotification?.to_id;
 };
+
+exports.read = async (req, res) => {
+    let {id, read_by} = req.body;
+    console.log('read!!!!', read_by)
+
+    let notification = await GroupNotifications.findById(id);
+    if (notification) {
+
+        if (!notification?.read.find(r => r.read_by.id === read_by.id)) {
+            notification?.read.push({read_by, read_at: moment().format('YYYY-MM-DD, h:mm:ss a')});
+        }
+        await notification.save();
+    }
+
+    let currentNotification = await GroupNotifications.findById(id);
+    return currentNotification;
+};
+
+exports.markAllAsRead = async (req, res) => {
+    let {notifications, read_by} = req.body;
+    // console.log('ids!!!', ids)
+    let result = await Promise.all(notifications.map(async ({id}) => {
+        let notification = await GroupNotifications.findById(id);
+        if (notification) {
+
+            // console.log('check to find!!!', !notification.read.find(r => r.read_by.id === read_by.id))
+            if (!notification.read.find(r => r.read_by.id === read_by.id)) {
+                notification.read.push({read_by, read_at: moment().format('YYYY-MM-DD, h:mm:ss a')});
+            }
+            await notification.save();
+        }
+    }));
+
+    return 'OK';
+
+
+};

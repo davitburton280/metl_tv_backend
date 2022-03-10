@@ -15,7 +15,7 @@ module.exports = {
     ],
     GROUP_NOTIFICATION_TYPES: [
         'group_join_invitation', 'accept_page_group_invitation', 'decline_page_group_invitation', 'remove_from_page_group', 'left_page_group',
-        'confirm_group_invitation', 'ignore_group_invitation', 'join_group_invitation'
+        'confirm_group_invitation', 'ignore_group_invitation', 'join_group_invitation','page_group_join_request'
     ]
 };
 
