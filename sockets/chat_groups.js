@@ -116,7 +116,7 @@ exports.declineJoinChatGroup = async (data, usersGroups, io) => {
     // })
 }
 
-exports.leaveGroup = async (data, usersGroups, socket, io) => {
+exports.leaveChatGroup = async (data, usersGroups, socket, io) => {
     console.log('leave group!!!')
     let {from_user, group} = data;
     let groupName = group.name;
@@ -141,7 +141,7 @@ exports.leaveGroup = async (data, usersGroups, socket, io) => {
         // to_user: member,
         // to_id: member.id,
         msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has left the <strong>${group.name}</strong> group`,
-        type: 'left_group'
+        type: 'left_cgat_group'
     };
 
     let savedNotification = await groupChatNotificationsController.saveNotification(notification);
@@ -149,7 +149,7 @@ exports.leaveGroup = async (data, usersGroups, socket, io) => {
     notification._id = savedNotification._id;
 
     console.log(await io.in(groupName).allSockets());
-    io.sockets.in(group.name).emit('leaveGroupNotify', {
+    io.sockets.in(group.name).emit('leaveChatGroupNotify', {
         ...data,
         ...notification,
     });

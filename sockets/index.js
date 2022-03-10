@@ -107,12 +107,12 @@ let socket = (io) => {
             await pageGroups.declineJoinPageGroup(data, usersGroups, io);
         });
 
-        socket.on('leaveGroup', async (data) => {
-            if (data.group_type === 'chat') {
-                await chatGroups.leaveGroup(data, usersGroups, socket, io);
-            } else {
-                await pageGroups.leaveGroup(data, usersGroups, socket, io);
-            }
+        socket.on('leaveChatGroup', async (data) => {
+            await chatGroups.leaveChatGroup(data, usersGroups, socket, io);
+        });
+
+        socket.on('leavePageGroup', async (data) => {
+            await pageGroups.leavePageGroup(data, usersGroups, socket, io);
         });
 
         socket.on('removeFromGroup', async (data) => {
