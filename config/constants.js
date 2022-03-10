@@ -11,8 +11,7 @@ module.exports = {
     ],
     GROUP_CHAT_NOTIFICATION_TYPES: [
         'chat_group_join_invitation', 'accept_chat_group_invitation', 'decline_chat_group_invitation',
-        'remove_from_chat_group', 'left_chat_group',
-        'confirm_group_invitation', 'ignore_group_invitation',
+        'remove_from_chat_group', 'left_chat_group'
     ],
     GROUP_NOTIFICATION_TYPES: [
         'page_group_join_invitation', 'accept_page_group_invitation', 'decline_page_group_invitation',

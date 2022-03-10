@@ -76,7 +76,7 @@ exports.removeNotification = async (req, res) => {
 
 exports.read = async (req, res) => {
     let {id, read_by} = req.body;
-    console.log('read!!!!', read_by)
+    // console.log('read!!!!', read_by)
 
     let notification = await GroupNotifications.findById(id);
     if (notification) {
@@ -93,7 +93,7 @@ exports.read = async (req, res) => {
 
 exports.markAllAsRead = async (req, res) => {
     let {notifications, read_by} = req.body;
-    // console.log('ids!!!', ids)
+    console.log('mark all group notifs as read!!!')
     let result = await Promise.all(notifications.map(async ({id}) => {
         let notification = await GroupNotifications.findById(id);
         if (notification) {

@@ -55,6 +55,7 @@ exports.read = async (req, res) => {
         userNotificationsResult = await groupChatNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     } else if (c.GROUP_NOTIFICATION_TYPES.includes(type)) {
+        console.log('here', type)
         userNotificationsResult = await groupNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     }
@@ -68,7 +69,6 @@ exports.markAllAsRead = async (req, res) => {
     let userNotificationsResult;
 
     await Promise.all(notifications.map(async (n) => {
-
         if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(n.type)) {
             userNotificationsResult = await usersConnectionNotificationsController.markAllAsRead(req, res);
             req.query.user_id = userNotificationsResult;
@@ -76,7 +76,7 @@ exports.markAllAsRead = async (req, res) => {
             userNotificationsResult = await groupChatNotificationsController.markAllAsRead(req, res);
             req.query.user_id = read_by.id;
         } else if (c.GROUP_NOTIFICATION_TYPES.includes(n.type)) {
-            userNotificationsResult = await groupNotificationsController.read(req, res);
+            userNotificationsResult = await groupNotificationsController.markAllAsRead(req, res);
             req.query.user_id = read_by.id;
         }
     }))
