@@ -14,14 +14,18 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
     if (groupName) {
         await Promise.all(invited_members.map(async (member) => {
             let username = member.username;
-            let invitedMemberSocketId = h.getSocketId(username, usersGroups);
-            let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
-            theSocket?.join(groupName);
 
-            let notification = await h.saveGroupNotification({
+            let invitedMemberSocketId = h.getSocketId(username, usersGroups);
+            let gSockets = await h.joinToSocketRoom(io, groupName, member, usersGroups, h);
+            // let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
+            // theSocket?.join(groupName);
+
+            let notification = await h.saveGroupChatNotification({
                 ...data, ...{member},
                 type: 'chat_group_join_invitation'
             });
+
+            console.log('notification', notification)
 
             io.to(invitedMemberSocketId).emit('inviteToChatGroupSent', {
                 group_id: group.id,
@@ -94,8 +98,8 @@ exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
 exports.declineJoinChatGroup = async (data, usersGroups, io) => {
     console.log('decline joining group!!!');
 
-    let {group} = data;
-    let socketId = h.getSocketId(user.username, usersGroups);
+    let {from_user, group} = data;
+    let socketId = h.getSocketId(from_user.username, usersGroups);
     data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
 
 
@@ -158,7 +162,7 @@ exports.leaveChatGroup = async (data, usersGroups, socket, io) => {
 }
 
 exports.removeFromChatGroup = async (data, usersGroups, socket, io) => {
-    let {initiator, member, group} = data;
+    let {from_user, member, group} = data;
     let groupName = group.name;
     console.log('remove from group!!!');
 
@@ -179,10 +183,10 @@ exports.removeFromChatGroup = async (data, usersGroups, socket, io) => {
 
     let notification = {
         group_id: group.id,
-        from_user: initiator,
+        from_user: from_user,
         // to_user: member,
         // to_id: member.id,
-        msg: `<strong>${initiator.first_name + ' ' + initiator.last_name}</strong> removed  <strong>${member.first_name + ' ' + member.last_name}</strong>
+        msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> removed  <strong>${member.first_name + ' ' + member.last_name}</strong>
                        from <strong>${groupName}</strong> group`,
         type: 'remove_from_chat_group'
     };
@@ -200,5 +204,5 @@ exports.removeFromChatGroup = async (data, usersGroups, socket, io) => {
         currentUserNotifications
     });
 
-    theSocket.leave(groupName);
+    theSocket?.leave(groupName);
 }

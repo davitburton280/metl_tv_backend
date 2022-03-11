@@ -40,25 +40,11 @@ exports.saveNotification = async (data) => {
         savedNotification = await newNot.save();
     }
 
-    return savedNotification;
-
-    // console.log(savedNotification)
-    //
-    // let notification = await GroupChatNots.findOne({
-    //     include: [
-    //         {model: Users, as: 'from_user', attributes: ['id', 'username', 'avatar', 'first_name', 'last_name']},
-    //         {model: Users, as: 'to_user', attributes: ['id', 'username', 'avatar', 'first_name', 'last_name']},
-    //         {model: NotificationTypes, as: 'notification_type'}
-    //     ],
-    //     where: {id: savedNotification.id},
-    // });
-    //
-    // if(notification){
-    //     return JSON.parse(JSON.stringify(notification))
-    // }
-    // else {
-    //     return '';
-    // }
+    let found = !!savedNotification.read.find(r => r.read_by.id === data.id)
+    delete savedNotification.read;
+    let ret = {...savedNotification.toObject(), read: found};
+    console.log('ret!!!', ret)
+    return ret;
 };
 
 exports.getCurrentGroupUsersNotifications = async (data) => {

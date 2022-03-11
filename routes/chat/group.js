@@ -9,7 +9,7 @@ router.post('/create-group', validateChatGroupName.rules, groupChatController.cr
 router.delete('/remove-group', groupChatController.removeGroup);
 
 router.get('/get-group-members', groupChatController.getGroupMembers);
-router.post('/add-group-members', groupChatController.addGroupMembers);
+router.post('/invite-group-members', groupChatController.addGroupMembers);
 router.delete('/remove-group-member', groupChatController.removeGroupMember);
 
 router.post('/join-group', groupChatController.addGroupMembers);

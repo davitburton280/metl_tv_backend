@@ -43,21 +43,27 @@ exports.saveDirectChatNotification = async ({from_user, to_user, connection_id, 
     return notification;
 }
 
-exports.saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) => {
+exports.saveGroupChatNotification = async ({from_user, member, group, msg, type}) => {
+
     let notification = {
         from_user,
-        to_user,
-        group_id,
-        read: false,
+        group_id: group.id,
+        group_name: group.name,
+        read: [],
         read_at: '',
         type,
         msg: msg
     };
 
-    let n = await groupChatNotificationsController.saveNotification(notification);
+    if (member) {
+        notification.to_user = member;
+        notification.to_id = member.id
+    }
+
+    return await groupChatNotificationsController.saveNotification(notification);
 }
 
-exports.saveGroupNotification = async ({from_user, to_user, member, group, msg, type, link}) => {
+exports.saveGroupNotification = async ({from_user, member, group, msg, type, link}) => {
 
     let notification = {
         group_id: group.id,
