@@ -2,11 +2,11 @@ const usersConnectionNotificationsController = require('../controllers/notificat
 const groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController');
 const groupNotificationsController = require('../controllers/notifications/groupNotificationsController')
 
-getGroupSockets = async (io, group) => {
+exports.getGroupSockets = async (io, group) => {
     return await io.in(group).allSockets();
 }
 
-getGroupUsernames = (groupName, usersGroups) => {
+exports.getGroupUsernames = (groupName, usersGroups) => {
     let groupUsernames = [];
     // console.log(Object.values(usersGroups))
     Object.values(usersGroups).map(gu => {
@@ -18,15 +18,15 @@ getGroupUsernames = (groupName, usersGroups) => {
     return groupUsernames;
 }
 
-getConnectedUserNames = (usersGroups) => {
+exports.getConnectedUserNames = (usersGroups) => {
     return Object.keys(usersGroups);
 }
 
-getSocketId = (username, usersGroups) => {
+exports.getSocketId = (username, usersGroups) => {
     return usersGroups[username]?.socket_id;
 }
 
-saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, type}) => {
+exports.saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, type}) => {
     let notification = {
         from_user,
         to_user,
@@ -43,7 +43,7 @@ saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, typ
     return notification;
 }
 
-saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) => {
+exports.saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) => {
     let notification = {
         from_user,
         to_user,
@@ -57,7 +57,7 @@ saveGroupChatNotification = async ({from_user, to_user, group_id, msg, type}) =>
     let n = await groupChatNotificationsController.saveNotification(notification);
 }
 
-saveGroupNotification = async ({from_user, to_user, member, group, msg, type, link}) => {
+exports.saveGroupNotification = async ({from_user, to_user, member, group, msg, type, link}) => {
 
     let notification = {
         group_id: group.id,
@@ -79,7 +79,7 @@ saveGroupNotification = async ({from_user, to_user, member, group, msg, type, li
 }
 
 
-joinToSocketRoom = async (io, groupName, user, usersGroups, h) => {
+exports.joinToSocketRoom = async (io, groupName, user, usersGroups, h) => {
     let newUserSocketId = h.getSocketId(user.username, usersGroups);
     let newUserSocket = io.sockets.sockets.get(newUserSocketId);
     let groupSockets = await h.getGroupSockets(io, groupName);
@@ -92,12 +92,20 @@ joinToSocketRoom = async (io, groupName, user, usersGroups, h) => {
     return gSockets;
 }
 
-module.exports = {
-    getGroupSockets,
-    getGroupUsernames,
-    getConnectedUserNames,
-    getSocketId,
-    saveDirectChatNotification,
-    saveGroupNotification,
-    joinToSocketRoom
+exports.addUserToGroup = (user, groupName, usersGroups) => {
+    Object.values(usersGroups).map((gu, index) => {
+        if (gu.username === user.username && !gu.page_groups.find(g => g === groupName)) {
+            gu.page_groups.push(groupName);
+        }
+    })
+    return usersGroups;
+}
+
+exports.removeUserFromGroup = (user, groupName, usersGroups) => {
+    Object.values(usersGroups).map(gu => {
+        if (gu.username === user.username && gu.page_groups.find(g => g === groupName)) {
+            gu.page_groups = gu.page_groups.filter(g => g !== groupName);
+        }
+    })
+    return usersGroups;
 }
