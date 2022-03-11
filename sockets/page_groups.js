@@ -128,10 +128,7 @@ exports.ignoreJoinGroup = async (data, usersGroups, io) => {
 
     data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
     data.leftGroups = await groupsController.get({return: true, user_id: member.id});
-    console.log(await io.in(groupName).allSockets());
-    console.log('ignored!!!')
-    console.log(io.in(group.name).allSockets())
-    console.log(usersGroups)
+
     io.sockets.in(groupName).emit('ignoredJoinGroup', {
         rest: data,
         notification
