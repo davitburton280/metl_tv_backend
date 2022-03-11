@@ -9,14 +9,6 @@ const NotificationTypes = db.notification_types;
 const moment = require('moment');
 
 exports.saveNotification = async (data) => {
-    // console.log('aaa', data)
-    // let fields = {
-    //     from_id: data.initiator_id,
-    //     to_id: data.receiver_id,
-    //     group_id: data.group_id,
-    //     msg: data.msg
-    // };
-
     let foundNotificationType = await NotificationTypes.findOne({
         where: {name: data.type}
     });
@@ -42,9 +34,8 @@ exports.saveNotification = async (data) => {
 
     let found = !!savedNotification.read.find(r => r.read_by.id === data.id)
     delete savedNotification.read;
-    let ret = {...savedNotification.toObject(), read: found};
-    console.log('ret!!!', ret)
-    return ret;
+
+    return {...savedNotification.toObject(), read: found};
 };
 
 exports.getCurrentGroupUsersNotifications = async (data) => {

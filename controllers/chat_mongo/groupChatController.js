@@ -168,7 +168,6 @@ exports.getGroupMembers = async (req, res) => {
 exports.addGroupMembers = async (req, res) => {
     const {group_id, member_ids, accepted} = req.body;
     let list = member_ids?.map(async (member_id) => {
-        console.log('OKK', member_id)
         await to(ChatGroupsMembers.create({group_id, member_id, ...{accepted, confirmed: 0}}));
     });
 

@@ -16,16 +16,12 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
             let username = member.username;
 
             let invitedMemberSocketId = h.getSocketId(username, usersGroups);
-            let gSockets = await h.joinToSocketRoom(io, groupName, member, usersGroups, h);
-            // let theSocket = io.sockets.sockets.get(invitedMemberSocketId);
-            // theSocket?.join(groupName);
+
 
             let notification = await h.saveGroupChatNotification({
                 ...data, ...{member},
                 type: 'chat_group_join_invitation'
             });
-
-            console.log('notification', notification)
 
             io.to(invitedMemberSocketId).emit('inviteToChatGroupSent', {
                 group_id: group.id,
@@ -39,46 +35,24 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
     }
 }
 
-exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
-    console.log('joining group!!!');
+exports.acceptJoinToChatGroup = async (data, usersGroups, io) => {
+    console.log('accept joining group!!!');
 
     let {from_user, group} = data;
     let groupName = group.name;
 
-    // let socketId = getSocketId(user.username); //socket.id
-    // let theSocket = io.sockets.sockets.get(socketId);
-    // theSocket.join(groupName);
+    await h.joinToSocketRoom(io, groupName, from_user, usersGroups, h);
 
-    // console.log(usersGroups)
-    Object.values(usersGroups).map(gu => {
-        // console.log('aaaa', gu, gu.chat_groups.find(g => g === groupName))
-        if (gu.username === from_user.username && !gu.chat_groups.find(g => g === groupName)) {
-            gu.chat_groups.push(groupName);
-        }
-    })
+    h.addUserToGroup(from_user, groupName, 'chat_groups', usersGroups)
 
-
-    let notification = {
-        group_id: group.id,
-        group_name: groupName,
-        from_user: from_user,
-        // to_user: member,
-        // to_id: member.id,
-        msg: data.msg,
-        link: data.link,
+    let notification = await h.saveGroupChatNotification({
+        ...data,
         type: 'accept_chat_group_invitation'
-    };
-    // console.log(notification)
-
-    let savedNotification = await groupChatNotificationsController.saveNotification(notification);
-
-    notification._id = savedNotification._id;
+    });
 
     await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
 
     data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
-    // console.log(await io.in(groupName).allSockets());
-    console.log('accepted!!!', from_user.id, data.group)
 
     io.sockets.in(group.name).emit('acceptedJoinChatGroup', {
         rest: data,
@@ -87,37 +61,26 @@ exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
 
     let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
-
-
-    // socket.broadcast.to(groupName).emit('acceptedJoinGroup', {
-    //     ...data,
-    //     ...notification
-    // });
 }
 
 exports.declineJoinChatGroup = async (data, usersGroups, io) => {
     console.log('decline joining group!!!');
 
     let {from_user, group} = data;
-    let socketId = h.getSocketId(from_user.username, usersGroups);
     data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
 
 
-    let notification = await h.saveGroupNotification({
+    let notification = await h.saveGroupChatNotification({
         ...data,
         type: 'decline_chat_group_invitation'
     });
 
     await groupChatNotificationsController.removeNotification({return: true, id: data.notification_id});
 
-    console.log(await io.in(group.name).allSockets());
     io.sockets.in(group.name).emit('getDeclinedJoinChatGroup', {
         ...data,
-        ...notification,
+        notification,
     });
-    // io.to(socketId).emit('getDeclinedJoinGroup', {
-    //     ...data, initiator_id: user.id
-    // })
 }
 
 exports.leaveChatGroup = async (data, usersGroups, socket, io) => {

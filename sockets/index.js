@@ -91,8 +91,8 @@ let socket = (io) => {
             await pageGroups.inviteToNewGroup(data, usersGroups, io);
         })
 
-        socket.on('acceptJoinChatGroup', async (data) => {
-            await chatGroups.acceptJoinChatGroup(data, usersGroups, io);
+        socket.on('acceptJoinToChatGroup', async (data) => {
+            await chatGroups.acceptJoinToChatGroup(data, usersGroups, io);
         });
 
         socket.on('acceptJoinPageGroup', async (data) => {
