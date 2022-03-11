@@ -38,7 +38,7 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
 exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
     console.log('joining group!!!');
 
-    let {user, group} = data;
+    let {from_user, group} = data;
     let groupName = group.name;
 
     // let socketId = getSocketId(user.username); //socket.id
@@ -48,7 +48,7 @@ exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
     // console.log(usersGroups)
     Object.values(usersGroups).map(gu => {
         // console.log('aaaa', gu, gu.chat_groups.find(g => g === groupName))
-        if (gu.username === user.username && !gu.chat_groups.find(g => g === groupName)) {
+        if (gu.username === from_user.username && !gu.chat_groups.find(g => g === groupName)) {
             gu.chat_groups.push(groupName);
         }
     })
@@ -57,7 +57,7 @@ exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
     let notification = {
         group_id: group.id,
         group_name: groupName,
-        from_user: user,
+        from_user: from_user,
         // to_user: member,
         // to_id: member.id,
         msg: data.msg,
@@ -74,7 +74,7 @@ exports.acceptJoinChatGroup = async (data, usersGroups, io) => {
 
     data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
     // console.log(await io.in(groupName).allSockets());
-    console.log('accepted!!!', user.id, data.group)
+    console.log('accepted!!!', from_user.id, data.group)
 
     io.sockets.in(group.name).emit('acceptedJoinChatGroup', {
         rest: data,

@@ -78,11 +78,26 @@ saveGroupNotification = async ({from_user, to_user, member, group, msg, type, li
     return notification;
 }
 
+
+joinToSocketRoom = async (io, groupName, user, usersGroups, h) => {
+    let newUserSocketId = h.getSocketId(user.username, usersGroups);
+    let newUserSocket = io.sockets.sockets.get(newUserSocketId);
+    let groupSockets = await h.getGroupSockets(io, groupName);
+    let gSockets = [...groupSockets];
+    if (!gSockets.includes(newUserSocket)) {
+        newUserSocket?.join(groupName);
+        gSockets = await h.getGroupSockets(io, groupName);
+    }
+
+    return gSockets;
+}
+
 module.exports = {
     getGroupSockets,
     getGroupUsernames,
     getConnectedUserNames,
     getSocketId,
     saveDirectChatNotification,
-    saveGroupNotification
+    saveGroupNotification,
+    joinToSocketRoom
 }

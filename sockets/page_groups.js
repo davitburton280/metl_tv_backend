@@ -33,23 +33,13 @@ exports.inviteToNewGroup = async (data, usersGroups, io) => {
     }
 }
 
-exports.acceptJoinPageGroup = async (data, usersGroups, io) => {
+exports.acceptJoinPageGroup = async (data, usersGroups, socket, io) => {
     console.log('accept joining group!!!');
 
     let {from_user, group} = data;
     let groupName = group.name;
 
-    let socketId = h.getSocketId(from_user.username, usersGroups); //socket.id
-    let theSocket = io.sockets.sockets.get(socketId);
-    theSocket.join(groupName);
-
-    // console.log(usersGroups)
-    Object.values(usersGroups).map(gu => {
-        // console.log('aaaa', gu, gu.chat_groups.find(g => g === groupName))
-        if (gu.username === from_user.username && !gu.page_groups.find(g => g === groupName)) {
-            gu.page_groups.push(groupName);
-        }
-    })
+    await h.joinToSocketRoom(io, groupName, from_user, usersGroups, h);
 
     let notification = await h.saveGroupNotification({
         ...data,
@@ -59,31 +49,21 @@ exports.acceptJoinPageGroup = async (data, usersGroups, io) => {
     await groupNotificationsController.removeNotification({return: true, id: data.notification_id});
 
     data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
-    // console.log(await io.in(groupName).allSockets());
-    console.log('accepted!!!', from_user.id, data.group)
-
-    io.sockets.in(group.name).emit('acceptedJoinPageGroup', {
-        rest: data,
-        notification
-    });
 
     let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 
-
-    // socket.broadcast.to(groupName).emit('acceptedJoinGroup', {
-    //     ...data,
-    //     ...notification
-    // });
+    socket.broadcast.to(groupName).emit('acceptedJoinPageGroup', {
+        rest: data,
+        notification
+    });
 }
 
 exports.declineJoinPageGroup = async (data, usersGroups, io) => {
     console.log('decline joining page group!!!');
 
-    let {from_user, group} = data;
-    let socketId = h.getSocketId(from_user.username, usersGroups);
+    let {group} = data;
     data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
-
 
     let notification = await h.saveGroupNotification({
         ...data,
@@ -92,35 +72,21 @@ exports.declineJoinPageGroup = async (data, usersGroups, io) => {
 
     await groupNotificationsController.removeNotification({return: true, id: data.notification_id});
 
-    console.log(await io.in(group.name).allSockets());
     io.sockets.in(group.name).emit('getDeclinedJoinPageGroup', {
         ...data,
         notification,
     });
-    // io.to(socketId).emit('getDeclinedJoinGroup', {
-    //     ...data, initiator_id: user.id
-    // })
 }
-
 
 exports.joinGroup = async (data, usersGroups, io) => {
     let {from_user, group} = data;
     let groupName = group.name;
 
-    let newUserSocketId = h.getSocketId(from_user.username, usersGroups);
-    let theSocket = io.sockets.sockets.get(newUserSocketId);
-    let groupSockets = await h.getGroupSockets(io, groupName);
-    let gSockets = [...groupSockets];
-    if (!gSockets.includes(theSocket)) {
-        theSocket?.join(groupName);
-        groupSockets = await h.getGroupSockets(io, groupName);
-        console.log('joined', groupSockets)
-        console.log('groupName:', groupName, usersGroups)
-    }
+    await h.joinToSocketRoom(io, groupName, from_user, usersGroups,h);
 
     let notification = await h.saveGroupNotification({
         ...data,
-        type: 'join_group_invitation'
+        type: 'join_page_group_invitation'
     });
 
     data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
@@ -143,7 +109,6 @@ exports.confirmJoinGroup = async (data, usersGroups, io) => {
         }
     })
 
-
     let notification = await h.saveGroupNotification({
         ...data,
         type: 'confirm_group_invitation'
@@ -151,10 +116,6 @@ exports.confirmJoinGroup = async (data, usersGroups, io) => {
 
     data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
 
-
-    console.log('confirmed!!!')
-    console.log(await io.in(group.name).allSockets())
-    // console.log(usersGroups)
     io.sockets.in(group.name).emit('confirmedJoinGroup', {
         rest: data,
         notification
@@ -199,7 +160,6 @@ exports.leavePageGroup = async (data, usersGroups, socket, io) => {
     Object.values(usersGroups).map(gu => {
 
         if (gu.username === from_user.username && gu.page_groups.find(g => g === groupName)) {
-            console.log(gu.page_groups.filter(g => g !== groupName))
             gu.page_groups = gu.page_groups.filter(g => g !== groupName);
         }
     })
@@ -232,8 +192,8 @@ exports.removeFromPageGroup = async (data, usersGroups, socket, io) => {
 
     Object.values(usersGroups).map(gu => {
 
-        if (gu.username === member.username && gu.chat_groups.find(g => g === groupName)) {
-            gu.chat_groups = gu.chat_groups.filter(g => g !== groupName);
+        if (gu.username === member.username && gu.page_groups.find(g => g === groupName)) {
+            gu.page_groups = gu.page_groups.filter(g => g !== groupName);
         }
     })
 
