@@ -100,7 +100,7 @@ exports.confirmJoinGroup = async (data, usersGroups, io) => {
     let {group, member} = data;
     let groupName = group.name;
 
-    h.addUserToGroup(member, groupName, usersGroups);
+    h.addUserToGroup(member, groupName, 'page_groups', usersGroups);
 
     let notification = await h.saveGroupNotification({...data, type: 'confirm_group_invitation'});
 
@@ -146,7 +146,7 @@ exports.leavePageGroup = async (data, usersGroups, socket, io) => {
     let {from_user, group} = data;
     let groupName = group.name;
 
-    h.removeUserFromGroup(from_user, groupName, usersGroups)
+    h.removeUserFromGroup(from_user, groupName, 'page_groups', usersGroups)
 
     let groupMembers = await groupsController.getGroupMembers({return: true, group_id: group.id});
     data.group.group_members = groupMembers?.group_members;
@@ -167,7 +167,7 @@ exports.removeFromPageGroup = async (data, usersGroups, socket, io) => {
     let groupName = group.name;
     console.log('remove from page group!!!');
 
-    h.removeUserFromGroup(member, groupName, usersGroups);
+    h.removeUserFromGroup(member, groupName, 'page_groups', usersGroups);
 
     let socketId = h.getSocketId(member.username, usersGroups); //socket.id
     let theSocket = io.sockets.sockets.get(socketId);

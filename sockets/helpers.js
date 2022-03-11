@@ -92,19 +92,21 @@ exports.joinToSocketRoom = async (io, groupName, user, usersGroups, h) => {
     return gSockets;
 }
 
-exports.addUserToGroup = (user, groupName, usersGroups) => {
+exports.addUserToGroup = (user, groupName, groupTypeKey, usersGroups) => {
     Object.values(usersGroups).map((gu, index) => {
-        if (gu.username === user.username && !gu.page_groups.find(g => g === groupName)) {
-            gu.page_groups.push(groupName);
+        let group = gu[groupTypeKey];
+        if (gu.username === user.username && !group.find(g => g === groupName)) {
+            group.push(groupName);
         }
     })
     return usersGroups;
 }
 
-exports.removeUserFromGroup = (user, groupName, usersGroups) => {
+exports.removeUserFromGroup = (user, groupName, groupTypeKey, usersGroups) => {
     Object.values(usersGroups).map(gu => {
-        if (gu.username === user.username && gu.page_groups.find(g => g === groupName)) {
-            gu.page_groups = gu.page_groups.filter(g => g !== groupName);
+        let group = gu[groupTypeKey];
+        if (gu.username === user.username && group.find(g => g === groupName)) {
+            gu[groupTypeKey] = group.filter(g => g !== groupName);
         }
     })
     return usersGroups;
