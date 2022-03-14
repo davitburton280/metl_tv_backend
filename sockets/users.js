@@ -80,9 +80,6 @@ exports.acceptConnection = async (data, usersGroups, io) => {
         user_id: from_user.id
     });
 
-    console.log('FROM USER MESSAGES!!!')
-    console.log(fromUserMessages.map(f => f.username))
-    console.log('FROM USER MESSAGES!!!')
 
     let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
     await usersConnNotificationsController.removeNotification({return: true, id: data.notification_id});
@@ -90,13 +87,16 @@ exports.acceptConnection = async (data, usersGroups, io) => {
     let notification = await h.saveDirectChatNotification({...data, type: 'accept_connection_request'});
     console.log('accept from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
 
+    let profileUserContacts = await usersController.getContacts({return: true, user_id: from_user.id});
+
     io.to(fromUserSocketId).emit('acceptedConnection', {
         notification,
         users_messages: fromUserMessages
     });
     io.to(toUserSocketId).emit('acceptedConnection', {
         notification,
-        users_messages: toUserMessages
+        users_messages: toUserMessages,
+        profile_user_contacts: profileUserContacts
     })
 }
 
