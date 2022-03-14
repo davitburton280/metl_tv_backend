@@ -111,12 +111,7 @@ exports.removeFromChatGroup = async (data, usersGroups, socket, io) => {
     let groupName = group.name;
     console.log('remove from group!!!');
 
-    Object.values(usersGroups).map(gu => {
-
-        if (gu.username === member.username && gu.chat_groups.find(g => g === groupName)) {
-            gu.chat_groups = gu.chat_groups.filter(g => g !== groupName);
-        }
-    })
+    h.removeUserFromGroup(from_user, groupName, 'chat_groups', usersGroups)
 
     let socketId = h.getSocketId(member.username, usersGroups); //socket.id
     let theSocket = io.sockets.sockets.get(socketId);
@@ -126,28 +121,23 @@ exports.removeFromChatGroup = async (data, usersGroups, socket, io) => {
     data.group = await groupChatController.getGroupMembers({return: true, group_id: group.id});
     data.leftGroups = await groupChatController.getGroupsMessages({return: true, user_id: member.id});
 
-    let notification = {
-        group_id: group.id,
-        from_user: from_user,
-        // to_user: member,
-        // to_id: member.id,
-        msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> removed  <strong>${member.first_name + ' ' + member.last_name}</strong>
-                       from <strong>${groupName}</strong> group`,
+    let notification = await h.saveGroupChatNotification({
+        ...data,
         type: 'remove_from_chat_group'
-    };
-
-    let savedNotification = await groupChatNotificationsController.saveNotification(notification);
-
-    notification._id = savedNotification._id;
+    });
 
     let currentUserNotifications = await notificationsController.get({return: true, user_id: member.id});
 
 
     console.log(currentUserNotifications);
-    socket.broadcast.to(groupName).emit('removeFromChatGroupNotify', {
+    io.sockets.in(groupName).emit('removeFromChatGroupNotify', {
         ...data,
-        currentUserNotifications
+        currentUserNotifications,
+        notification
     });
+
+    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
+    io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 
     theSocket?.leave(groupName);
 }
