@@ -139,10 +139,11 @@ exports.disconnectUsers = async (data, usersGroups, io) => {
     });
 }
 
-exports.blockUnblockUser = async (data, io) => {
+exports.blockUnblockUser = async (data, usersGroups, io) => {
     let {from_user, to_user} = data;
-    let fromUserSocketId = h.getSocketId(from_user.username);
-    let toUserSocketId = h.getSocketId(to_user.username);
+
+    let fromUserSocketId = h.getSocketId(from_user.username, usersGroups);
+    let toUserSocketId = h.getSocketId(to_user.username, usersGroups);
 
     console.log('block/unblock user!!!', to_user.username, toUserSocketId)
 

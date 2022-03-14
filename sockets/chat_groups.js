@@ -129,7 +129,6 @@ exports.removeFromChatGroup = async (data, usersGroups, socket, io) => {
     let currentUserNotifications = await notificationsController.get({return: true, user_id: member.id});
 
 
-    console.log(currentUserNotifications);
     io.sockets.in(groupName).emit('removeFromChatGroupNotify', {
         ...data,
         currentUserNotifications,

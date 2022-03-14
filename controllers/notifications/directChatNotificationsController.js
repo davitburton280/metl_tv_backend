@@ -74,7 +74,7 @@ exports.removeNotification = async (req, res) => {
     } else {
         id = req.query.id;
     }
-    console.log('notification id!!!', req)
+
     let currentNotification = await DirectChatNotifications.findOne({id});
     let t = await DirectChatNotifications.deleteOne({_id: id});
     return currentNotification?.to_id;
@@ -87,14 +87,12 @@ exports.removeAllNotifications = async (user_id) => {
 
 exports.read = async (req, res) => {
     let {id} = req.body;
-    console.log("body", req.body.id)
 
     let notification = await DirectChatNotifications.findById(id);
     notification.read = true;
     await notification.save();
 
     let currentNotification = await DirectChatNotifications.findById(id);
-    console.log(currentNotification)
     return currentNotification.to_user.id;
 };
 

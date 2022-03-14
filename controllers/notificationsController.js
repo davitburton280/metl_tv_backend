@@ -45,7 +45,6 @@ exports.get = async (req, res) => {
 
 exports.read = async (req, res) => {
     let {type, id, read_by} = req.body;
-    console.log(type)
     let userNotificationsResult;
 
     if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
@@ -55,7 +54,6 @@ exports.read = async (req, res) => {
         userNotificationsResult = await groupChatNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     } else if (c.GROUP_NOTIFICATION_TYPES.includes(type)) {
-        console.log('here', type)
         userNotificationsResult = await groupNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     }

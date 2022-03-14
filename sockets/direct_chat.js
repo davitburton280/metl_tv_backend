@@ -12,7 +12,7 @@ exports.unreadLastMessages = async (data, usersGroups, io) => {
     if (!data.group) {
 
         let toUserSocketId = h.getSocketId(to_username, usersGroups);
-        let fromUserSocketId = h.getSocketId(from_username);
+        let fromUserSocketId = h.getSocketId(from_username, usersGroups);
 
         await directChatController.unreadMessages(data);
         data.direct_messages = await to(directChatController.getConnectionMessages(
