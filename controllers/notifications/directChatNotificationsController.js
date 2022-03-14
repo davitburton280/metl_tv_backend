@@ -66,7 +66,6 @@ exports.getCurrentUserNotifications = async (user_id) => {
     return notifications;
 };
 
-
 exports.removeNotification = async (req, res) => {
     let id;
     if (req.return) {

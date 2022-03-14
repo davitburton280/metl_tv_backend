@@ -1,4 +1,5 @@
-const usersConnectionNotificationsController = require('./notifications/directChatNotificationsController');
+const directChatNotificationsController = require('./notifications/directChatNotificationsController');
+const usersConnNotificationsController = require('./notifications/usersConnectionNotificationsController');
 const groupChatNotificationsController = require('./notifications/groupChatNotificationsController');
 const groupNotificationsController = require('./notifications/groupNotificationsController');
 
@@ -31,10 +32,11 @@ exports.get = async (req, res) => {
         ]
     });
 
-    let usersConnectionNotifs = await usersConnectionNotificationsController.getCurrentUserNotifications(user_id);
+    let usersConnectionNotifs = await usersConnNotificationsController.getCurrentUserNotifications(user_id);
+    let directChatNotifs = await directChatNotificationsController.getCurrentUserNotifications(user_id);
     let groupChatNotifs = await groupChatNotificationsController.getCurrentGroupUsersNotifications(user.toJSON());
     let groupNotifs = await groupNotificationsController.getCurrentGroupNotifications(user.toJSON());
-    let ret = [...new Set([...usersConnectionNotifs, ...groupChatNotifs, ...groupNotifs])];
+    let ret = [...new Set([...usersConnectionNotifs, ...directChatNotifs, ...groupChatNotifs, ...groupNotifs])];
 
     if (req.return) {
         return ret;
@@ -48,7 +50,7 @@ exports.read = async (req, res) => {
     let userNotificationsResult;
 
     if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
-        userNotificationsResult = await usersConnectionNotificationsController.read(req, res);
+        userNotificationsResult = await directChatNotificationsController.read(req, res);
         req.query.user_id = userNotificationsResult;
     } else if (c.GROUP_CHAT_NOTIFICATION_TYPES.includes(type)) {
         userNotificationsResult = await groupChatNotificationsController.read(req, res);
@@ -68,7 +70,7 @@ exports.markAllAsRead = async (req, res) => {
 
     await Promise.all(notifications.map(async (n) => {
         if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(n.type)) {
-            userNotificationsResult = await usersConnectionNotificationsController.markAllAsRead(req, res);
+            userNotificationsResult = await directChatNotificationsController.markAllAsRead(req, res);
             req.query.user_id = userNotificationsResult;
         } else if (c.GROUP_CHAT_NOTIFICATION_TYPES.includes(n.type)) {
             userNotificationsResult = await groupChatNotificationsController.markAllAsRead(req, res);
@@ -91,7 +93,7 @@ exports.remove = async (req, res) => {
     let userNotificationsResult;
 
     if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
-        userNotificationsResult = await usersConnectionNotificationsController.removeNotification(req, res);
+        userNotificationsResult = await directChatNotificationsController.removeNotification(req, res);
         console.log(userNotificationsResult)
         req.query.user_id = userNotificationsResult;
     }
@@ -103,7 +105,7 @@ exports.remove = async (req, res) => {
 
 exports.removeAll = async (req, res) => {
     let {user_id} = req.query;
-    await usersConnectionNotificationsController.removeAllNotifications(user_id);
+    await directChatNotificationsController.removeAllNotifications(user_id);
     // await groupChatNotificationsController.removeAllNotifications(user_id);
     this.get(req, res);
 };

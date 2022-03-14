@@ -4,7 +4,7 @@ const to = require('../helpers/getPromiseResult');
 let usersController = require('../controllers/usersController');
 let groupChatController = require('../controllers/chat_mongo/groupChatController');
 let directChatController = require('../controllers/chat_mongo/directChatController');
-let usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController');
+let usersConnNotificationsController = require('../controllers/notifications/usersConnectionNotificationsController');
 
 
 exports.newUser = async ({username, chat_groups, page_groups}, usersGroups, socket, io) => {
@@ -46,7 +46,7 @@ exports.connectWithUser = async (data, usersGroups, io) => {
     let authUserSocketId = h.getSocketId(from_user.username, usersGroups);
 
     let connection = await to(usersController.createUsersConnection(data));
-    let notification = await h.saveDirectChatNotification({
+    let notification = await h.saveUserConnectionNotification({
         ...data, ...connection,
         type: 'users_connection_request'
     });
@@ -57,10 +57,13 @@ exports.connectWithUser = async (data, usersGroups, io) => {
 }
 
 exports.cancelUsersConnection = async ({authUser, channelUser, connection_id}, usersGroups, io) => {
+    console.log('cancel users connection!!!')
     let authUserSocketId = h.getSocketId(authUser.username, usersGroups);
     let channelUserSocketId = h.getSocketId(channelUser.username, usersGroups);
 
     let connection = await to(usersController.cancelUsersConnection(connection_id));
+    let invitationNotification = await usersConnNotificationsController.getRequestByConnectionId(connection_id)
+    await usersConnNotificationsController.removeNotification({return: true, id: invitationNotification.id});
 
     io.to(channelUserSocketId).emit('cancelledUsersConnection', connection)
     io.to(authUserSocketId).emit('cancelledUsersConnection', connection)
@@ -82,7 +85,7 @@ exports.acceptConnection = async (data, usersGroups, io) => {
     console.log('FROM USER MESSAGES!!!')
 
     let toUserMessages = await directChatController.getDirectMessages({return: true, user_id: to_user.id});
-    await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
+    await usersConnNotificationsController.removeNotification({return: true, id: data.notification_id});
 
     let notification = await h.saveDirectChatNotification({...data, type: 'accept_connection_request'});
     console.log('accept from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
@@ -105,7 +108,7 @@ exports.declineConnection = async (data, usersGroups, io) => {
 
     let notification = await h.saveDirectChatNotification({...data, type: 'decline_connection_request'});
 
-    await usersConnectionNotificationsController.removeNotification({return: true, id: data.notification_id});
+    await usersConnNotificationsController.removeNotification({return: true, id: data.notification_id});
     io.to(toUserSocketId).emit('declinedConnection', {
         ...notification, from_user,
         to_user,

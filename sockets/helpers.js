@@ -1,4 +1,5 @@
-const usersConnectionNotificationsController = require('../controllers/notifications/directChatNotificationsController')
+const directChatNotificationsController = require('../controllers/notifications/directChatNotificationsController')
+const usersConnectionNotificationsController = require('../controllers/notifications/usersConnectionNotificationsController')
 const groupChatNotificationsController = require('../controllers/notifications/groupChatNotificationsController');
 const groupNotificationsController = require('../controllers/notifications/groupNotificationsController')
 
@@ -26,7 +27,7 @@ exports.getSocketId = (username, usersGroups) => {
     return usersGroups[username]?.socket_id;
 }
 
-exports.saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, type}) => {
+exports.saveUserConnectionNotification = async ({from_user, to_user, connection_id, msg, type}) => {
     let notification = {
         from_user,
         to_user,
@@ -38,6 +39,23 @@ exports.saveDirectChatNotification = async ({from_user, to_user, connection_id, 
     };
 
     let savedNotification = await usersConnectionNotificationsController.saveNotification(notification);
+
+    notification._id = savedNotification._id;
+    return notification;
+}
+
+exports.saveDirectChatNotification = async ({from_user, to_user, connection_id, msg, type}) => {
+    let notification = {
+        from_user,
+        to_user,
+        connection_id,
+        read: false,
+        read_at: '',
+        type,
+        msg: msg
+    };
+
+    let savedNotification = await directChatNotificationsController.saveNotification(notification);
 
     notification._id = savedNotification._id;
     return notification;
