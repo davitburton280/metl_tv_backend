@@ -128,17 +128,20 @@ exports.disconnectUsers = async (data, usersGroups, io) => {
 
 
     let notification = await h.saveDirectChatNotification({...data, type: 'break_connection'});
+    let profileUserContacts = await usersController.getContacts({return: true, user_id: to_user.id});
 
     console.log('disconnect from ' + from_user.username + '=>' + fromUserSocketId, to_user.username + '=>', toUserSocketId)
     // console.log(toUserMessages, toUserSocketId, fromUserSocketId, fromUserMessages)
     io.to(toUserSocketId).emit('getDisconnectUsers', {
         ...notification,
-        users_messages: toUserMessages
+        users_messages: toUserMessages,
+        profile_user_contacts: profileUserContacts
     });
 
     io.to(fromUserSocketId).emit('getDisconnectUsers', {
         ...notification,
-        users_messages: fromUserMessages
+        users_messages: fromUserMessages,
+        profile_user_contacts: profileUserContacts
     });
 }
 
