@@ -479,23 +479,23 @@ exports.checkIfUsersConnected = async (req, res = null) => {
 };
 
 exports.createUsersConnection = async (data) => {
+    console.log('create users connection!!!')
 
     let {from_user, to_user} = data;
     let params = {
         channel_user_id: to_user.id,
         user_id: from_user.id
     };
-    console.log('create users connection')
 
     let connection = await this.checkIfConnectionExist({from_id: from_user.id, to_id: to_user.id});
-
-    console.log('check if users connected', params, connection)
 
     if (!connection) {
         connection = await to(UsersConnection.create({
             from_id: from_user.id,
             to_id: to_user.id,
         }));
+    } else {
+        await UsersConnection.update({is_blocked: 0}, {where: {id: connection.id}});
     }
 
 

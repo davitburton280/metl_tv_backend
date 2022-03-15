@@ -46,10 +46,13 @@ exports.connectWithUser = async (data, usersGroups, io) => {
     let authUserSocketId = h.getSocketId(from_user.username, usersGroups);
 
     let connection = await to(usersController.createUsersConnection(data));
-    let notification = await h.saveUserConnectionNotification({
-        ...data, ...connection,
-        type: 'users_connection_request'
-    });
+    let notification;
+    if (connection) {
+        notification = await h.saveUserConnectionNotification({
+            ...data, ...connection,
+            type: 'users_connection_request'
+        });
+    }
 
     console.log("connection request from " + from_user.username + '=>', `${authUserSocketId}`, ' to ' + to_user.username + '=>' + `${channelUserSocketId}`)
     io.to(channelUserSocketId).emit('getConnectWithUser', {notification});
