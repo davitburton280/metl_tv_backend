@@ -14,7 +14,6 @@ const nl2br = require('../../helpers/nl2br');
 
 
 exports.create = async (req, res) => {
-
     this.getDirectMessages(req, res)
 };
 

@@ -454,6 +454,8 @@ exports.checkIfUsersConnected = async (req, res = null) => {
 
     let directConnectionIds = JSON.parse(JSON.stringify(directConnectionsResult)).map(t => t.connection_id);
 
+    console.log(directConnectionIds)
+
     let usersConnection = await UsersConnection.findAll({
         where: {
             id: {[Op.in]: directConnectionIds},
@@ -463,7 +465,7 @@ exports.checkIfUsersConnected = async (req, res = null) => {
         ]
     });
 
-    // console.log(JSON.parse(JSON.stringify(usersConnection)))
+    console.log(JSON.parse(JSON.stringify(usersConnection)))
 
     let ret = usersConnection.find(t => t.connection_users.every(elem => {
         return [+user_id, +channel_user_id].includes(elem.id)
@@ -483,42 +485,73 @@ exports.createUsersConnection = async (data) => {
         channel_user_id: to_user.id,
         user_id: from_user.id
     };
+    console.log('create users connection')
 
-    let checkIfConnected = await this.checkIfUsersConnected(params);
+    let connection = await this.checkIfConnectionExist({from_id: from_user.id, to_id: to_user.id});
 
-    if (!checkIfConnected) {
-        let connection = await to(UsersConnection.create({
+    console.log('check if users connected', params, connection)
+
+    if (!connection) {
+        connection = await to(UsersConnection.create({
             from_id: from_user.id,
             to_id: to_user.id,
         }));
-
-        if (connection) {
-            await UsersConnectionMembers.create({
-                member_id: from_user.id,
-                connection_id: connection.id
-            });
-            await UsersConnectionMembers.create({
-                member_id: to_user.id,
-                connection_id: connection.id
-            });
-        }
-
-        let checkAgain = await this.checkIfUsersConnected(params)
-        let returnData = {
-            initiator_id: from_user.id,
-            receiver_id: to_user.id,
-            from_user,
-            to_user,
-            connection_id: connection.id,
-            type: 'users_connection_request',
-            msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has sent a connection request to you`,
-            ...checkAgain.toJSON(),
-        };
-        return returnData;
     }
 
-    return null;
+
+    await UsersConnectionMembers.create({
+        member_id: from_user.id,
+        connection_id: connection.id
+    });
+    await UsersConnectionMembers.create({
+        member_id: to_user.id,
+        connection_id: connection.id
+    });
+
+
+    let checkAgain = await this.checkIfUsersConnected(params)
+    let returnData = {
+        initiator_id: from_user.id,
+        receiver_id: to_user.id,
+        from_user,
+        to_user,
+        connection_id: connection.id,
+        type: 'users_connection_request',
+        msg: `<strong>${from_user.first_name + ' ' + from_user.last_name}</strong> has sent a connection request to you`,
+        ...checkAgain.toJSON(),
+    };
+    return returnData;
 };
+
+exports.checkIfConnectionExist = async (data) => {
+
+    let {from_id, to_id} = data;
+
+
+    let arr = [
+        {
+            to_id: from_id,
+            from_id: to_id
+
+        },
+        {
+            from_id: from_id,
+            to_id: to_id,
+        }
+    ];
+
+    let connection = await UsersConnection.findOne({
+        attributes: ['id'],
+        where: {
+            [Op.or]: arr,
+        },
+        include: [
+            {model: Users, as: 'connection_users', attributes: ['id', 'first_name', 'last_name', 'avatar', 'username']}
+        ]
+    });
+
+    return connection;
+}
 
 exports.confirmConnection = async (data) => {
 
@@ -589,7 +622,7 @@ exports.cancelUsersConnection = async (connection_id) => {
 exports.disconnectUsers = async (data) => {
     let {connection_id} = data;
     await to(UsersConnectionMembers.destroy({where: {connection_id}}));
-    await to(UsersConnection.destroy({where: {id: connection_id}}));
+    // await to(UsersConnection.destroy({where: {id: connection_id}}));
 };
 
 exports.getUserConnections = async (req, res) => {
