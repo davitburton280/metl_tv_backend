@@ -23,20 +23,25 @@ exports.get = async (req, res) => {
         let data = req.query;
         user_id = data.user_id
     }
-    let user = await Users.findOne({
-        where: {id: user_id},
-        include: [
-            {model: Channels, as: 'channel'},
-            {model: ChatGroups, as: 'chat_group_members'},
-            {model: PageGroups, as: 'group_members'}
-        ]
-    });
+    let ret = [];
+    if (user_id) {
+        let user = await Users.findOne({
+            where: {id: user_id},
+            include: [
+                {model: Channels, as: 'channel'},
+                {model: ChatGroups, as: 'chat_group_members'},
+                {model: PageGroups, as: 'group_members'}
+            ]
+        });
 
-    let usersConnectionNotifs = await usersConnNotificationsController.getCurrentUserNotifications(user_id);
-    let directChatNotifs = await directChatNotificationsController.getCurrentUserNotifications(user_id);
-    let groupChatNotifs = await groupChatNotificationsController.getCurrentGroupUsersNotifications(user.toJSON());
-    let groupNotifs = await groupNotificationsController.getCurrentGroupNotifications(user.toJSON());
-    let ret = [...new Set([...usersConnectionNotifs, ...directChatNotifs, ...groupChatNotifs, ...groupNotifs])];
+        let usersConnectionNotifs = await usersConnNotificationsController.getCurrentUserNotifications(user_id);
+        let directChatNotifs = await directChatNotificationsController.getCurrentUserNotifications(user_id);
+        let groupChatNotifs = await groupChatNotificationsController.getCurrentGroupUsersNotifications(user.toJSON());
+        let groupNotifs = await groupNotificationsController.getCurrentGroupNotifications(user.toJSON());
+        ret = [...new Set([...usersConnectionNotifs, ...directChatNotifs, ...groupChatNotifs, ...groupNotifs])];
+
+    }
+
 
     if (req.return) {
         return ret;

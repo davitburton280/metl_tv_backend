@@ -27,7 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         from_id: DataTypes.INTEGER,
         to_id: DataTypes.INTEGER,
         confirmed: DataTypes.INTEGER,
-        is_blocked: DataTypes.INTEGER
+        is_blocked: DataTypes.INTEGER,
+        is_idle: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'users_connection',

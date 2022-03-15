@@ -622,7 +622,7 @@ exports.cancelUsersConnection = async (connection_id) => {
 exports.disconnectUsers = async (data) => {
     let {connection_id} = data;
     await to(UsersConnectionMembers.destroy({where: {connection_id}}));
-    // await to(UsersConnection.destroy({where: {id: connection_id}}));
+    await to(UsersConnection.update({is_idle: 1}, {where: {id: connection_id}}));
 };
 
 exports.getUserConnections = async (req, res) => {
