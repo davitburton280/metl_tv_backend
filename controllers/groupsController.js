@@ -6,6 +6,7 @@ const Groups = db.groups;
 const GroupsMembers = db.groups_members;
 
 const Users = db.users;
+const UserPageGroups = db.users_page_groups;
 const showIfErrors = require('../helpers/showIfErrors');
 
 const to = require('../helpers/getPromiseResult');
@@ -200,4 +201,13 @@ exports.ignoreJoinGroup = async (req, res) => {
     console.log(group)
     req.query.user_id = group.creator_id;
     this.get(req, res);
+}
+
+
+exports.testRoleId = async (req, res) => {
+    await UserPageGroups.create({
+        role_id: 1,
+        user_id: 1,
+        group_id: 30
+    })
 }

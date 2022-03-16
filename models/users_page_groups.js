@@ -19,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
     group_id: DataTypes.INTEGER
   }, {
     sequelize,
+    underscored: true,
     modelName: 'users_page_groups',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
   return users_page_groups;
 };
