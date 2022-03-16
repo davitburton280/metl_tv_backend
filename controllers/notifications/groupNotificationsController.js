@@ -30,7 +30,6 @@ exports.saveNotification = async (data) => {
         });
         savedNotification = await newNot.save();
     }
-    console.log('saved notification', savedNotification)
     return savedNotification;
 }
 

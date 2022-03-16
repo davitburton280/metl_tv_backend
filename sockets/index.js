@@ -75,8 +75,12 @@ let socket = (io) => {
             await groupChat.getConnectedGroupMembers(data, usersGroups, io);
         });
 
-        socket.on('setNewGroup', async (data) => {
+        socket.on('setNewChatGroup', async (data) => {
             await groupChat.setNewGroup(data, usersGroups, socket, io)
+        });
+
+        socket.on('setNewPageGroup', async (data) => {
+            await pageGroups.setNewGroup(data, usersGroups, socket, io)
         });
 
         socket.on('removeGroup', async (data) => {

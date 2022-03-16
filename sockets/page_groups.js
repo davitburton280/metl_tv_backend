@@ -5,6 +5,21 @@ let notificationsController = require('../controllers/notificationsController');
 let groupsController = require('../controllers/groupsController');
 let groupNotificationsController = require('../controllers/notifications/groupNotificationsController');
 
+exports.setNewGroup = async ({username, ...data}, usersGroups, socket, io) => {
+    let userGroups = usersGroups[username]?.page_groups || [];
+    console.log(username, usersGroups, userGroups)
+    console.log('set new page group', data, userGroups)
+    let newGroupName = data.name;
+
+    if (!userGroups?.find(g => g === newGroupName)) {
+        userGroups?.push(newGroupName);
+        socket.join(newGroupName);
+    }
+
+    let groupUsernames = h.getGroupUsernames(newGroupName, usersGroups);
+    io.to(newGroupName).emit('onGetOnlineMembers', {members: groupUsernames, group: newGroupName})
+}
+
 exports.inviteToNewGroup = async (data, usersGroups, io) => {
     console.log('invite to new page group!!!');
 
@@ -40,6 +55,7 @@ exports.acceptJoinPageGroup = async (data, usersGroups, socket, io) => {
     let groupName = group.name;
 
     await h.joinToSocketRoom(io, groupName, from_user, usersGroups, h);
+    console.log(await h.getGroupSockets(io, groupName))
 
     let notification = await h.saveGroupNotification({
         ...data,
