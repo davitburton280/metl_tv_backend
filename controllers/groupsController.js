@@ -205,9 +205,12 @@ exports.ignoreJoinGroup = async (req, res) => {
 
 
 exports.testRoleId = async (req, res) => {
-    await UserPageGroups.create({
+    console.log('test!!!')
+    let t = await UserPageGroups.create({
         role_id: 1,
         user_id: 1,
         group_id: 30
     })
+
+    console.log(JSON.parse(JSON.stringify(t)))
 }
