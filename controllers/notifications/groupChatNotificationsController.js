@@ -59,6 +59,9 @@ exports.getCurrentGroupUsersNotifications = async (data) => {
     notifications.map(n => {
         let found = !!n.read.find(r => r.read_by.id === data.id)
         delete n.read;
+        if (n.type === 'chat_group_join_invitation' && n.to_user.id === data.id) {
+            return;
+        }
         ret.push({...n.toObject(), read: found});
     })
 

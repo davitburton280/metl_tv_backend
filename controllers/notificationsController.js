@@ -26,6 +26,7 @@ exports.get = async (req, res) => {
     let ret = [];
     if (user_id) {
         let user = await Users.findOne({
+            attributes: {exclude: ['password']},
             where: {id: user_id},
             include: [
                 {model: Channels, as: 'channel'},
