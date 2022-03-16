@@ -34,7 +34,6 @@ exports.saveNotification = async (data) => {
 }
 
 exports.getCurrentGroupNotifications = async (data) => {
-    console.log(data)
     data.group_ids = data.group_members.map(group => group.id);
     console.log('group_ids!!!', data.group_ids)
     let notifications = await GroupNotifications.find({
@@ -45,7 +44,6 @@ exports.getCurrentGroupNotifications = async (data) => {
             {
                 "from_user.id": {'$ne': data.id}
             },
-            {}
         ],
 
     }).sort({'created_at': 1});
