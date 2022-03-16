@@ -3,6 +3,10 @@ const Op = sequelize.Op;
 
 const db = require('../../models');
 const Users = db.users;
+const UserRoles = db.users_roles;
+const Roles = db.roles;
+const UserChatGroups = db.users_chat_groups;
+
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
 
@@ -105,6 +109,32 @@ exports.createGroup = async (req, res) => {
             accepted: 1,
             confirmed: 1
         }));
+
+        let role = await to(Roles.findOne({
+            where: {
+                name: 'Chat group creator'
+            }
+        }))
+
+        await to(UserChatGroups.create({
+            user_id: data.creator_id,
+            role_id: role.id,
+            group_id: group.id
+        }));
+
+        let adminRole = await to(Roles.findOne({
+            where: {
+                name: 'Chat group admin'
+            }
+        }))
+
+        await to(UserChatGroups.create({
+            user_id: data.creator_id,
+            role_id: adminRole.id,
+            group_id: group.id
+        }));
+
+
         req.query.user_id = data.creator_id;
         // this.getChatGroups(req, res);
         this.getGroupsMessages(req, res);

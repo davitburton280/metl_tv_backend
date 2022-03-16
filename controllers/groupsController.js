@@ -6,6 +6,8 @@ const Groups = db.groups;
 const GroupsMembers = db.groups_members;
 
 const Users = db.users;
+const UserRoles = db.users_roles;
+const Roles = db.roles;
 const UserPageGroups = db.users_page_groups;
 const showIfErrors = require('../helpers/showIfErrors');
 
@@ -98,6 +100,33 @@ exports.createGroup = async (req, res) => {
             accepted: 1,
             confirmed: 1
         }));
+
+        let role = await to(Roles.findOne({
+            where: {
+                name: 'Chat group creator'
+            }
+        }))
+
+        await to(UserPageGroups.create({
+            user_id: data.creator_id,
+            role_id: role.id,
+            group_id: group.id
+        }));
+
+        let adminRole = await to(Roles.findOne({
+            where: {
+                name: 'Chat group admin'
+            }
+        }))
+
+        console.log(role, adminRole)
+
+        await to(UserPageGroups.create({
+            user_id: data.creator_id,
+            role_id: adminRole.id,
+            group_id: group.id
+        }));
+
         req.query.user_id = data.creator_id;
         this.get(req, res);
     }
@@ -206,11 +235,18 @@ exports.ignoreJoinGroup = async (req, res) => {
 
 exports.testRoleId = async (req, res) => {
     console.log('test!!!')
+
+    for (let key in UserPageGroups.rawAttributes) {
+        console.log('Field: ', key); // this is name of the field
+        console.log('TypeField: ', UserPageGroups.rawAttributes[key].type.key); // Sequelize type of field
+    }
+
+
     let t = await UserPageGroups.create({
-        role_id: 1,
+        role_id: 2,
         user_id: 1,
         group_id: 30
     })
 
-    console.log(JSON.parse(JSON.stringify(t)))
+    // console.log(JSON.parse(JSON.stringify(t)))
 }

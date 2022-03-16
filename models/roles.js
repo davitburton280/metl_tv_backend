@@ -11,6 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
+      roles.belongsToMany(models.users, {
+        as: 'page_group_roles',
+        through: models.users_page_groups,
+        foreignKey: 'user_id',
+      })
+
+      roles.belongsToMany(models.users, {
+        as: 'chat_group_roles',
+        through: models.users_chat_groups,
+        foreignKey: 'user_id',
+      })
     }
   };
   roles.init({

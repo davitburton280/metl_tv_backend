@@ -69,16 +69,20 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'member_id'
         });
 
+        // users.belongsToMany(models.roles, {
+        //     as: 'group_members',
+        //     through: models.users_roles,
+        //     foreignKey: 'user_id',
+        // })
+
         users.belongsToMany(models.roles, {
-            through: models.users_roles,
+            as: 'page_group_roles',
+            through: models.users_page_groups,
             foreignKey: 'user_id',
         })
 
         users.belongsToMany(models.roles, {
-            through: models.users_page_groups,
-            foreignKey: 'user_id',
-        })
-        users.belongsToMany(models.roles, {
+            as: 'chat_group_roles',
             through: models.users_chat_groups,
             foreignKey: 'user_id',
         })
