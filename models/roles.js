@@ -15,13 +15,13 @@ module.exports = (sequelize, DataTypes) => {
       roles.belongsToMany(models.users, {
         as: 'page_group_roles',
         through: models.users_page_groups,
-        foreignKey: 'user_id',
+        foreignKey: 'role_id',
       })
 
       roles.belongsToMany(models.users, {
         as: 'chat_group_roles',
         through: models.users_chat_groups,
-        foreignKey: 'user_id',
+        foreignKey: 'role_id',
       })
     }
   };

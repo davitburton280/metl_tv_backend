@@ -183,7 +183,7 @@ exports.forceDisconnect = async (user, usersGroups, socket, io) => {
 
     contacts.map(contact => {
         // console.log('aaa', contact.username, getSocketId(contact.username))
-        let theSocket = io.sockets.sockets.get(h.getSocketId(contact.username));
+        let theSocket = io.sockets.sockets.get(h.getSocketId(contact.username, usersGroups));
         theSocket?.emit('onLogout', user)
     })
 

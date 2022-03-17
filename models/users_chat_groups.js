@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'users_chat_groups',
+    underscored: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
   return users_chat_groups;
 };
