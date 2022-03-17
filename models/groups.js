@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
         through: models.groups_members,
         foreignKey: 'group_id'
       });
+
+      groups.belongsToMany(models.users, {
+        as: 'page_group_users_roles',
+        through: models.users_page_groups,
+        foreignKey: 'group_id',
+      })
     }
   };
   groups.init({
@@ -30,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'groups',
+    underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at'
   });

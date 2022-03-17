@@ -15,6 +15,11 @@ module.exports = {
                 type: Sequelize.INTEGER
             },
             is_admin: {
+                defaultValue: 0,
+                type: Sequelize.INTEGER
+            },
+            is_moderator: {
+                defaultValue: 0,
                 type: Sequelize.INTEGER
             },
             accepted: {

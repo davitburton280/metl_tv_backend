@@ -15,7 +15,7 @@ const to = require('../helpers/getPromiseResult');
 const nl2br = require('../helpers/nl2br');
 
 exports.get = async (req, res) => {
-    console.log('get only groups!!!')
+    console.log('get only page groups!!!')
     let user_id;
     if (req.return) {
         user_id = req.user_id;
@@ -30,9 +30,10 @@ exports.get = async (req, res) => {
 
     let groupIds = JSON.parse(JSON.stringify(groupsResult)).map(t => t.group_id);
 
-    let where = {
-        id: {[Op.in]: groupIds}
-    };
+    let where = [
+        {id: {[Op.in]: groupIds}},
+        // sequelize.where(sequelize.col('group_members->page_group_roles.group_id'), user_id),
+    ];
 
     let groups = await Groups.findAll({
         where,
@@ -41,8 +42,8 @@ exports.get = async (req, res) => {
             {
                 model: Users,
                 as: 'group_members',
-                attributes: ['id', 'avatar', 'username', 'first_name', 'last_name']
-            },
+                attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
+            }
         ]
     });
 
@@ -64,6 +65,7 @@ exports.getGroupByCustomName = async (req, res) => {
                 model: Users,
                 as: 'group_members',
                 attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
+
             },
         ]
     });
@@ -96,6 +98,7 @@ exports.createGroup = async (req, res) => {
         console.log(data)
         await to(GroupsMembers.create({
             group_id: group.id,
+            is_admin: 1,
             member_id: data.creator_id,
             accepted: 1,
             confirmed: 1
@@ -107,27 +110,8 @@ exports.createGroup = async (req, res) => {
             }
         }))
 
-        await to(UserPageGroups.create({
-            user_id: data.creator_id,
-            role_id: role.id,
-            group_id: group.id
-        }));
-
-        let adminRole = await to(Roles.findOne({
-            where: {
-                name: 'Chat group admin'
-            }
-        }))
-
-        console.log(role, adminRole)
-
-        await to(UserPageGroups.create({
-            user_id: data.creator_id,
-            role_id: adminRole.id,
-            group_id: group.id
-        }));
-
         req.query.user_id = data.creator_id;
+        // let token = await usersController.changeJwt({id: data.creator_id}, res, true);
         this.get(req, res);
     }
 
