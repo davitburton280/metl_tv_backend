@@ -143,6 +143,14 @@ let socket = (io) => {
             await pageGroups.sendMakeAdminRequest(data, usersGroups, io);
         })
 
+        socket.on('acceptPageGroupAdminRequest', async (data) => {
+            await pageGroups.acceptPageGroupAdminRequest(data, usersGroups, socket, io);
+        })
+
+        socket.on('declinePageGroupAdminRequest', async (data) => {
+            await pageGroups.declinePageGroupAdminRequest(data, usersGroups, socket, io);
+        })
+
 
         socket.on('forceDisconnect', async (user) => {
             await users.forceDisconnect(user, usersGroups, socket, io);

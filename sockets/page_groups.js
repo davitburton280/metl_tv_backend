@@ -230,3 +230,46 @@ exports.sendMakeAdminRequest = async (data, usersGroups, io) => {
         ...data
     })
 }
+
+exports.declinePageGroupAdminRequest = async (data, usersGroups, socket, io) => {
+    let {group} = data;
+    console.log('decline make admin request!!!', data)
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'decline_page_group_admin_request'
+    });
+
+    await groupNotificationsController.removeNotification({return: true, id: data.notification_id});
+    data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
+
+    socket.broadcast.to(group.name).emit('getDeclinedPageGroupAdminRequest', {
+        ...data,
+        notification,
+    });
+}
+
+exports.acceptPageGroupAdminRequest = async (data, usersGroups, socket, io) => {
+    console.log('accept make admin request!!!');
+
+    let {from_user, group} = data;
+    let groupName = group.name;
+
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'accept_page_group_invitation'
+    });
+
+    await groupNotificationsController.removeNotification({return: true, id: data.notification_id});
+
+    data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
+
+    let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
+    io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
+
+    socket.broadcast.to(groupName).emit('getAcceptedPageGroupAdminRequest', {
+        ...data,
+        notification
+    });
+}

@@ -221,3 +221,14 @@ exports.makeMemberAdmin = async (req, res) => {
     await GroupsMembers.update({is_admin: 1, is_moderator: 0}, {where: {group_id, member_id}});
     res.json('OK');
 }
+
+exports.declineMakeAdmin = async (req, res) => {
+    const {group_id, member_id} = req.body;
+}
+
+exports.removeAdminPrivileges = async (req, res) => {
+    const {group_id, member_id} = req.body;
+    await GroupsMembers.update({is_admin: 0, is_moderator: 0}, {where: {group_id, member_id}});
+    req.query.group_id = group_id;
+    this.getGroupMembers(req, res)
+}

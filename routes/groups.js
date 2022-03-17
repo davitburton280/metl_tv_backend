@@ -22,5 +22,7 @@ router.put('/ignore-join-group', groupsController.ignoreJoinGroup);
 router.delete('/leave-group', groupsController.leaveGroup);
 
 router.put('/make-member-admin', groupsController.makeMemberAdmin);
+router.put('/decline-make-member-admin', groupsController.declineMakeAdmin);
+router.put('/remove-admin-privileges', groupsController.removeAdminPrivileges);
 
 module.exports = router;
