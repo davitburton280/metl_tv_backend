@@ -206,3 +206,27 @@ exports.removeFromPageGroup = async (data, usersGroups, socket, io) => {
 
     theSocket?.leave(groupName);
 }
+
+exports.sendMakeAdminRequest = async (data, usersGroups, io) => {
+    console.log('send make admin request!!!')
+
+    let {from_user, group, member} = data;
+    let groupName = group.name;
+
+    let groupMembers = await groupsController.getGroupMembers({return: true, group_id: group.id});
+    data.group.group_members = groupMembers?.group_members;
+
+
+    let socketId = h.getSocketId(member.username, usersGroups);
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: 'page_group_admin_request'
+    });
+
+    console.log(socketId, usersGroups)
+    io.to(socketId).emit('getMakeAdminRequest', {
+        notification,
+        ...data
+    })
+}

@@ -139,6 +139,10 @@ let socket = (io) => {
             await pageGroups.removeFromPageGroup(data, usersGroups, socket, io);
         });
 
+        socket.on('sendMakeAdminRequest', async (data) => {
+            await pageGroups.sendMakeAdminRequest(data, usersGroups, io);
+        })
+
 
         socket.on('forceDisconnect', async (user) => {
             await users.forceDisconnect(user, usersGroups, socket, io);

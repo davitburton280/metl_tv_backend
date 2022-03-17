@@ -218,5 +218,6 @@ exports.ignoreJoinGroup = async (req, res) => {
 
 exports.makeMemberAdmin = async (req, res) => {
     const {group_id, member_id} = req.body;
-    await GroupsMembers.update({is_admin: 1}, {where: {group_id, member_id}});
+    await GroupsMembers.update({is_admin: 1, is_moderator: 0}, {where: {group_id, member_id}});
+    res.json('OK');
 }
