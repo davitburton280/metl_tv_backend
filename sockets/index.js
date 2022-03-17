@@ -79,10 +79,6 @@ let socket = (io) => {
             await groupChat.setNewGroup(data, usersGroups, socket, io)
         });
 
-        socket.on('setNewPageGroup', async (data) => {
-            await pageGroups.setNewGroup(data, usersGroups, socket, io)
-        });
-
         socket.on('removeGroup', async (data) => {
             await groupChat.removeGroup(data, usersGroups, io)
         });
@@ -91,42 +87,37 @@ let socket = (io) => {
             await chatGroups.inviteToNewGroup(data, usersGroups, io);
         });
 
-        socket.on('inviteToNewPageGroup', async (data) => {
-            await pageGroups.inviteToNewGroup(data, usersGroups, io);
-        })
-
         socket.on('acceptJoinToChatGroup', async (data) => {
             await chatGroups.acceptJoinToChatGroup(data, usersGroups, io);
-        });
-
-        socket.on('acceptJoinPageGroup', async (data) => {
-            await pageGroups.acceptJoinPageGroup(data, usersGroups, socket, io);
         });
 
         socket.on('declineJoinChatGroup', async (data) => {
             await chatGroups.declineJoinChatGroup(data, usersGroups, io);
         });
 
-        socket.on('declineJoinPageGroup', async (data) => {
-            await pageGroups.declineJoinPageGroup(data, usersGroups, io);
-        });
-
         socket.on('leaveChatGroup', async (data) => {
             await chatGroups.leaveChatGroup(data, usersGroups, socket, io);
-        });
-
-        socket.on('leavePageGroup', async (data) => {
-            await pageGroups.leavePageGroup(data, usersGroups, socket, io);
         });
 
         socket.on('removeFromChatGroup', async (data) => {
             await chatGroups.removeFromChatGroup(data, usersGroups, socket, io);
         });
 
-        socket.on('removeFromPageGroup', async (data) => {
-            await pageGroups.removeFromPageGroup(data, usersGroups, socket, io);
+        socket.on('setNewPageGroup', async (data) => {
+            await pageGroups.setNewGroup(data, usersGroups, socket, io)
         });
 
+        socket.on('inviteToNewPageGroup', async (data) => {
+            await pageGroups.inviteToNewGroup(data, usersGroups, io);
+        })
+
+        socket.on('acceptJoinPageGroup', async (data) => {
+            await pageGroups.acceptJoinPageGroup(data, usersGroups, socket, io);
+        });
+
+        socket.on('declineJoinPageGroup', async (data) => {
+            await pageGroups.declineJoinPageGroup(data, usersGroups, io);
+        });
 
         socket.on('joinGroup', async (data) => {
             await pageGroups.joinGroup(data, usersGroups, io);
@@ -138,6 +129,14 @@ let socket = (io) => {
 
         socket.on('ignoreJoinGroup', async (data) => {
             await pageGroups.ignoreJoinGroup(data, usersGroups, io);
+        });
+
+        socket.on('leavePageGroup', async (data) => {
+            await pageGroups.leavePageGroup(data, usersGroups, socket, io);
+        });
+
+        socket.on('removeFromPageGroup', async (data) => {
+            await pageGroups.removeFromPageGroup(data, usersGroups, socket, io);
         });
 
 
