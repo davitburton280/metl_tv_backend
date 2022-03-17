@@ -21,6 +21,6 @@ router.put('/decline-join-group', groupsController.declineGroupJoin);
 router.put('/ignore-join-group', groupsController.ignoreJoinGroup);
 router.delete('/leave-group', groupsController.leaveGroup);
 
-router.post('/test-role-id', groupsController.testRoleId);
+router.put('/make-member-admin', groupsController.makeMemberAdmin);
 
 module.exports = router;

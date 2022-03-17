@@ -3,7 +3,7 @@ const Op = sequelize.Op;
 
 const db = require('../../models');
 const Users = db.users;
-const DirectChatNotifications = require('../../mongoose_chat/direct_chat_notifications');
+const DirectChatNotifications = require('../../mongoose/direct_chat_notifications');
 const NotificationTypes = db.notification_types;
 
 exports.saveNotification = async (data) => {

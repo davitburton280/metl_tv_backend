@@ -10,7 +10,7 @@ const UserChatGroups = db.users_chat_groups;
 const ChatGroups = db.chat_groups;
 const ChatGroupsMembers = db.chat_groups_members;
 
-const GroupsMessages = require('../../mongoose_chat/group_chat_messages');
+const GroupsMessages = require('../../mongoose/group_chat_messages');
 const moment = require('moment');
 
 const to = require('../../helpers/getPromiseResult');

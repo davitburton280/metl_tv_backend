@@ -6,7 +6,7 @@ const Users = db.users;
 const UsersConnection = db.users_connection;
 const UsersConnectionMembers = db.users_connection_members;
 
-const DirectMessages = require('../../mongoose_chat/direct_chat_messages');
+const DirectMessages = require('../../mongoose/direct_chat_messages');
 const moment = require('moment');
 
 const to = require('../../helpers/getPromiseResult');

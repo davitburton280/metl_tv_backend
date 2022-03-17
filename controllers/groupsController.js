@@ -216,21 +216,7 @@ exports.ignoreJoinGroup = async (req, res) => {
     this.get(req, res);
 }
 
-
-exports.testRoleId = async (req, res) => {
-    console.log('test!!!')
-
-    for (let key in UserPageGroups.rawAttributes) {
-        console.log('Field: ', key); // this is name of the field
-        console.log('TypeField: ', UserPageGroups.rawAttributes[key].type.key); // Sequelize type of field
-    }
-
-
-    let t = await UserPageGroups.create({
-        role_id: 2,
-        user_id: 1,
-        group_id: 30
-    })
-
-    // console.log(JSON.parse(JSON.stringify(t)))
+exports.makeMemberAdmin = async (req, res) => {
+    const {group_id, member_id} = req.body;
+    await GroupsMembers.update({is_admin: 1}, {where: {group_id, member_id}});
 }

@@ -2,7 +2,7 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 
 const db = require('../../models');
-const GroupNotifications = require('../../mongoose_chat/group_notifications');
+const GroupNotifications = require('../../mongoose/group_notifications');
 const NotificationTypes = db.notification_types;
 
 const moment = require('moment');
