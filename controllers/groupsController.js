@@ -217,8 +217,11 @@ exports.ignoreJoinGroup = async (req, res) => {
 }
 
 exports.makeMemberAdmin = async (req, res) => {
-    const {group_id, member_id} = req.body;
-    await GroupsMembers.update({is_admin: 1, is_moderator: 0}, {where: {group_id, member_id}});
+    const {group_id, member_id, type} = req.body;
+    let is_admin = +(type === 'admin');
+    let is_moderator = +(type === 'moderator');
+    console.log('making', is_admin, is_moderator, member_id)
+    await GroupsMembers.update({is_admin, is_moderator}, {where: {group_id, member_id}});
     res.json('OK');
 }
 
