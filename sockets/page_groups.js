@@ -268,7 +268,7 @@ exports.acceptPageGroupAdminRequest = async (data, usersGroups, socket, io) => {
     let groupUsernames = h.getGroupUsernames(groupName, usersGroups);
     io.to(groupName).emit('onGetOnlineMembers', {members: groupUsernames, group: groupName})
 
-    socket.broadcast.to(groupName).emit('getAcceptedPageGroupAdminRequest', {
+    io.to(groupName).to(groupName).emit('getAcceptedPageGroupAdminRequest', {
         ...data,
         notification
     });

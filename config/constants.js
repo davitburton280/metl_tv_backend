@@ -19,6 +19,12 @@ module.exports = {
         'confirm_group_invitation', 'ignore_group_invitation',
         'left_page_group',
         'remove_from_page_group',
+        'page_group_admin_request',
+        'page_group_moderator_request',
+        'decline_page_group_admin_request',
+        'accept_page_group_admin_request',
+        'accept_page_group_moderator_request',
+
     ]
 };
 

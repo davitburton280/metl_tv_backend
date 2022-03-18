@@ -77,7 +77,7 @@ exports.removeNotification = async (req, res) => {
 
 exports.read = async (req, res) => {
     let {id, read_by} = req.body;
-    // console.log('read!!!!', read_by)
+    console.log('read!!!!', read_by, id)
 
     let notification = await GroupNotifications.findById(id);
     if (notification) {
