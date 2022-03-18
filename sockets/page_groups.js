@@ -221,7 +221,7 @@ exports.sendMakeAdminRequest = async (data, usersGroups, io) => {
 
     let notification = await h.saveGroupNotification({
         ...data,
-        type: 'page_group_admin_request'
+        type: `page_group_${data.type}_request`
     });
 
     console.log(socketId, usersGroups)
