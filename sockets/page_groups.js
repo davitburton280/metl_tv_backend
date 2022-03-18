@@ -273,3 +273,22 @@ exports.acceptPageGroupAdminRequest = async (data, usersGroups, socket, io) => {
         notification
     });
 }
+
+exports.removePageGroupAdminPrivileges = async (data, usersGroups, socket, io) => {
+    console.log('remove page group admin privileges!!!');
+
+    let {from_user, group} = data;
+    let groupName = group.name;
+
+    let notification = await h.saveGroupNotification({
+        ...data,
+        type: `remove_page_group_${data.type}_privileges`
+    });
+
+    data.group = await groupsController.getGroupMembers({return: true, group_id: group.id});
+
+    io.to(groupName).to(groupName).emit('getRemovedPageGroupAdminPrivileges', {
+        ...data,
+        notification
+    });
+}

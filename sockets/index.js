@@ -151,6 +151,14 @@ let socket = (io) => {
             await pageGroups.declinePageGroupAdminRequest(data, usersGroups, socket, io);
         })
 
+        socket.on('declinePageGroupAdminRequest', async (data) => {
+            await pageGroups.declinePageGroupAdminRequest(data, usersGroups, socket, io);
+        })
+
+        socket.on('removePageGroupAdminPrivileges', async (data) => {
+            await pageGroups.removePageGroupAdminPrivileges(data, usersGroups, socket, io);
+        })
+
 
         socket.on('forceDisconnect', async (user) => {
             await users.forceDisconnect(user, usersGroups, socket, io);
