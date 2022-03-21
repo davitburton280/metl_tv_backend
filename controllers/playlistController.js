@@ -19,6 +19,7 @@ exports.add = async (req, res) => {
         res.json(p);
     }
 };
+
 exports.addVideos = async (req, res) => {
     const data = req.body;
     const videoIds = JSON.parse(data.video_ids);

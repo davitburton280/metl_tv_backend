@@ -14,6 +14,9 @@ module.exports = {
             category_id: {
                 type: Sequelize.INTEGER
             },
+            group_id: {
+                type: Sequelize.INTEGER
+            },
             title: {
                 type: Sequelize.STRING
             },
@@ -21,12 +24,15 @@ module.exports = {
                 type: Sequelize.TEXT
             },
             likes: {
+                defaultValue: 0,
                 type: Sequelize.INTEGER
             },
             views: {
+                defaultValue: 0,
                 type: Sequelize.INTEGER
             },
             privacy: {
+                defaultValue: 0,
                 type: Sequelize.INTEGER
             },
             created_at: {

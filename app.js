@@ -96,7 +96,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 
-console.log("MONGO URL",mongoDB)
+console.log("MONGO URL", mongoDB)
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then(t => {
     console.log(mongoose.connection.readyState)
     console.log('mongo connected')
@@ -124,6 +124,7 @@ app.use('/playlists', require('./routes/playlists'));
 app.use('/channels', require('./routes/channels'));
 app.use('/stocks', require('./routes/stocks'));
 app.use('/cards', require('./routes/cards'));
+app.use('/posts', require('./routes/posts'));
 app.use('/groups', require('./routes/groups'));
 app.use('/webhooks', require('./routes/webhooks'));
 app.use('/stripe/customers', require('./routes/stripe/customers'));

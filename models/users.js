@@ -102,6 +102,8 @@ module.exports = (sequelize, DataTypes) => {
         // users.hasMany(models.users_connection, {as: 'from_connection_user', foreignKey: 'from_id'});
         // users.hasMany(models.users_connection, {as: 'to_connection_user', foreignKey: 'to_id'});
 
+        users.hasMany(models.posts, {as: 'posts', foreignKey: 'author_id'});
+
         // associations can be defined here
     };
     return users;
