@@ -10,7 +10,9 @@ exports.add = async (req, res) => {
     if (!showIfErrors(req, res)) {
         const data = req.body;
         let p = await Posts.create(data);
-        res.json(p);
+        req.query.author_id = data.author_id;
+        req.query.group_id = data.group_id;
+        this.get(req, res);
     }
 };
 
@@ -31,6 +33,9 @@ exports.get = async (req, res) => {
                     'first_name', 'last_name', 'username', 'email', 'avatar'
                 ]
             }
+        ],
+        order: [
+            ['created_at', 'desc']
         ]
     });
     res.json(posts);
