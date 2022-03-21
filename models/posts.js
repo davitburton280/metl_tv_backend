@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
         group_id: DataTypes.INTEGER,
         title: DataTypes.STRING,
         description: DataTypes.TEXT,
-        likes: DataTypes.INTEGER,
+        cover_img: DataTypes.STRING,
+        votes: DataTypes.INTEGER,
         views: DataTypes.INTEGER,
         privacy: DataTypes.INTEGER
     }, {

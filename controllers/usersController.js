@@ -216,7 +216,7 @@ exports.changeJwt = async (data, res, ret = false) => {
         password,
         ...details
     } = user.toJSON();
-    if (res) {
+    if (res && !res.headersSent) {
         res.json({
             token: jwt.sign(details, 'secretkey', {
                 expiresIn: '8h'

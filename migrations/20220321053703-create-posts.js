@@ -23,7 +23,10 @@ module.exports = {
             description: {
                 type: Sequelize.TEXT
             },
-            likes: {
+            cover_img: {
+                type: Sequelize.STRING
+            },
+            votes: {
                 defaultValue: 0,
                 type: Sequelize.INTEGER
             },
