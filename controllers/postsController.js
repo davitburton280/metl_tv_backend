@@ -2,6 +2,7 @@ const db = require('../models');
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
 const Posts = db.posts;
+const Groups = db.groups;
 const Users = db.users;
 const to = require('../helpers/getPromiseResult');
 const showIfErrors = require('../helpers/showIfErrors');
@@ -9,9 +10,14 @@ const showIfErrors = require('../helpers/showIfErrors');
 exports.add = async (req, res) => {
     if (!showIfErrors(req, res)) {
         const data = req.body;
+        let {group_id, author_id} = data;
+        if (!group_id) {
+            group_id = null;
+            data.group_id = group_id;
+        }
         let p = await Posts.create(data);
-        req.query.author_id = data.author_id;
-        req.query.group_id = data.group_id;
+        req.query.author_id = author_id;
+        req.query.group_id = group_id;
         this.get(req, res);
     }
 };
@@ -31,6 +37,11 @@ exports.get = async (req, res) => {
             {
                 model: Users, as: 'post_author', attributes: [
                     'first_name', 'last_name', 'username', 'email', 'avatar'
+                ]
+            },
+            {
+                model: Groups, as: 'post_group', attributes: [
+                    'id', 'name'
                 ]
             }
         ],
