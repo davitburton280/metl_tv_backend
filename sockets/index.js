@@ -5,6 +5,7 @@ let directChat = require('./direct_chat');
 let groupChat = require('./group_chat');
 let chatGroups = require('./chat_groups');
 let pageGroups = require('./page_groups');
+let posts = require('./posts');
 
 let socket = (io) => {
     io.on('connection', async (socket) => {
@@ -157,6 +158,10 @@ let socket = (io) => {
 
         socket.on('removePageGroupAdminPrivileges', async (data) => {
             await pageGroups.removePageGroupAdminPrivileges(data, usersGroups, socket, io);
+        })
+
+        socket.on('postAdded', (data) => {
+            posts.postAdded(data, usersGroups, socket, io)
         })
 
 

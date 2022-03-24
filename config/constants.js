@@ -24,7 +24,13 @@ module.exports = {
         'decline_page_group_admin_request',
         'accept_page_group_admin_request',
         'accept_page_group_moderator_request',
+    ],
 
-    ]
+    POST_NOTIFICATION_TYPES: [
+        'post_added',
+        'group_post_added'
+    ],
+
+
 };
 

@@ -2,6 +2,7 @@ const directChatNotificationsController = require('./notifications/directChatNot
 const usersConnNotificationsController = require('./notifications/usersConnectionNotificationsController');
 const groupChatNotificationsController = require('./notifications/groupChatNotificationsController');
 const groupNotificationsController = require('./notifications/groupNotificationsController');
+const postsNotificationsController = require('./notifications/postsNotificationsController');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
@@ -64,6 +65,9 @@ exports.read = async (req, res) => {
     } else if (c.GROUP_NOTIFICATION_TYPES.includes(type)) {
         userNotificationsResult = await groupNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
+    } else if (c.POST_NOTIFICATION_TYPES.includes(type)) {
+        userNotificationsResult = await postsNotificationsController.read(req, res);
+        req.query.user_id = read_by.id;
     }
     console.log('mark as read', req.query)
     this.get(req, res);
@@ -83,6 +87,9 @@ exports.markAllAsRead = async (req, res) => {
             req.query.user_id = read_by.id;
         } else if (c.GROUP_NOTIFICATION_TYPES.includes(n.type)) {
             userNotificationsResult = await groupNotificationsController.markAllAsRead(req, res);
+            req.query.user_id = read_by.id;
+        } else if (c.POST_NOTIFICATION_TYPES.includes(type)) {
+            userNotificationsResult = await postsNotificationsController.markAllAsRead(req, res);
             req.query.user_id = read_by.id;
         }
     }))
