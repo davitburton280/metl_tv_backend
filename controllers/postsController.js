@@ -41,7 +41,7 @@ exports.get = async (req, res) => {
             },
             {
                 model: Groups, as: 'post_group', attributes: [
-                    'id', 'name'
+                    'id', 'name', 'custom_name'
                 ]
             }
         ],
@@ -53,7 +53,26 @@ exports.get = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-    let data = req.query;
+    let {id} = req.query;
+    let post = await Posts.findOne({
+        where: {id},
+        include: [
+            {
+                model: Users, as: 'post_author', attributes: [
+                    'first_name', 'last_name', 'username', 'email', 'avatar'
+                ]
+            },
+            {
+                model: Groups, as: 'post_group', attributes: [
+                    'id', 'name'
+                ]
+            }
+        ],
+        order: [
+            ['created_at', 'desc']
+        ]
+    });
+    res.json(post);
 }
 
 exports.remove = async (req, res) => {
