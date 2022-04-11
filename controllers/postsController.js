@@ -64,7 +64,7 @@ exports.getById = async (req, res) => {
             },
             {
                 model: Groups, as: 'post_group', attributes: [
-                    'id', 'name'
+                    'id', 'name', 'custom_name'
                 ]
             }
         ],
