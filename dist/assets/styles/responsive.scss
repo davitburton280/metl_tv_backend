@@ -187,7 +187,7 @@
     .trending-text {
         text-align: center;
         max-width: 200px;
-        margin: 0 auto;
+        margin: 0 auto 24px;
     }
 
     .subscriptions-text {
@@ -254,6 +254,12 @@
 @media screen and (min-width: 320px) and (max-width: 374px) {
     nav.home-header {
         padding: 20px 20px !important;
+    }
+}
+
+@media screen and (min-width: 561px) and (max-width: 991px) {
+    nav.home-header {
+     flex-wrap: wrap;
     }
 }
 
