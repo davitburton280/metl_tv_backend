@@ -465,7 +465,7 @@ exports.removeVideo = async (req, res) => {
             // removing live video by token
         } else if (token) {
             let v = await to(Videos.findOne({where: {token: token, status: 'live'}}));
-            await to(ChatMessages.destroy({where: {video_id: v.id}}));
+            // await to(ChatMessages.destroy({where: {video_id: v.id}}));
             await to(UsersVideos.destroy({where: {video_id: v.id}}));
             await to(Videos.destroy({where: {token: token, status: 'live'}}));
             res.json('removed live video');
