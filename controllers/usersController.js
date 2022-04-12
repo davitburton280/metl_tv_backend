@@ -148,7 +148,9 @@ exports.getSession = async (req, res) => {
                     })
                     .catch(error => {
                         console.log('token generation error')
-                        res.status(500).json({msg: error.toString()})
+                        if (!res.headersSent) {
+                            res.status(500).json({msg: error.toString()})
+                        }
                     });
             })
             .catch(error => {
