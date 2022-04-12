@@ -25,6 +25,7 @@ exports.add = async (req, res) => {
 
 exports.get = async (req, res) => {
     let {author_id, group_id} = req.query;
+    console.log('get posts!!!')
     let where = {};
     if (author_id) {
         where.author_id = author_id;
@@ -102,7 +103,7 @@ exports.vote = async (req, res) => {
         }
 
         await Posts.update({votes: votesCount}, {where: {id: post_id}});
-        req.query.author_id = user_id;
+        // req.query.author_id = user_id;
         this.get(req, res);
     }
 }
