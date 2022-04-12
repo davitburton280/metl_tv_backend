@@ -44,6 +44,9 @@ exports.get = async (req, res) => {
                 model: Groups, as: 'post_group', attributes: [
                     'id', 'name', 'custom_name'
                 ]
+            },
+            {
+                model: Users, as: 'user_posts', attributes: ['id', 'username']
             }
         ],
         order: [
@@ -67,6 +70,9 @@ exports.getById = async (req, res) => {
                 model: Groups, as: 'post_group', attributes: [
                     'id', 'name', 'custom_name'
                 ]
+            },
+            {
+                model: Users, as: 'user_posts', attributes: ['id', 'username']
             }
         ],
         order: [
@@ -82,6 +88,19 @@ exports.vote = async (req, res) => {
     if (p) {
         let votesCount = p.votes + vote;
         console.log('vote!!!', req.body, p.votes, vote, votesCount)
+
+        let foundPostVote = await UsersPosts.findOne({
+            where: {
+                post_id, user_id
+            }
+        })
+
+        if (!foundPostVote) {
+            await UsersPosts.create({post_id, user_id, liked: vote})
+        } else {
+            await UsersPosts.update({liked: vote}, {where: {post_id, user_id}});
+        }
+
         await Posts.update({votes: votesCount}, {where: {id: post_id}});
         req.query.author_id = user_id;
         this.get(req, res);
