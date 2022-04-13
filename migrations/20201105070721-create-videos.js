@@ -32,6 +32,10 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 defaultValue: 0
             },
+            participants: {
+                type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
             duration: {
                 type: Sequelize.STRING(5),
                 defaultValue: '00:00'
