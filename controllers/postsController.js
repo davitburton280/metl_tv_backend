@@ -87,8 +87,8 @@ exports.vote = async (req, res) => {
     let {vote, post_id, user_id} = req.body;
     let p = await Posts.findOne({where: {id: post_id}, attributes: ['id', 'votes']});
     if (p) {
-        let votesCount = p.votes + vote;
-        console.log('vote!!!', req.body, p.votes, vote, votesCount)
+
+        console.log('vote!!!', req.body, p.votes, vote)
 
         let foundPostVote = await UsersPosts.findOne({
             where: {
@@ -102,8 +102,11 @@ exports.vote = async (req, res) => {
             await UsersPosts.update({liked: vote}, {where: {post_id, user_id}});
         }
 
-        await Posts.update({votes: votesCount}, {where: {id: post_id}});
-        // req.query.author_id = user_id;
+        if (vote > 0 || foundPostVote) {
+            let votesCount = p.votes + vote;
+            await Posts.update({votes: votesCount}, {where: {id: post_id}});
+            // req.query.author_id = user_id;
+        }
         this.get(req, res);
     }
 }
