@@ -6,6 +6,7 @@ const validateVideoDetails = require('../validators/validateVideoDetails');
 const isAuth = require('../helpers/isAuth');
 
 router.post('/save-video-token', isAuth, videoController.saveVideoToken);
+router.put('/update-streaming-participants-count', isAuth, videoController.updateParticipantsCount);
 router.post('/save-video-data', isAuth, uploadVideoStreamFile, videoController.saveVideoData);
 router.post('/save-video-thumbnail', isAuth, uploadVideoThumbFile, videoController.saveVideoThumbnail);
 router.delete('/remove-video-thumbnail', isAuth, uploadVideoThumbFile, videoController.removeVideoThumbnail);

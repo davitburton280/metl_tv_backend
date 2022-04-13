@@ -154,6 +154,11 @@ exports.saveVideoToken = async (req, res) => {
     }
 };
 
+exports.updateParticipantsCount = async (req, res) => {
+    let {video_id, participants} = req.body;
+    await Videos.update({participants}, {where: {id: video_id}});
+    res.json('OK');
+}
 
 exports.saveVideoData = async (req, res) => {
     let data = req.body;
@@ -194,7 +199,7 @@ exports.saveVideoData = async (req, res) => {
             video_id: video.id
             // }
         });
-        await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
+
 
         res.json('OK');
     })
