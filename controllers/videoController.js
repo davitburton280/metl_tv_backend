@@ -78,6 +78,7 @@ exports.getVideos = async (req, res) => {
         where: whereFilters,
         limitOption
     });
+    console.log('VIDEOS!!!!!', v)
     ret['videos'] = v;
     // whereFilters = this.getVideoFiltersQuery(filters, '`videos->category`.`name`');
     // console.log(filters, whereFilters)
