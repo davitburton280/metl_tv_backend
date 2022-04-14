@@ -78,7 +78,7 @@ exports.getVideos = async (req, res) => {
         where: whereFilters,
         limitOption
     });
-    console.log('VIDEOS!!!!!', v)
+    // console.log('VIDEOS!!!!!', v)
     ret['videos'] = v;
     // whereFilters = this.getVideoFiltersQuery(filters, '`videos->category`.`name`');
     // console.log(filters, whereFilters)
@@ -200,7 +200,7 @@ exports.saveVideoData = async (req, res) => {
             video_id: video.id
             // }
         });
-
+        await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
 
         res.json('OK');
     })

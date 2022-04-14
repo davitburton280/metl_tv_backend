@@ -287,7 +287,7 @@ exports.getUserInfo = async (req, res) => {
             let {videos, ...rest} = user.toJSON();
             if (!+own_channel) {
                 console.log('not own channel')
-                let ret = {videos: videos.filter(t => t.privacy.name === 'Public'), ...rest};
+                let ret = {videos: videos.filter(t => t.privacy?.name === 'Public'), ...rest};
                 res.json(ret);
             } else {
                 res.json(user)
