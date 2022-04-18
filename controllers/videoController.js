@@ -22,6 +22,7 @@ const getFullName = require('../helpers/getFullNameCol');
 
 const Videos = db.videos;
 const Playlists = db.playlists;
+const VideoChatMessages = require('../mongoose/video_chat_messages');
 
 const sequelize = require('sequelize');
 const Op = sequelize.Op;
@@ -30,6 +31,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const moment = require('moment');
 const m = require('../helpers/multer');
+
 
 exports.getVideos = async (req, res) => {
     let data = req.query;
@@ -317,7 +319,17 @@ exports.getVideoById = async (req, res) => {
         ],
         attributes: ['id', 'author_id', 'likes', 'thumbnail', 'duration', 'name', 'dislikes', 'views', 'filename', 'status', 'created_at']
     });
-    res.json(v);
+
+    let messages = await VideoChatMessages.find({
+        video_id: id
+    }).sort({'created_at': 1});
+
+    let ret = {...v.toJSON(), ...{messages}};
+
+    // v.messages = messages
+    console.log('video messages!!!', ret)
+
+    res.json(ret);
 };
 
 exports.getVideosByAuthor = async (req, res) => {
@@ -472,7 +484,7 @@ exports.removeVideo = async (req, res) => {
         } else if (token) {
             let v = await to(Videos.findOne({where: {token: token, status: 'live'}}));
             // await to(ChatMessages.destroy({where: {video_id: v.id}}));
-            await to(UsersVideos.destroy({where: {video_id: v.id}}));
+            await to(UsersVideos.destroy({where: {video_id: v?.id}}));
             await to(Videos.destroy({where: {token: token, status: 'live'}}));
             res.json('removed live video');
         }
