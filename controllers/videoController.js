@@ -324,7 +324,7 @@ exports.getVideoById = async (req, res) => {
         video_id: id
     }).sort({'created_at': 1});
 
-    let ret = {...v.toJSON(), ...{messages}};
+    let ret = {...v?.toJSON(), ...{messages}};
 
     // v.messages = messages
     console.log('video messages!!!', ret)
