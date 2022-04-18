@@ -47,9 +47,9 @@ html, body, p, h1, h2, h3, h4, ul {
 
 .mat-drawer-inner-container {
     padding: 0 10px !important;
-        @media only screen and (max-width: 340px) {
-            padding: 0 2px !important;
-        }
+    //@media only screen and (max-width: 340px) {
+    //    padding: 0 2px !important;
+    //}
 }
 
 input, button {
@@ -400,6 +400,9 @@ select {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
+    @media (max-width: 530px) {
+        display: unset !important
+    }
 
     img {
         width: 100%;
@@ -438,19 +441,22 @@ select {
     .thumbnail {
         position: relative;
         margin-bottom: 24px;
+        //width: 100%;
 
         img {
             height: 249px;
             max-width: 400px;
+            width: 100% !important;
             min-width: 400px;
+            object-fit: cover;
             @media screen and (max-width: 991px) {
                 max-width: 432px !important;
                 width: 100% !important;
                 min-width: 432px;
             }
-            @media screen and (max-width: 505px) {
-                min-width: 100%;
-            }
+            //@media screen and (max-width: 505px) {
+            //    min-width: 100%;
+            //}
         }
     }
 
@@ -458,6 +464,10 @@ select {
         flex: 1;
         margin-left: 32px;
         min-width: 250px;
+
+        @media screen and (max-width: 1054px) and (min-width: 992px) {
+            margin-left: 0
+        }
 
         h4.title {
             margin: 0;
@@ -805,7 +815,7 @@ mat-optgroup {
     }
 }
 
-.mat-form-field-label-wrapper{
+.mat-form-field-label-wrapper {
     overflow: unset !important;
 }
 
@@ -819,9 +829,10 @@ mat-optgroup {
 
 .disabled {
     pointer-events: none;
+    filter: blur(5px);
     //opacity: 0.4;
 }
-
+video-tags-list
 .wallet-content {
     padding: 30px 24px;
 
@@ -1172,6 +1183,10 @@ mat-sidenav-container {
     height: 300px !important;
 }
 
+.emoji-mart-preview {
+    display: none !important;
+}
+
 @media screen and (max-width: 545px) {
     .bottom-search-form {
         display: block;
@@ -1208,7 +1223,7 @@ mat-sidenav-container {
     }
 }
 
-@media screen and (max-width: 374px) and  (min-width:320px) {
+@media screen and (max-width: 374px) and (min-width: 320px) {
     .cdk-overlay-connected-position-bounding-box {
         width: 93px !important;
     }
@@ -1216,12 +1231,10 @@ mat-sidenav-container {
 
 
 @media screen and (max-width: 992px) and (min-width: 320px) {
-  #sidebar-watchlist  {
-     padding: 0 25px !important;
-  }
+    #sidebar-watchlist {
+        padding: 0 25px !important;
+    }
 }
-
-
 
 
 @import "responsive";
