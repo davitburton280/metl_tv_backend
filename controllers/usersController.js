@@ -267,7 +267,9 @@ exports.getUserInfo = async (req, res) => {
                     as: 'videos',
                     include: [
                         {model: Tags, as: 'tags'},
-                        {model: PrivacyTypes, as: 'privacy'}
+                        {model: PrivacyTypes, as: 'privacy'},
+                        {model: Users, as: 'user'},
+                        {model: Channels, as: 'channel'}
                     ],
                     // where: sequelize.where(sequelize.col('`videos`.`privacy`.`name`'), 'Public')
                 },
