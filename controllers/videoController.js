@@ -255,6 +255,7 @@ exports.getUserVideos = async (req, res) => {
             include: [
                 {model: Channels, as: 'channel'},
                 {model: Playlists, as: 'playlists', attributes: ['id']},
+                {model: Users, as: 'user'},
                 {model: Tags, as: 'tags'},
                 {
                     model: VideoCategories,
@@ -357,6 +358,7 @@ exports.searchInAllVideos = async (req, res) => {
         include: [
             {model: Channels, as: 'channel'},
             {model: Playlists, as: 'playlists', attributes: ['id']},
+            {model: Users, as: 'user'},
             {model: Tags, as: 'tags'}
         ]
     });
