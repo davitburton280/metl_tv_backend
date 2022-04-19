@@ -9,6 +9,12 @@ let MessagesSchema = new mongoose.Schema({
         first_name: {type: String},
         last_name: {type: String},
     },
+    from_channel: {
+        id: {type: Number},
+        name: {type: String},
+        avatar: {type: String},
+        username: {type: String},
+    },
     video_id: {
         type: Number,
         required: true
