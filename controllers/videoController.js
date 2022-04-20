@@ -279,12 +279,18 @@ exports.getUserSavedVideos = async (req, res) => {
     let userWhere = {id: req.query.user_id};
     let v = await Users.findOne({
         where: userWhere,
-        include: [{
-            model: Videos,
-            as: 'users_vids',
-            where: [sequelize.where(sequelize.col('`users_vids->users_videos`.`saved`'), 1)],
-            include: [{model: Channels, as: 'channel'}, {model: Tags, as: 'tags'}]
-        }],
+        include: [
+            {
+                model: Videos,
+                as: 'users_vids',
+                where: [sequelize.where(sequelize.col('`users_vids->users_videos`.`saved`'), 1)],
+                include: [
+                    {model: Channels, as: 'channel'},
+                    {model: Users, as: 'user'},
+                    {model: Tags, as: 'tags'}
+                ]
+            }
+        ],
 
     });
     res.json(v);
