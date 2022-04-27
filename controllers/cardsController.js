@@ -1,6 +1,5 @@
 const db = require('../models');
 const UsersCards = db.users_cards;
-const Channel = db.channels;
 
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 

@@ -80,6 +80,22 @@ exports.getById = async (req, res) => {
             ['created_at', 'desc']
         ]
     });
+
+    const userPost = await UsersPosts.findOne({ where: { user_id: req.decoded.id, post_id: id } });
+    if (userPost && userPost.viewed === 0) {
+        const postViewCount = post.views + 1;
+        await Promise.all([
+            Posts.update({ views: postViewCount }, { where: { id } }),
+            UsersPosts.update({ viewed: 1 }, { where: { user_id: req.decoded.id, post_id: id } })
+        ]);
+        post.views = postViewCount;
+        post.user_posts.forEach(x => {
+            if ((x.users_posts.user_id === req.decoded.id) && (x.users_posts.post_id === +id)) {
+                x.users_posts.viewed = 1;
+            };
+        });
+    }
+
     res.json(post);
 }
 
