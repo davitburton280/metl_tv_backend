@@ -23,8 +23,20 @@ exports.add = async (req, res) => {
     }
 };
 
+exports.edit = async (req, res) => {
+    const { id } = req.query;
+    const user = req.decoded;
+
+    const currentPost = await Posts.findOne({ where: { id, author_id: user.id } });
+    if (!currentPost) return res.status(400).send("wrong post id, or current post author is not a this user");
+    const { group_id, description } = req.body;
+
+    await Posts.update({ group_id, description }, { where: id, author_id: user.id });
+    this.get(req, res);
+}
+
 exports.get = async (req, res) => {
-    let { author_id, group_id } = req.query;
+    let { author_id, group_id, search, offset, limit } = req.query;
     console.log('get posts!!!')
     let where = {};
     if (author_id) {
@@ -33,8 +45,24 @@ exports.get = async (req, res) => {
     if (group_id) {
         where.group_id = group_id;
     }
+    if (search && search.length) {
+        where.description = {
+            [Op.like]: '%' + search + '%'
+        }
+    }
+
+    if ((offset && Number(offset) !== NaN) && (limit && Number(offset) !== NaN)) {
+        offset = (+offset - 1) * +limit;
+        limit = +limit;
+    } else {
+        offset = 0,
+        limit = 10;
+    };
+
     let posts = await Posts.findAll({
         where: where,
+        limit,
+        offset,
         include: [
             {
                 model: Users, as: 'post_author', attributes: [
@@ -139,6 +167,28 @@ exports.vote = async (req, res) => {
 
 
 exports.remove = async (req, res) => {
+    const { idList } = req.body;
+    const user = req.decoded;
+    await Promise.all([
+        UsersPosts.destroy({
+            where: {
+                id: {
+                    [Op.in]: idList
+                },
+                author_id: user.id
+            }
+        }),
+        UsersPosts.destroy({
+            where: {
+                post_id: {
+                    [Op.in]: idList
+                },
+                user_id: user.id
+            }
+        })
+    ]);
 
-}
+    return res.send({ message: "Post(s) successfuly deleted" });
+
+};
 
