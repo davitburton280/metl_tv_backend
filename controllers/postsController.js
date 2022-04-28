@@ -98,7 +98,7 @@ exports.getById = async (req, res) => {
         const newUserPost = await UsersPosts.create({ post_id: id, user_id: req.decoded.id, viewed: 1 });
         await Posts.update({ views: postViewCount }, { where: { id } });
         post.views = postViewCount;
-        const user = await Users.findOne({ where: { id: req.decoded.id }, select: ["id", "username"] });
+        const user = await Users.findOne({ where: { id: req.decoded.id }, attributes: ["id", "username"] });
         user.dataValues.users_posts = [
             newUserPost
         ];
