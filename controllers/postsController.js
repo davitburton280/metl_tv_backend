@@ -98,15 +98,12 @@ exports.getById = async (req, res) => {
         const newUserPost = await UsersPosts.create({ post_id: id, user_id: req.decoded.id, viewed: 1 });
         await Posts.update({ views: postViewCount }, { where: { id } });
         post.views = postViewCount;
-        const model = {
-            id: req.decoded.id,
-            username: req.decoded.username,
-            users_posts: [
-                newUserPost
-            ]
-        };
+        const user = await Users.findOne({ where: { id: req.decoded.id }, select: ["id", "username"] });
+        user.dataValues.users_posts = [
+            newUserPost
+        ];
         console.log(post.user_posts, 'post.user_posts');
-        post.user_posts.push(model);
+        post.user_posts.push(user);
     };
 
     res.json(post);
