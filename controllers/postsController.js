@@ -81,9 +81,9 @@ exports.getById = async (req, res) => {
         ]
     });
 
+    const postViewCount = post.views + 1;
     const userPost = await UsersPosts.findOne({ where: { user_id: req.decoded.id, post_id: id } });
     if (userPost && userPost.viewed === 0) {
-        const postViewCount = post.views + 1;
         await Promise.all([
             Posts.update({ views: postViewCount }, { where: { id } }),
             UsersPosts.update({ viewed: 1 }, { where: { user_id: req.decoded.id, post_id: id } })
@@ -96,6 +96,8 @@ exports.getById = async (req, res) => {
         });
     } else if (!userPost) {
         const newUserPost = await UsersPosts.create({ post_id: id, user_id: req.decoded.id, viewed: 1 });
+        await Posts.update({ views: postViewCount }, { where: { id } });
+        post.views = postViewCount;
         const model = {
             id: req.decoded.id,
             username: req.decoded.username,
