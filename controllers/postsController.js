@@ -105,6 +105,7 @@ exports.getById = async (req, res) => {
                 newUserPost
             ]
         };
+        console.log(post.user_posts, 'post.user_posts');
         post.user_posts.push(model);
     };
 
