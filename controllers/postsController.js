@@ -11,7 +11,7 @@ const showIfErrors = require('../helpers/showIfErrors');
 exports.add = async (req, res) => {
     if (!showIfErrors(req, res)) {
         const data = req.body;
-        let {group_id, author_id} = data;
+        let { group_id, author_id } = data;
         if (!group_id) {
             group_id = null;
             data.group_id = group_id;
@@ -24,7 +24,7 @@ exports.add = async (req, res) => {
 };
 
 exports.get = async (req, res) => {
-    let {author_id, group_id} = req.query;
+    let { author_id, group_id } = req.query;
     console.log('get posts!!!')
     let where = {};
     if (author_id) {
@@ -58,9 +58,9 @@ exports.get = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-    let {id} = req.query;
+    let { id } = req.query;
     let post = await Posts.findOne({
-        where: {id},
+        where: { id },
         include: [
             {
                 model: Users, as: 'post_author', attributes: [
@@ -94,14 +94,24 @@ exports.getById = async (req, res) => {
                 x.users_posts.viewed = 1;
             };
         });
-    }
+    } else if (!userPost) {
+        const newUserPost = await UsersPosts.create({ post_id: id, user_id: req.decoded.id, viewed: 1 });
+        const model = {
+            id: req.decoded.id,
+            username: req.decoded.username,
+            users_posts: [
+                newUserPost
+            ]
+        };
+        post.user_posts.push(model);
+    };
 
     res.json(post);
 }
 
 exports.vote = async (req, res) => {
-    let {vote, post_id, user_id} = req.body;
-    let p = await Posts.findOne({where: {id: post_id}, attributes: ['id', 'votes']});
+    let { vote, post_id, user_id } = req.body;
+    let p = await Posts.findOne({ where: { id: post_id }, attributes: ['id', 'votes'] });
     if (p) {
 
         console.log('vote!!!', req.body, p.votes, vote)
@@ -113,14 +123,14 @@ exports.vote = async (req, res) => {
         })
 
         if (!foundPostVote) {
-            await UsersPosts.create({post_id, user_id, liked: vote})
+            await UsersPosts.create({ post_id, user_id, liked: vote })
         } else {
-            await UsersPosts.update({liked: vote}, {where: {post_id, user_id}});
+            await UsersPosts.update({ liked: vote }, { where: { post_id, user_id } });
         }
 
         if (vote > 0 || foundPostVote) {
             let votesCount = p.votes + vote;
-            await Posts.update({votes: votesCount}, {where: {id: post_id}});
+            await Posts.update({ votes: votesCount }, { where: { id: post_id } });
             // req.query.author_id = user_id;
         }
         this.get(req, res);
