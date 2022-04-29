@@ -29,7 +29,9 @@ module.exports = (sequelize, DataTypes) => {
         cover_img: DataTypes.STRING,
         votes: DataTypes.INTEGER,
         views: DataTypes.INTEGER,
-        privacy: DataTypes.INTEGER
+        privacy: DataTypes.INTEGER,
+        likes: DataTypes.INTEGER,
+        dislikes: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'posts',

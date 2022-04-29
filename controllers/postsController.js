@@ -8,6 +8,12 @@ const UsersPosts = db.users_posts;
 const to = require('../helpers/getPromiseResult');
 const showIfErrors = require('../helpers/showIfErrors');
 
+const LIKES_REACTION_STATUSES = {
+    like: 1,
+    dislike: -1,
+    none: 0
+};
+
 exports.add = async (req, res) => {
     if (!showIfErrors(req, res)) {
         const data = req.body;
@@ -56,33 +62,39 @@ exports.get = async (req, res) => {
         limit = +limit;
     } else {
         offset = 0,
-        limit = 10;
+            limit = 10;
     };
 
-    let posts = await Posts.findAll({
-        where: where,
-        limit,
-        offset,
-        include: [
-            {
-                model: Users, as: 'post_author', attributes: [
-                    'first_name', 'last_name', 'username', 'email', 'avatar'
-                ]
-            },
-            {
-                model: Groups, as: 'post_group', attributes: [
-                    'id', 'name', 'custom_name'
-                ]
-            },
-            {
-                model: Users, as: 'user_posts', attributes: ['id', 'username']
-            }
-        ],
-        order: [
-            ['created_at', 'desc']
-        ]
-    });
-    res.json(posts);
+    const [posts, totalCount] = await Promise.all([
+        Posts.findAll({
+            where,
+            limit,
+            offset,
+            include: [
+                {
+                    model: Users, as: 'post_author', attributes: [
+                        'first_name', 'last_name', 'username', 'email', 'avatar'
+                    ]
+                },
+                {
+                    model: Groups, as: 'post_group', attributes: [
+                        'id', 'name', 'custom_name'
+                    ]
+                },
+                {
+                    model: Users, as: 'user_posts', attributes: ['id', 'username']
+                }
+            ],
+            order: [
+                ['created_at', 'desc']
+            ]
+        }),
+        Posts.count({ where })
+    ]);
+
+
+
+    res.json({ posts, totalCount });
 };
 
 exports.getById = async (req, res) => {
@@ -151,9 +163,9 @@ exports.vote = async (req, res) => {
         })
 
         if (!foundPostVote) {
-            await UsersPosts.create({ post_id, user_id, liked: vote })
+            await UsersPosts.create({ post_id, user_id, voted: vote })
         } else {
-            await UsersPosts.update({ liked: vote }, { where: { post_id, user_id } });
+            await UsersPosts.update({ voted: vote }, { where: { post_id, user_id } });
         }
 
         if (vote > 0 || foundPostVote) {
@@ -165,12 +177,97 @@ exports.vote = async (req, res) => {
     }
 }
 
+exports.like = async (req, res) => {
+    let { value, post_id } = req.body;
+    const user = req.decoded;
+    let response = { message: 'post liked status changed successfuly' };
+    const existsPost = await Posts.findOne({ where: { id: post_id }, attributes: ['id', 'like'] });
+    if (!existsPost) res.status(400).send({ message: 'wrong post id' });
+
+    const existsUserPost = await UsersPosts.findOne({ where: { post_id, user_id: user.id } });
+
+    if (existsUserPost) {
+
+        if (existsUserPost.liked === 1) {
+
+            if (value === LIKES_REACTION_STATUSES.like) { //! remove like
+                await Promise.all([
+                    UsersPosts.update({ liked: 0 }, { where: { post_id, user_id: user.id } }),
+                    Posts.update({ likes: existsPost.likes - 1 > 0 ? existsPost.likes - 1 : 0 }, { where: { id: post_id } })
+                ]);
+
+                return res.send(response);
+            }
+
+            if (value === LIKES_REACTION_STATUSES.dislike) {
+                await Promise.all([
+                    UsersPosts.update({ liked: 0, disliked: 1 }, { where: { post_id, user_id: user.id } }),
+                    Posts.update({ likes: existsPost.likes - 1 > 0 ? existsPost.likes - 1 : 0, dislikes: existsPost.dislikes + 1 }, { where: { id: post_id } })
+                ]);
+
+                return res.send(response);
+            }
+
+        };
+
+
+        if (existsUserPost.disliked === 1) {
+
+            if (value === LIKES_REACTION_STATUSES.like) { //! remove like
+                await Promise.all([
+                    UsersPosts.update({ liked: 1, disliked: 0 }, { where: { post_id, user_id: user.id } }),
+                    Posts.update({ dislikes: existsPost.dislikes - 1 > 0 ? existsPost.dislikes - 1 : 0, likes: existsPost.likes + 1 }, { where: { id: post_id } })
+                ]);
+
+                return res.send(response);
+            }
+
+            if (value === LIKES_REACTION_STATUSES.dislike) {
+                await Promise.all([
+                    UsersPosts.update({ disliked: 0 }, { where: { post_id, user_id: user.id } }),
+                    Posts.update({ dislikes: existsPost.dislikes - 1 > 0 ? existsPost.dislikes - 1 : 0 }, { where: { id: post_id } })
+                ]);
+
+                return res.send(response);
+            }
+
+        };
+
+        //?
+    } else {
+        if (value === LIKES_REACTION_STATUSES.like) {
+
+            await Promise.all([
+                UsersPosts.create({
+                    post_id, user_id: user.id, liked: 1
+                }),
+                Posts.update({ likes: existsPost.likes + 1 }, { where: { id: post_id } })
+            ]);
+
+            return res.send(response);
+
+        } else if (value === LIKES_REACTION_STATUSES.dislike) {
+
+            await Promise.all([
+                UsersPosts.create({
+                    post_id, user_id: user.id, disliked: 1
+                }),
+                Posts.update({ disliked: existsPost.disliked + 1 }, { where: { id: post_id } })
+            ]);
+
+            return res.send(response);
+
+        }
+    }
+
+    return res.send(response);
+};
 
 exports.remove = async (req, res) => {
     const { idList } = req.body;
     const user = req.decoded;
     await Promise.all([
-        UsersPosts.destroy({
+        Posts.destroy({
             where: {
                 id: {
                     [Op.in]: idList

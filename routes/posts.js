@@ -10,5 +10,6 @@ router.put('/vote', postsController.vote);
 router.get('/get-by-id', isAuth, postsController.getById);
 router.delete('/remove', isAuth, postsController.remove);
 router.put('/edit', isAuth, postsController.edit);
+router.put('/like', isAuth, postsController.like);
 
 module.exports = router;
