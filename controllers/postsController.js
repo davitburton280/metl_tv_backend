@@ -22,6 +22,10 @@ exports.add = async (req, res) => {
             group_id = null;
             data.group_id = group_id;
         }
+        data.votes = 0;
+        data.views = 0;
+        data.likes = 0;
+        data.privacy = 0;
         let p = await Posts.create(data);
         req.query.author_id = author_id;
         req.query.group_id = group_id;
