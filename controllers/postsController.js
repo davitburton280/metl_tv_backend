@@ -22,6 +22,9 @@ exports.add = async (req, res) => {
             group_id = null;
             data.group_id = group_id;
         }
+        if (!data.title) {
+            data.title = null;
+        }
         data.votes = 0;
         data.views = 0;
         data.likes = 0;
