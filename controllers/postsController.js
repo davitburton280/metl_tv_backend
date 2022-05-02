@@ -31,12 +31,23 @@ exports.add = async (req, res) => {
         if (!data.category_id) {
             data.category_id = null;
         }
-        data.votes = 0;
         data.views = 0;
         data.likes = 0;
         data.privacy = 0;
         data.cover_img = null;
-        let p = await Posts.create(data);
+        const obj = {
+            author_id: author_id,
+            category_id: null,
+            group_id: null,
+            title: null,
+            description: '<p>hi test</p>',
+            cover_img: null,
+            votes: 0,
+            views: 0,
+            likes: 0,
+            privacy: 0
+        }
+        let p = await Posts.create(obj);
         req.query.author_id = author_id;
         req.query.group_id = group_id;
         this.get(req, res);

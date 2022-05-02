@@ -12,46 +12,44 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       category_id: {
+        default: null,
         type: Sequelize.INTEGER
       },
       group_id: {
-        defaultValue: null,
+        default: null,
         type: Sequelize.INTEGER
       },
       title: {
-        defaultValue: null,
+        default: 0,
         type: Sequelize.STRING
       },
       description: {
-        defaultValue: null,
         type: Sequelize.TEXT
       },
       cover_img: {
-        defaultValue: null,
+        default: null,
         type: Sequelize.STRING
       },
       votes: {
-        defaultValue: 0,
+        default: 0,
         type: Sequelize.INTEGER
       },
       views: {
-        defaultValue: 0,
+        default: 0,
         type: Sequelize.INTEGER
       },
       likes: {
-        defaultValue: 0,
+        default: 0,
         type: Sequelize.INTEGER
       },
       privacy: {
-        defaultValue: 0,
+        default: 0,
         type: Sequelize.INTEGER
       },
-      createdAt: {
-        allowNull: false,
+      created_at: {
         type: Sequelize.DATE
       },
-      updatedAt: {
-        allowNull: false,
+      updated_at: {
         type: Sequelize.DATE
       }
     });
