@@ -36,18 +36,20 @@ exports.add = async (req, res) => {
         data.privacy = 0;
         data.cover_img = null;
         const obj = {
-            author_id: author_id,
-            category_id: null,
-            group_id: null,
-            title: null,
-            description: '<p>hi test</p>',
-            cover_img: null,
-            votes: 0,
-            views: 0,
-            likes: 0,
-            privacy: 0
+            
         }
-        let p = await Posts.create(obj);
+        let p = await Posts.create();
+        p.author_id = author_id,
+        p.category_id = null,
+        p.group_id = null,
+        p.title = null,
+        p.description = '<p>hi test</p>',
+        p.cover_img = null,
+        p.votes = 0,
+        p.views = 0,
+        p.likes = 0,
+        p.privacy = 0
+        await p.save();
         req.query.author_id = author_id;
         req.query.group_id = group_id;
         this.get(req, res);
