@@ -28,6 +28,9 @@ exports.add = async (req, res) => {
         if (!data.description) {
             data.description = null;
         }
+        if (!data.category_id) {
+            data.category_id = null;
+        }
         data.votes = 0;
         data.views = 0;
         data.likes = 0;
