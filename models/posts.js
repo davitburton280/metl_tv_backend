@@ -1,6 +1,19 @@
 'use strict';
+const {
+  Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  const posts = sequelize.define('posts', {
+  class posts extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  };
+  posts.init({
     author_id: DataTypes.INTEGER,
     category_id: DataTypes.INTEGER,
     group_id: DataTypes.INTEGER,
@@ -9,12 +22,12 @@ module.exports = (sequelize, DataTypes) => {
     cover_img: DataTypes.STRING,
     votes: DataTypes.INTEGER,
     likes: DataTypes.INTEGER,
-    privacy: DataTypes.INTEGER,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
-  }, {});
-  posts.associate = function(models) {
-    // associations can be defined here
-  };
+    privacy: DataTypes.INTEGER
+  }, {
+    sequelize,
+    modelName: 'posts',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+  });
   return posts;
 };
