@@ -25,6 +25,9 @@ exports.add = async (req, res) => {
         if (!data.title) {
             data.title = null;
         }
+        if (!data.description) {
+            data.description = null;
+        }
         data.votes = 0;
         data.views = 0;
         data.likes = 0;

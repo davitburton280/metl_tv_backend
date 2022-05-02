@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     votes: DataTypes.INTEGER,
     views: DataTypes.INTEGER,
     likes: DataTypes.INTEGER,
-    privacy: DataTypes.INTEGER,
+    privacy: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'posts',

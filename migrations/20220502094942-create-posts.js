@@ -15,17 +15,19 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       group_id: {
-        defaultValue: NULL,
+        defaultValue: null,
         type: Sequelize.INTEGER
       },
       title: {
+        defaultValue: null,
         type: Sequelize.STRING
       },
       description: {
+        defaultValue: null,
         type: Sequelize.TEXT
       },
       cover_img: {
-        defaultValue: NULL,
+        defaultValue: null,
         type: Sequelize.STRING
       },
       votes: {
@@ -43,12 +45,6 @@ module.exports = {
       privacy: {
         defaultValue: 0,
         type: Sequelize.INTEGER
-      },
-      createdAt: {
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
