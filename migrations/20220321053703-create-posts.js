@@ -30,6 +30,10 @@ module.exports = {
                 defaultValue: 0,
                 type: Sequelize.INTEGER
             },
+            likes: {
+                defaultValue: 0,
+                type: Sequelize.INTEGER
+            },
             views: {
                 defaultValue: 0,
                 type: Sequelize.INTEGER
