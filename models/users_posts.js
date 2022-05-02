@@ -1,16 +1,16 @@
 module.exports = (sequelize, Sequelize) => {
-    const Currency = sequelize.define('posts', {
-        user_id: DataTypes.INTEGER,
-        post_id: DataTypes.INTEGER,
-        liked: DataTypes.INTEGER,
-        disliked: DataTypes.INTEGER,
-        viewed: DataTypes.INTEGER,
-        saved: DataTypes.INTEGER,
-        voted: DataTypes.INTEGER,
+    const Posts = sequelize.define('posts', {
+        user_id: Sequelize.INTEGER,
+        post_id: Sequelize.INTEGER,
+        liked: Sequelize.INTEGER,
+        disliked: Sequelize.INTEGER,
+        viewed: Sequelize.INTEGER,
+        saved: Sequelize.INTEGER,
+        voted: Sequelize.INTEGER,
 
-        createdAt: { type: Sequelize.DATE },
-        updatedAt: { type: Sequelize.DATE }
+        created_at: { type: Sequelize.DATE },
+        updated_at: { type: Sequelize.DATE }
     });
 
-    return Currency;
+    return Posts;
 };
