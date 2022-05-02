@@ -22,20 +22,6 @@ exports.add = async (req, res) => {
             group_id = null;
             data.group_id = group_id;
         }
-        if (!data.title) {
-            data.title = null;
-        }
-        if (!data.description) {
-            data.description = null;
-        }
-        if (!data.category_id) {
-            data.category_id = null;
-        }
-        data.votes = 0;
-        data.views = 0;
-        data.likes = 0;
-        data.privacy = 0;
-        data.cover_img = null;
         let p = await Posts.create(data);
         req.query.author_id = author_id;
         req.query.group_id = group_id;
