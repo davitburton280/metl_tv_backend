@@ -42,22 +42,16 @@ module.exports = {
         defaultValue: 0,
         type: Sequelize.INTEGER
       },
-      created_at: {
-        type: Sequelize.DATE
-      },
-      updated_at: {
-        type: Sequelize.DATE
-      },
-      created_at: {
+      createdAt: {
         defaultValue: Sequelize.fn('NOW'),
         allowNull: false,
         type: Sequelize.DATE
-    },
-    updated_at: {
+      },
+      updatedAt: {
         defaultValue: Sequelize.fn('NOW'),
         allowNull: false,
         type: Sequelize.DATE
-    }
+      }
     });
   },
   down: (queryInterface, Sequelize) => {
