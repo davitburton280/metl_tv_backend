@@ -27,16 +27,20 @@ module.exports = {
         type: Sequelize.STRING
       },
       votes: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        default: 0
       },
       views: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        default: 0
       },
       likes: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        default: 0
       },
       privacy: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        default: 0
       },
       createdAt: {
         type: Sequelize.DATE
