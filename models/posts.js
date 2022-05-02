@@ -9,7 +9,9 @@ module.exports = (sequelize, DataTypes) => {
     cover_img: DataTypes.STRING,
     votes: DataTypes.INTEGER,
     likes: DataTypes.INTEGER,
-    privacy: DataTypes.INTEGER
+    privacy: DataTypes.INTEGER,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {});
   posts.associate = function(models) {
     // associations can be defined here
