@@ -29,6 +29,9 @@ module.exports = {
       votes: {
         type: Sequelize.INTEGER
       },
+      views: {
+        type: Sequelize.INTEGER
+      },
       likes: {
         type: Sequelize.INTEGER
       },
