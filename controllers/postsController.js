@@ -70,21 +70,21 @@ exports.get = async (req, res) => {
             where,
             limit,
             offset,
-            include: [
-                {
-                    model: Users, as: 'post_author', attributes: [
-                        'first_name', 'last_name', 'username', 'email', 'avatar'
-                    ]
-                },
-                {
-                    model: Groups, as: 'post_group', attributes: [
-                        'id', 'name', 'custom_name'
-                    ]
-                },
-                {
-                    model: Users, as: 'user_posts', attributes: ['id', 'username']
-                }
-            ],
+            // include: [
+            //     {
+            //         model: Users, as: 'post_author', attributes: [
+            //             'first_name', 'last_name', 'username', 'email', 'avatar'
+            //         ]
+            //     },
+            //     {
+            //         model: Groups, as: 'post_group', attributes: [
+            //             'id', 'name', 'custom_name'
+            //         ]
+            //     },
+            //     {
+            //         model: Users, as: 'user_posts', attributes: ['id', 'username']
+            //     }
+            // ],
             order: [
                 ['created_at', 'desc']
             ]
