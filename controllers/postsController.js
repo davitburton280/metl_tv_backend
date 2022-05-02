@@ -26,6 +26,7 @@ exports.add = async (req, res) => {
         data.views = 0;
         data.likes = 0;
         data.privacy = 0;
+        data.cover_img = null;
         let p = await Posts.create(data);
         req.query.author_id = author_id;
         req.query.group_id = group_id;
