@@ -27,15 +27,19 @@ module.exports = {
         type: Sequelize.STRING
       },
       votes: {
+        defaultValue: 0,
         type: Sequelize.INTEGER
       },
       views: {
+        defaultValue: 0,
         type: Sequelize.INTEGER
       },
       likes: {
+        defaultValue: 0,
         type: Sequelize.INTEGER
       },
       privacy: {
+        defaultValue: 0,
         type: Sequelize.INTEGER
       },
       created_at: {
@@ -44,14 +48,16 @@ module.exports = {
       updated_at: {
         type: Sequelize.DATE
       },
-      createdAt: {
+      created_at: {
+        defaultValue: Sequelize.fn('NOW'),
         allowNull: false,
         type: Sequelize.DATE
-      },
-      updatedAt: {
+    },
+    updated_at: {
+        defaultValue: Sequelize.fn('NOW'),
         allowNull: false,
         type: Sequelize.DATE
-      }
+    }
     });
   },
   down: (queryInterface, Sequelize) => {
