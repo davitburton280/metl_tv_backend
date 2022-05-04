@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
         liked: DataTypes.INTEGER,
         disliked: DataTypes.INTEGER,
         viewed: DataTypes.INTEGER,
-        saved: DataTypes.INTEGER
+        saved: DataTypes.INTEGER,
+	voted: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'users_posts',
