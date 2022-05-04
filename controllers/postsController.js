@@ -7,11 +7,20 @@ const Users = db.users;
 const UsersPosts = db.users_posts;
 const to = require('../helpers/getPromiseResult');
 const showIfErrors = require('../helpers/showIfErrors');
+const { FILTER_SORTING_FIELDS,
+    FILTER_SORTINH_VALUES } = require('../helpers/filters');
 
 const LIKES_REACTION_STATUSES = {
     like: 1,
     dislike: -1,
     none: 0
+};
+
+const FILTER_PRIORITY_TYPES = {
+    hot: 'hot',
+    new: 'new',
+    top: 'top',
+    bestOfTheWeek: 'best_of_the_week'
 };
 
 exports.add = async (req, res) => {
@@ -41,18 +50,53 @@ exports.edit = async (req, res) => {
     this.get(req, res);
 }
 
-exports.get = async (req, res) => {
-    let { author_id, group_id, search, offset, limit } = req.query;
-    console.log('get posts!!!')
-    let where = {};
+const setSortingModel = (sorting_keyword) => {
+    let sort = [FILTER_SORTING_FIELDS.postsFiltersFields.created_at, FILTER_SORTINH_VALUES.desc];
+
+    if (sorting_keyword) {
+        let sortingKey = null;
+        switch (sorting_keyword) {
+            case FILTER_PRIORITY_TYPES.hot:
+                sortingKey = FILTER_SORTING_FIELDS.postsFiltersFields.likes;
+                break;
+
+            case FILTER_PRIORITY_TYPES.new:
+                sortingKey = FILTER_SORTING_FIELDS.postsFiltersFields.created_at;
+                break;
+
+
+            case FILTER_PRIORITY_TYPES.top:
+                sortingKey = FILTER_SORTING_FIELDS.postsFiltersFields.views;
+
+                break;
+
+
+            case FILTER_PRIORITY_TYPES.bestOfTheWeek:
+                sortingKey = FILTER_SORTING_FIELDS.postsFiltersFields.views;
+                break;
+
+            default:
+                sortingKey = null;
+                break;
+        };
+
+        if (sortingKey) sort[0] = sortingKey;
+
+    }
+
+    return sort;
+};
+
+const castToPostsFilterModel = (model) => {
+    let { author_id, group_id, search, offset, limit } = model, filter = {};
     if (author_id) {
-        where.author_id = author_id;
+        filter.author_id = author_id;
     }
     if (group_id) {
-        where.group_id = group_id;
+        filter.group_id = group_id;
     }
     if (search && search.length) {
-        where.description = {
+        filter.description = {
             [Op.like]: '%' + search + '%'
         }
     }
@@ -65,11 +109,20 @@ exports.get = async (req, res) => {
             limit = 10;
     };
 
+    return { filter, offset, limit };
+
+};
+
+exports.get = async (req, res) => {
+    let { author_id, group_id, search, offset, limit, sorting_keyword } = req.query;
+    console.log('get posts!!!')
+    const filter = castToPostsFilterModel({ author_id, group_id, search, offset, limit });
+    const sort = setSortingModel(sorting_keyword);
     const [posts, totalCount] = await Promise.all([
         Posts.findAll({
-            where,
-            limit,
-            offset,
+            where: filter.filter,
+            limit: filter.limit,
+            offset: filter.offset,
             include: [
                 {
                     model: Users, as: 'post_author', attributes: [
@@ -86,10 +139,10 @@ exports.get = async (req, res) => {
                 }
             ],
             order: [
-                ['created_at', 'desc']
+                sort
             ]
         }),
-        Posts.count({ where })
+        Posts.count({ where: filter.filter })
     ]);
 
 
