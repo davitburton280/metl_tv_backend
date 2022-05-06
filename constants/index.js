@@ -1,0 +1,1 @@
+const CLIPZ_DURATION = 30000;

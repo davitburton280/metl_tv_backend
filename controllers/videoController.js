@@ -33,6 +33,12 @@ const moment = require('moment');
 const m = require('../helpers/multer');
 const { castDurationToMiliseconds } = require('../helpers/index');
 
+const VIDEO_TYPES = {
+    clipz: 'clipz'
+}
+
+exports.VIDEO_TYPES = VIDEO_TYPES;
+
 exports.getVideos = async (req, res) => {
     let data = req.query;
     let {withPlaylists, trending, limit, tag, user_id} = data;
@@ -130,6 +136,11 @@ exports.getVideoFiltersQuery = (filters, categoryCol = '`category.name`') => {
             }
         }
     }
+
+    if (filters.video_type && filters.video_type === VIDEO_TYPES.clipz) {
+        whereFilters.duration_miliseconds = { [Op.lte]: CLIPZ_DURATION };
+    };
+
     return whereFilters;
 };
 
