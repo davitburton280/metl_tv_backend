@@ -45,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
         views: DataTypes.INTEGER,
         participants: DataTypes.INTEGER,
         duration: DataTypes.STRING(4),
+        duration_miliseconds: DataTypes.INTEGER,
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
         session_name: DataTypes.STRING,

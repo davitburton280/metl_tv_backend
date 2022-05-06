@@ -31,7 +31,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const moment = require('moment');
 const m = require('../helpers/multer');
-
+const { castDurationToMiliseconds } = require('../helpers/index');
 
 exports.getVideos = async (req, res) => {
     let data = req.query;
@@ -176,7 +176,8 @@ exports.saveVideoData = async (req, res) => {
         let privacy_id = await PrivacyTypes.findOne({where: {name: videoSettings.privacy}, attributes: ['id']});
 
         console.log(privacy_id.dataValues)
-
+        let duration_miliseconds = castDurationToMiliseconds(data.video_duration).decoded;
+        
         let d = {
             name: videoSettings.name,
             description: videoSettings.description,
@@ -187,6 +188,7 @@ exports.saveVideoData = async (req, res) => {
             avatar: data.avatar,
             filename: data.video_name,
             duration: data.video_duration,
+            duration_miliseconds,
             status: 'recorded',
         };
 
