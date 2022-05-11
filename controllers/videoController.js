@@ -11,7 +11,7 @@ const UsersVideos = db.users_videos;
 const UsersComments = db.users_comments;
 const PlaylistsVideos = db.playlists_videos;
 const UsersTags = db.users_tags;
-
+const { CLIPZ_DURATION } = require('../constants/index');
 const usersController = require('../controllers/usersController');
 
 
