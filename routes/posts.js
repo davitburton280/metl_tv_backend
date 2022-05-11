@@ -13,7 +13,7 @@ router.put('/edit', isAuth, postsController.edit);
 router.put('/like', isAuth, postsController.like);
 router.put('/comment', isAuth, postsController.comment);
 router.get('/comment', isAuth, postsController.getComments);
-router.get('/comment/replys', isAuth. postsController.getCommentReplys);
+router.get('/comment/replys', isAuth, postsController.getCommentReplys);
 router.post('/comment/reaction', isAuth, postsController.reactionPostComment);
 
 module.exports = router;
