@@ -3,8 +3,10 @@ const sequelize = require('sequelize');
 const Op = sequelize.Op;
 const Posts = db.posts;
 const Groups = db.groups;
+const Posts_Comments = db.posts_comments;
 const Users = db.users;
 const UsersPosts = db.users_posts;
+const UserComments = db.users_comments;
 const to = require('../helpers/getPromiseResult');
 const showIfErrors = require('../helpers/showIfErrors');
 const { FILTER_SORTING_FIELDS,
@@ -314,6 +316,152 @@ exports.like = async (req, res) => {
     }
 
     return res.send(response);
+};
+
+exports.comment = async (req, res) => {
+    const { post_id, is_reply, comment_id, comment } = req.body;
+    const user = req.decoded;
+
+    const post = await Posts.findOne({ where: { post_id } });
+
+    //! TODO add field to post, such us comments count
+
+    if (!post) res.status(400).send({ message: 'Wrong post id, or post is not available' }); // post checking
+
+    const replyedComment = await Posts_Comments.findOne({ where: { id: comment_id } });
+
+    const body = {
+        post_id,
+        user_id: user.id,
+        comment: comment,
+        is_reply: is_reply,
+        to_comment_id: replyedComment ? comment_id : null,
+        to_user_id: replyedComment ? replyedComment.user_id : null,
+    };
+
+    await Posts_Comments.create(body);
+    await P
+    return res.send({ message: 'Comment successfuly added' });
+};
+
+exports.getComments = async (req, res) => {
+    const { post_id, offset, limit } = req.query;
+    let filter = { post_id };
+    const sort = [FILTER_SORTING_FIELDS.postsFiltersFields.created_at, FILTER_SORTINH_VALUES.desc];
+
+    const [list, totalCount] = await Promise.all([
+        Posts_Comments.findAll({
+            where: filter,
+            limit: +limit,
+            offset: (+offset - 1) * +limit,
+            order: [
+                sort
+            ]
+        }),
+        Posts_Comments.count({ where: filter })
+    ]);
+
+    return res.send({ list, totalCount });
+};
+
+exports.getCommentReplys = async (req, res) => {
+    const { comment_id } = req.query;
+    const comment = await Posts_Comments.findOne({ where: { id: comment_id } });
+    if (!comment) return res.status(400).send({ message: 'Wrong comment id or comment is not available' });
+    const sort = [FILTER_SORTING_FIELDS.postsFiltersFields.created_at, FILTER_SORTINH_VALUES.desc];
+
+    const list = await Posts_Comments.findAll({
+        where: {
+            to_comment_id: comment_id
+        },
+        order: sort
+    });
+    return res.send({ message: 'ok', list });
+};
+
+exports.reactionPostComment = async (req, res) => {
+    const { comment_id, reaction } = req.body;
+    const user = req.decoded;
+
+    const postComment = await Posts_Comments.findOne({ where: { id: comment_id } });
+    const userComment = await UserComments.findOne({ where: {
+        comment_id: postComment.id,
+        user_id: user.id
+    } });
+
+    if (!userComment) {
+        await UserComments.create({
+            user_id: user.id,
+            comment_id: postComment.id,
+            liked: reaction === LIKES_REACTION_STATUSES.like ? 1 : 0,
+            disliked: reaction === LIKES_REACTION_STATUSES.dislike ? 1 : 0
+        });
+    } else {
+
+        if (userComment.liked === 1) {
+
+            if (reaction === LIKES_REACTION_STATUSES.none) {
+
+                await Promise.all([
+                    UserComments.update({
+                        liked: 0,
+                    }, { where: { user_id: user.id, comment_id: postComment.id } }),
+                    Posts_Comments.update({ likes: postComment.likes - 1 > 0 ? postComment.likes - 1 : 0 }, { where: { id: postComment.id } })
+                ])
+
+            } else if (reaction === LIKES_REACTION_STATUSES.dislike) {
+                await Promise.all([
+                    UserComments.update({
+                        liked: 0,
+                        disliked: 1
+                    }, { where: { user_id: user.id, comment_id: postComment.id } }),
+                    Posts_Comments.update({ likes: postComment.likes - 1 > 0 ? postComment.likes - 1 : 0, dislikes: postComment.dislikes + 1 }, { where: { id: postComment.id } })
+                ])
+            }
+
+        } else if (userComment.disliked === 1) {
+
+            if (reaction === LIKES_REACTION_STATUSES.like) {
+                await Promise.all([
+                    UserComments.update({
+                        disliked: 0,
+                        liked: 1
+                    }, { where: { user_id: user.id, comment_id: postComment.id } }),
+                    Posts_Comments.update({ dislikes: postComment.dislikes - 1 > 0 ? postComment.dislikes - 1 : 0, likes: postComment.likes + 1 }, { where: { id: postComment.id } })
+                ])
+            } else if (reaction === LIKES_REACTION_STATUSES.none) {
+                await Promise.all([
+                    UserComments.update({
+                        disliked: 0
+                    }, { where: { user_id: user.id, comment_id: postComment.id } }),
+                    Posts_Comments.update({ dislikes: postComment.dislikes - 1 > 0 ? postComment.dislikes - 1 : 0 }, { where: { id: postComment.id } })
+                ])
+            }
+
+        } else if (userComment.disliked === 0 && userComment.liked === 0) {
+
+            if (reaction === LIKES_REACTION_STATUSES.like) {
+                await Promise.all([
+                    UserComments.update({
+                        liked: 1
+                    }, { where: { user_id: user.id, comment_id: postComment.id } }),
+                    Posts_Comments.update({ likes: postComment.likes + 1 }, { where: { id: postComment.id } })
+                ])
+            } else if (reaction === LIKES_REACTION_STATUSES.dislike) {
+                await Promise.all([
+                    UserComments.update({
+                        disliked: 1
+                    }, { where: { user_id: user.id, comment_id: postComment.id } }),
+                    Posts_Comments.update({ dislikes: postComment.dislikes + 1 }, { where: { id: postComment.id } })
+                ])
+            }
+
+        }
+
+    }
+
+    return res.send({ message: 'Reaction saved' });
+
 };
 
 exports.remove = async (req, res) => {
