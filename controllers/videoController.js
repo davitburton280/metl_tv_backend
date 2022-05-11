@@ -34,7 +34,8 @@ const m = require('../helpers/multer');
 const { castDurationToMiliseconds } = require('../helpers/index');
 
 const VIDEO_TYPES = {
-    clipz: 'clipz'
+    clipz: 'clipz',
+    videos: 'videos'
 }
 
 exports.VIDEO_TYPES = VIDEO_TYPES;
@@ -140,6 +141,10 @@ exports.getVideoFiltersQuery = (filters, categoryCol = '`category.name`') => {
     if (filters.video_type && filters.video_type === VIDEO_TYPES.clipz) {
         whereFilters.duration_miliseconds = { [Op.lte]: CLIPZ_DURATION };
     };
+
+    if (filters.video_type && filters.video_type === VIDEO_TYPES.videos) {
+        whereFilters.duration_miliseconds = { [Op.gte]: CLIPZ_DURATION };
+    }
 
     return whereFilters;
 };
