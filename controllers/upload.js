@@ -80,6 +80,6 @@ exports.upload = async (req, res) => {
     };
 
     await Files.create(model);
-    return res.send({ message: `${type} successfuly uploaded`, path: model.path + '/' + model.name });
+    return res.send({ message: `${type} successfuly uploaded`, path: model.name });
 
 };
