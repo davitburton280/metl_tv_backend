@@ -10,17 +10,31 @@ let storage = multer.diskStorage({
         let dir;
         if (file.fieldname === 'video_thumbnail_file') {
             dir = path.join(__dirname, '../public/uploads/thumbnails');
+            file.directory = '/public/uploads/thumbnails';
         } else if (file.fieldname === 'avatar_file') {
             dir = path.join(__dirname, '../public/uploads/avatars');
+            file.directory = '/public/uploads/avatars';
         } else if (file.fieldname === 'cover_file') {
             dir = path.join(__dirname, '../public/uploads/covers');
+            file.directory = '/public/uploads/covers';
         } else if (file.fieldname === 'user_avatar_file') {
             dir = path.join(__dirname, '../public/uploads/user_avatars');
+            file.directory = '/public/uploads/user_avatars';
         } else if (file.fieldname === 'group_avatar_file') {
             dir = path.join(__dirname, '../public/uploads/group_avatars');
+            file.directory = '/public/uploads/group_avatars';
+        } else if (file.fieldname === 'file') {
+            dir = path.join(__dirname, '../public/uploads/files');
+            file.directory = '/public/uploads/files';
+        } else if (file.fieldname === 'image') {
+            dir = path.join(__dirname, '../public/uploads/images');
+            file.directory = '/public/uploads/images';
+        } else if (file.fieldname === 'video') {
+            dir = path.join(__dirname, '../public/uploads/videos');
+            file.directory = '/public/uploads/videos';
         } else {
             dir = path.join(__dirname, '../public/uploads/videos');
-
+            file.directory = '/public/uploads/videos';
         }
 
         console.log(dir)
@@ -28,23 +42,24 @@ let storage = multer.diskStorage({
         const folder = data.folder;
         const edit = !!data.id;
 
-
         await fse.ensureDir(dir);
 
         cb(null, dir)
     },
     filename: (req, file, cb) => {
         let dir = path.join(__dirname, '../public/uploads/videos');
-        // console.log(req)
-        // console.log(file)
-        cb(null, file.originalname) // already have got Date implemented in the name
+        const extention = file.originalname.slice(file.originalname.lastIndexOf('.') + 1, file.originalname.length);
+        const date = new Date();
+        file.extention = extention;
+        const name = file.fieldname + '_' + date.getTime() + '.' +extention;
+        cb(null, name) // already have got Date implemented in the name
     }
 });
 
 
 let upload = multer({
     storage: storage,
-    limits: {fileSize: UPLOAD_MAX_FILE_SIZE},
+    limits: { fileSize: UPLOAD_MAX_FILE_SIZE },
     fileFilter: function (req, file, cb) {
         console.log('file filter!!!!')
         // let filetypes = /jpeg|jpg/;
@@ -63,3 +78,6 @@ global.uploadAvatar = upload.single('avatar_file');
 global.uploadGroupAvatar = upload.single('group_avatar_file');
 global.uploadUserAvatar = upload.single('user_avatar_file');
 global.uploadCover = upload.single('cover_file');
+global.uploadFile = upload.single('file');
+global.uploadImageFile = upload.single('image');
+global.uploadVideoFile = upload.single('video');
