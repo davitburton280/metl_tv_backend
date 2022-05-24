@@ -83,3 +83,36 @@ exports.upload = async (req, res) => {
     return res.send({ message: `${type} successfuly uploaded`, path: model.name });
 
 };
+
+exports.delete = async (req, res) => {
+    const { belonging, file } = req.body;
+    const type = req.params.type;
+    let pathToFIle;
+
+    switch (type) {
+        case UPLOAD_MODULE_TYPES.video:
+            pathToFIle = path.join(__dirname, `../public/uploads/videos/${file}`);
+            break;
+        case UPLOAD_MODULE_TYPES.image:
+            pathToFIle = path.join(__dirname, `../public/uploads/images/${file}`);
+            break;
+        case UPLOAD_MODULE_TYPES.file:
+            pathToFIle = path.join(__dirname, `../public/uploads/files/${file}`);
+            break;
+        default: pathToFIle = null;
+            break;
+    }
+
+    if (pathToFIle && file) {
+        fs.unlinkSync(pathToFIle);
+    } else return res.status(400).send({ message: 'wrong file name' });
+
+    await Files.destroy({
+        where: {
+            name: file
+        }
+    });
+
+    return res.send({ message: `${type} successfuly deleted` });
+
+};

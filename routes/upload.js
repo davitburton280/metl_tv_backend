@@ -20,5 +20,6 @@ async function uploadNestedMiddleware(req, res, next) {
 } 
 
 router.post('/upload/:type', isAuth, uploadNestedMiddleware, UploadController.upload);
+router.delete('/file/:type', UploadController.delete);
 
 module.exports = router;
