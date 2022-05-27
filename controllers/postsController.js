@@ -44,11 +44,11 @@ exports.edit = async (req, res) => {
     const { id } = req.query;
     const user = req.decoded;
 
-    const currentPost = await Posts.findOne({ where: { id: +id, author_id: user.id } });
+    const currentPost = await Posts.findOne({ where: { id, author_id: user.id } });
     if (!currentPost) return res.status(400).send("wrong post id, or current post author is not a this user");
     const { group_id, description, cover_img } = req.body;
 
-    await Posts.update({ group_id, description, cover_img }, { where: id, author_id: user.id });
+    await Posts.update({ group_id, description, cover_img }, { where: { id, author_id: user.id } });
     this.get(req, res);
 }
 
@@ -384,10 +384,12 @@ exports.reactionPostComment = async (req, res) => {
     const user = req.decoded;
 
     const postComment = await Posts_Comments.findOne({ where: { id: comment_id } });
-    const userComment = await UserComments.findOne({ where: {
-        comment_id: postComment.id,
-        user_id: user.id
-    } });
+    const userComment = await UserComments.findOne({
+        where: {
+            comment_id: postComment.id,
+            user_id: user.id
+        }
+    });
 
     if (!userComment) {
         await UserComments.create({
