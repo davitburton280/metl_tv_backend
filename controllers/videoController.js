@@ -486,6 +486,7 @@ exports.saveVideo = async (req, res) => {
 exports.removeVideo = async (req, res) => {
     let data = req.query;
     let {id, token, filename} = data;
+    if (!filename && !filename.length) filename = 'file_file';
     console.log('remove video!!!')
     console.log(req.query)
 
