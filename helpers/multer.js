@@ -1,7 +1,10 @@
 const fse = require('fs-extra');
 const multer = require('multer');
 const path = require('path');
-const UPLOAD_MAX_FILE_SIZE = 3 * 1024 * 1024;
+
+const fileLimit = 3 * 1024 * 1024;
+
+let isVideoHasLimit = true;
 
 let storage = multer.diskStorage({
     destination: async function (req, file, cb) {
@@ -32,9 +35,11 @@ let storage = multer.diskStorage({
         } else if (file.fieldname === 'video') {
             dir = path.join(__dirname, '../public/uploads/videos');
             file.directory = '/public/uploads/videos';
+            isVideoHasLimit = true;
         } else {
             dir = path.join(__dirname, '../public/uploads/videos');
             file.directory = '/public/uploads/videos';
+            isVideoHasLimit = true;
         }
 
         console.log(dir)
@@ -51,27 +56,36 @@ let storage = multer.diskStorage({
         const extention = file.originalname.slice(file.originalname.lastIndexOf('.') + 1, file.originalname.length);
         const date = new Date();
         file.extention = extention;
-        const name = file.fieldname + '_' + date.getTime() + '.' +extention;
+        const name = file.fieldname + '_' + date.getTime() + '.' + extention;
         cb(null, name) // already have got Date implemented in the name
     }
 });
 
-
-let upload = multer({
-    storage: storage,
-    limits: { fileSize: UPLOAD_MAX_FILE_SIZE },
-    fileFilter: function (req, file, cb) {
-        console.log('file filter!!!!')
-        // let filetypes = /jpeg|jpg/;
-        // let mimetype = filetypes.test(file.mimetype);
-        // let extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        // if (!mimetype && !extname) {
-        //     req.fileTypeError = {message: "The file has an invalid type"};
-        //     return cb(null, false, req.fileTypeError)
-        // }
-        cb(null, true);
+const multerConfig = () => {
+    let config = {
+        storage: storage,
+        limits: { fileSize: fileLimit },
+        fileFilter: function (req, file, cb) {
+            console.log('file filter!!!!')
+            // let filetypes = /jpeg|jpg/;
+            // let mimetype = filetypes.test(file.mimetype);
+            // let extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+            // if (!mimetype && !extname) {
+            //     req.fileTypeError = {message: "The file has an invalid type"};
+            //     return cb(null, false, req.fileTypeError)
+            // }
+            cb(null, true);
+        }
     }
-});
+
+    if (!isVideoHasLimit) {
+        delete config.limits;
+    }
+
+    return config;
+}
+
+let upload = multer(multerConfig());
 global.uploadVideoStreamFile = upload.single('video_stream_file');
 global.uploadVideoThumbFile = upload.single('video_thumbnail_file');
 global.uploadAvatar = upload.single('avatar_file');
