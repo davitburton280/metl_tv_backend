@@ -30,6 +30,11 @@ let MessagesSchema = new mongoose.Schema({
     seen_at:{
         type: String
     },
+    files: {
+        type: Array,
+        default: [],
+        required: false
+    }
     // created: {
     //     type: Date,
     //     default: moment().format()

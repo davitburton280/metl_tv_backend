@@ -5,7 +5,8 @@ const CLIPZ_DURATION = 30000;
 const UPLOAD_MODULE_TYPES = {
     video: 'video',
     image: 'image',
-    file: 'file'
+    file: 'file',
+    messageFile: 'message_files'
 };
 
 const ALLOWED_VIDEO_EXTS = ["mp4", "webm", "ogg", "mkv"];

@@ -13,6 +13,8 @@ async function uploadNestedMiddleware(req, res, next) {
         uploadFile(req, res, next);
     } else if (type === UPLOAD_MODULE_TYPES.video) {
         uploadVideoFile(req, res, next);
+    } else if (type === UPLOAD_MODULE_TYPES.messageFile) {
+        uploadMessageFiles(req, res, next);
     } else {
         res.status(404).send({ message: 'API no found' })
     };

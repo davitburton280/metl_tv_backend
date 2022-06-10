@@ -24,6 +24,11 @@ let MessagesSchema = new mongoose.Schema({
     message: {
         type: String
     },
+    files: {
+        type: Array,
+        default: [],
+        required: false
+    },
     // to_user: {
     //     type: String,
     //     required: true

@@ -63,25 +63,52 @@ exports.upload = async (req, res) => {
     const type = req.params.type;
     const user = req.decoded;
     const file = req.file;
+    const files = req.files;
     const { duration, belonging } = req.body;
 
-    const model = {
-        user_id: user.id,
-        type: type,
-        name: file.filename,
-        mimetype: file.mimetype,
-        originalName: file.originalname,
-        extension: file.extention,
-        path: file.directory,
-        size: file.size,
-        duration,
-        duration_miliseconds: castDurationToMiliseconds(duration).decoded,
-        belonging
-    };
+    if (type !== UPLOAD_MODULE_TYPES.messageFile) {
+        const model = {
+            user_id: user.id,
+            type: type,
+            name: file.filename,
+            mimetype: file.mimetype,
+            originalName: file.originalname,
+            extension: file.extention,
+            path: file.directory,
+            size: file.size,
+            duration,
+            duration_miliseconds: castDurationToMiliseconds(duration).decoded,
+            belonging
+        };
 
-    await Files.create(model);
-    return res.send({ message: `${type} successfuly uploaded`, path: model.name });
+        await Files.create(model);
+        return res.send({ message: `${type} successfuly uploaded`, path: model.name });
+    } else {
+        const list = [];
+        await Promise.all(files.map(async item => {
+            const model = {
+                user_id: user.id,
+                type: type,
+                name: item.filename,
+                mimetype: item.mimetype,
+                originalName: item.originalname,
+                extension: item.extention,
+                path: item.directory,
+                size: item.size,
+                duration,
+                duration_miliseconds: castDurationToMiliseconds(duration).decoded,
+                belonging
+            };
 
+            await Files.create(model);
+
+            list.push({
+                name: item.originalname,
+                path: model.name
+            });
+        }));
+        return res.send({ message: `${type} successfuly uploaded`, path: list });
+    }
 };
 
 exports.delete = async (req, res) => {

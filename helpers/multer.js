@@ -4,7 +4,7 @@ const path = require('path');
 
 const fileLimit = 3 * 1024 * 1024;
 
-let isVideoHasLimit = true;
+let isVideoHasLimit = false;
 
 let storage = multer.diskStorage({
     destination: async function (req, file, cb) {
@@ -36,6 +36,9 @@ let storage = multer.diskStorage({
             dir = path.join(__dirname, '../public/uploads/videos');
             file.directory = '/public/uploads/videos';
             isVideoHasLimit = true;
+        } else if (file.fieldname === 'message_files') {
+            dir = path.join(__dirname, '../public/uploads/message_files');
+            file.directory = '/public/uploads/message_files';
         } else {
             dir = path.join(__dirname, '../public/uploads/videos');
             file.directory = '/public/uploads/videos';
@@ -95,3 +98,4 @@ global.uploadCover = upload.single('cover_file');
 global.uploadFile = upload.single('file');
 global.uploadImageFile = upload.single('image');
 global.uploadVideoFile = upload.single('video');
+global.uploadMessageFiles = upload.any('message_files');
