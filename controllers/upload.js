@@ -104,7 +104,8 @@ exports.upload = async (req, res) => {
 
             list.push({
                 name: item.originalname,
-                path: model.name
+                path: model.name,
+                type: item.extention
             });
         }));
         return res.send({ message: `${type} successfuly uploaded`, path: list });
