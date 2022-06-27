@@ -83,7 +83,7 @@ exports.getAccountTransfers = async (req, res) => {
 
 exports.createPaymentIntent = async (req, res) => {
     let data = req.body;
-    let {customer_id, currency, purchase} = data;
+    let {customer_id, currency, purchase, isPlan} = data;
     let coinWorth = 0.0199;
     let unitAmount = purchase.unit_amount / 100;
     let purchasedCoins = unitAmount / coinWorth;
@@ -97,18 +97,20 @@ exports.createPaymentIntent = async (req, res) => {
         transfer_group: 'purchases'
     }), res)
 
-    let foundRecord = await UsersCoins.findOne({where: {user_id: data.user_id}});
-    if (foundRecord) {
-
-        await to(UsersCoins.increment('purchased', {by: purchasedCoins, where: {user_id: data.user_id}}));
-        await to(UsersCoins.increment('purchased_worth', {by: purchasedWorth, where: {user_id: data.user_id}}));
-    } else {
-        let us = await UsersCoins.create({
-            user_id: data.user_id,
-            stripe_account_id: data.stripe_account_id,
-            purchased: purchasedCoins,
-            purchased_worth: purchasedWorth
-        })
+    if (!isPlan) {
+        let foundRecord = await UsersCoins.findOne({where: {user_id: data.user_id}});
+        if (foundRecord) {
+    
+            await to(UsersCoins.increment('purchased', {by: purchasedCoins, where: {user_id: data.user_id}}));
+            await to(UsersCoins.increment('purchased_worth', {by: purchasedWorth, where: {user_id: data.user_id}}));
+        } else {
+            let us = await UsersCoins.create({
+                user_id: data.user_id,
+                stripe_account_id: data.stripe_account_id,
+                purchased: purchasedCoins,
+                purchased_worth: purchasedWorth
+            })
+        }
     }
 
 

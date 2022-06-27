@@ -105,7 +105,7 @@ exports.upload = async (req, res) => {
             list.push({
                 name: item.originalname,
                 path: model.name,
-                type: item.extention
+                type: item.mimetype
             });
         }));
         return res.send({ message: `${type} successfuly uploaded`, path: list });
@@ -126,6 +126,9 @@ exports.delete = async (req, res) => {
             break;
         case UPLOAD_MODULE_TYPES.file:
             pathToFIle = path.join(__dirname, `../public/uploads/files/${file}`);
+            break;
+        case UPLOAD_MODULE_TYPES.messageFile:
+            pathToFIle = path.join(__dirname, `../public/uploads/message_files/${file}`);
             break;
         default: pathToFIle = null;
             break;
