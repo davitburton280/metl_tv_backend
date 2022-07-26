@@ -3,7 +3,7 @@ const UsersCards = db.users_cards;
 const Users = db.users
 const UsersCoins = db.users_coins;
 const Channel = db.channels;
-const SubscriptionPlans = db.subscription_plans
+const SubscriotionPlans = db.subscriotion_plans
 
 const stripe = require('stripe')(process.env.STRIPE_TEST_PRIVATE_KEY);
 
@@ -85,7 +85,7 @@ exports.getAccountTransfers = async (req, res) => {
 exports.createSubscriptionPlanPaymentIntent = async (req, res) => {
     const { planId, currency, customer, } = req.body
     const user = req.decoded
-    const plan = await to(SubscriptionPlans.findOne({ where: { id: planId } }), res)
+    const plan = await to(SubscriotionPlans.findOne({ where: { id: planId } }), res)
     if (!plan) return res.status(400).send({ message: 'Wrong plan id', data: null })
     //! payment with cent
     const purchaseName = 'Metl.tv subscription plan patment'
