@@ -7,6 +7,7 @@ const isAuth = require('../helpers/isAuth');
 router.get('/session/get-token', usersController.getSession);
 router.get('/session/leave', usersController.leaveSession);
 router.get('/get-user-info', isAuth, usersController.getUserInfo);
+router.get('/detail', isAuth, usersController.getUserDetail);
 router.get('/get-contacts', isAuth, usersController.getContacts);
 router.get('/check-connection', isAuth, usersController.checkIfUsersConnected);
 router.put('/save-profile-changes', isAuth, uploadUserAvatar, usersController.saveProfileChanges);

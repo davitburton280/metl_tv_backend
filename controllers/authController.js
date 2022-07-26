@@ -28,15 +28,15 @@ exports.login = async (req, res) => {
         // Selecting an employee that has an email matching request one
         let user = await Users.findOne({
             // attributes: attributes,
-            include: [
-                // {model: Roles, as: 'page_group_roles'},
-                // {model: Roles, as: 'chat_group_roles', through: {attributes: []}},
-                {model: Channels, as: 'channel'},
-                {model: StocksOrderType, as: 'stocks_order_type'},
-                {model: UsersCards}
-            ],
+            // include: [
+            //     // {model: Roles, as: 'page_group_roles'},
+            //     // {model: Roles, as: 'chat_group_roles', through: {attributes: []}},
+            //     // {model: Channels, as: 'channel'},
+            //     // {model: StocksOrderType, as: 'stocks_order_type'},
+            //     // {model: UsersCards}
+            // ],
             where: {email},
-            order: [[{model: UsersCards}, sequelize.col('is_primary'), 'DESC']]
+            // order: [[{model: UsersCards}, sequelize.col('is_primary'), 'DESC']]
         }, res);
 
 

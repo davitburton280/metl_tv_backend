@@ -9,7 +9,9 @@ const checkVerificationCode = require('../validators/checkVerificationCode');
 const validateForgotPass = require('../validators/validateForgotPass');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
-
+const isAuth = require('../helpers/isAuth');
+const { roleMiddleware, roleMiddleware1 } = require('../middleware/role')
+const { USER_SUBSCRIPTION_PLANS } = require('../constants')
 // Regular auth routes and social auth logout route
 router.post('/register', validateRegister.rules, authController.register);
 router.post('/send-verification-code', validateRegister.rules, authController.sendVerificationCode);
@@ -20,6 +22,7 @@ router.post('/send-forgot-pass-email', authController.sendForgotPassEmail);
 router.post('/reset-password', validateResetPass.rules, authController.resetPassword);
 router.post('/login', validateLogin.rules, authController.login);
 router.get('/logout', authController.logout);
+router.get('/testing', isAuth, roleMiddleware([USER_SUBSCRIPTION_PLANS.gold]), (req, res) => res.send({message: 'test successful'})) //! setup middlware to all apis
 
 // Passport.js Facebook auth routes
 router.get('/facebook', passport.authenticate('facebook', {session: false}));
@@ -56,4 +59,3 @@ router.get('/google/callback', passport.authenticate('google', {
 
 
 module.exports = router;
-

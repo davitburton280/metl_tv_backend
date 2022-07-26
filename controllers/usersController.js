@@ -233,6 +233,21 @@ exports.changeJwt = async (data, res, ret = false) => {
     }
 };
 
+exports.getUserDetail = async (req, res) => {
+    const user = req.decoded
+    let data = await Users.findOne({
+        include: [
+            {model: Channels, as: 'channel'},
+            {model: StocksOrderType, as: 'stocks_order_type'},
+            {model: UsersCards}
+        ],
+        where: {id: user.id},
+        order: [[{model: UsersCards}, sequelize.col('is_primary'), 'DESC']]
+    });
+
+    return res.send({ message: 'user info', data })
+}
+
 exports.getUserInfo = async (req, res) => {
     console.log('get user info!!!!')
     let {username, own_channel} = req.query;

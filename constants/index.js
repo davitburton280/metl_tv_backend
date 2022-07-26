@@ -17,10 +17,17 @@ const FILE_PATHS = {
     VIDEO_PATH: path.join(__dirname, '../public/uploads/videos')
 }
 
+const USER_SUBSCRIPTION_PLANS = {
+    bronze: 'bronze',
+    silver: 'silver',
+    gold: 'gold'
+}
+
 module.exports = {
     CLIPZ_DURATION,
     UPLOAD_MODULE_TYPES,
     ALLOWED_VIDEO_EXTS,
     ALLOWED_MIME_TYPES,
-    FILE_PATHS
+    FILE_PATHS,
+    USER_SUBSCRIPTION_PLANS
 };

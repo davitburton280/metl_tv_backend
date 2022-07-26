@@ -9,6 +9,7 @@ router.post('/create-transfer', isAuth, paymentsController.createTransfer);
 router.post('/create-topup', isAuth, paymentsController.createTopup);
 router.get('/get-account-transfers', isAuth, paymentsController.getAccountTransfers);
 router.post('/create-payment-intent', paymentsController.createPaymentIntent);
+router.post('/create-subscription-payment-intent', paymentsController.createSubscriptionPlanPaymentIntent);
 router.get('/get-all-payments-history', paymentsController.getAllPaymentsHistory);
 router.get('/get-purchases-history', paymentsController.getPurchasesHistory);
 router.get('/get-payouts-history', paymentsController.getAccountPayouts);

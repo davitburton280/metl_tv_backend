@@ -16,7 +16,7 @@ module.exports = {
         "username": process.env.STAGING_DB_USER,
         "password": process.env.STAGING_DB_PASS,
         "database": process.env.STAGING_DB,
-        "host": process.env.STAGING_IP,
+        "host": "127.0.0.1",
         "dialect": "mysql",
         "operatorsAliases": 0,
         "logging": false
@@ -25,7 +25,7 @@ module.exports = {
         "username": process.env.PRODUCTION_DB_USER,
         "password": process.env.PRODUCTION_DB_PASS,
         "database": process.env.PRODUCTION_DB,
-        "host": process.env.PRODUCTION_IP,
+        "host": "127.0.0.1",
         "dialect": "mysql",
         "operatorsAliases": 0,
         "logging": false
