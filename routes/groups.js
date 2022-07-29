@@ -8,6 +8,7 @@ router.get('/get-regular-groups', isAuth, groupsController.get);
 
 router.get('/get-group-by-name', groupsController.getGroupByCustomName);
 router.post('/create-group', validateGroupName.rules, groupsController.createGroup);
+router.put('/update-group/:id', groupsController.updateGroup)
 router.delete('/remove-group', groupsController.removeGroup);
 
 router.get('/get-group-members', groupsController.getGroupMembers);

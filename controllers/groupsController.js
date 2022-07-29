@@ -91,6 +91,29 @@ exports.getGroupById = async (req, res) => {
     res.json(groupMembers);
 }
 
+exports.updateGroup = async (req, res) => {
+    const id = req.params.id
+    const { name, description, avatar, cover } = req.body
+
+    const group = await Groups.findOne({
+        where: { id }
+    })
+
+    if (!group) return res.send({ message: 'wrong group' })
+
+    let updateBody = {
+        name, description, avatar, cover, updated_at: new Date()
+    }
+
+    if (!name) delete updateBody.name
+    if (!description) delete updateBody.description
+    if (!avatar) delete updateBody.avatar
+    if (!cover) delete updateBody.cover
+
+    await Groups.update(updateBody, { where: { id } })
+    return res.send({ message: 'Group, updated' })
+}
+
 exports.createGroup = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
