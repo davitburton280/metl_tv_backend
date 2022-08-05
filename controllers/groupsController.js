@@ -59,7 +59,7 @@ exports.getGroupByCustomName = async (req, res) => {
 
     let groupMembers = await Groups.findOne({
         where: {custom_name},
-        attributes: ['id', 'name', 'custom_name', 'avatar', 'creator_id', 'privacy'],
+        attributes: ['id', 'name', 'custom_name', 'avatar', 'cover', 'description', 'creator_id', 'privacy'],
         include: [
             {
                 model: Users,
