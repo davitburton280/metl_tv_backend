@@ -117,6 +117,7 @@ exports.updateGroup = async (req, res) => {
 exports.createGroup = async (req, res) => {
     if (!showIfErrors(req, res)) {
         let data = req.body;
+        console.log(data, 'data');
         let group = await Groups.create(data);
         console.log(data)
         await to(GroupsMembers.create({
