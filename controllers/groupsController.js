@@ -16,7 +16,7 @@ const nl2br = require('../helpers/nl2br');
 
 exports.getList = async (req, res) => {
     const { search, onlyMy, isPrivate } = req.body
-    const user = req.user_id
+    const user = req.decoded.id
     let where = {}
 
     if (search) {
