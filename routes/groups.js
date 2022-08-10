@@ -5,8 +5,9 @@ const isAuth = require('../helpers/isAuth');
 const validateGroupName = require('../validators/validateGroupName');
 
 router.get('/get-regular-groups', isAuth, groupsController.get);
-
+router.post('/getList', isAuth, groupsController.getList)
 router.get('/get-group-by-name', groupsController.getGroupByCustomName);
+router.get('/:id', groupsController.getById)
 router.post('/create-group', validateGroupName.rules, groupsController.createGroup);
 router.put('/update-group/:id', groupsController.updateGroup)
 router.delete('/remove-group', groupsController.removeGroup);

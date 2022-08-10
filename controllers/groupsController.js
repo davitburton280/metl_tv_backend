@@ -14,6 +14,38 @@ const showIfErrors = require('../helpers/showIfErrors');
 const to = require('../helpers/getPromiseResult');
 const nl2br = require('../helpers/nl2br');
 
+exports.getList = async (req, res) => {
+    const { search, onlyMy, isPrivate } = req.body
+    const user = req.user_id
+    let where = {}
+
+    if (search) {
+        where.name = { [Op.like]: `%${search}%` }
+    }
+
+    if (onlyMy) {
+        where.creator_id = user
+    }
+
+    if (isPrivate === 0 || isPrivate === 1) {
+        where.privacy = isPrivate
+    }
+
+    const list = await Groups.findAll({
+        where,
+        attributes: ['id', 'name', 'avatar', 'creator_id', 'privacy'],
+        include: [
+            {
+                model: Users,
+                as: 'group_members',
+                attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
+            }
+        ]
+    })
+
+    return res.send({ message: 'ok', data: list })
+}
+
 exports.get = async (req, res) => {
     console.log('get only page groups!!!')
     let user_id;
@@ -71,6 +103,25 @@ exports.getGroupByCustomName = async (req, res) => {
     });
 
     res.json(groupMembers);
+}
+
+
+exports.getById = async (req, res) => {
+    const {id} = req.params
+
+    const groupMembers = await Groups.findOne({
+        where: { id },
+        attributes: ['id', 'name', 'custom_name', 'avatar', 'cover', 'creator_id', 'privacy'],
+        include: [
+            {
+                model: Users,
+                as: 'group_members',
+                attributes: ['id', 'avatar', 'username', 'first_name', 'last_name'],
+            },
+        ]
+    });
+
+   res.send(groupMembers)
 }
 
 exports.getGroupById = async (req, res) => {
