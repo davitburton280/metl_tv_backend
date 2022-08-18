@@ -57,13 +57,13 @@ exports.get = async (req, res) => {
     }
 
     let groupsResult = await GroupsMembers.findAll({
-        where: {member_id: user_id, confirmed: 1}, attributes: ['group_id']
+        where: { member_id: user_id, confirmed: 1 }, attributes: ['group_id']
     });
 
     let groupIds = JSON.parse(JSON.stringify(groupsResult)).map(t => t.group_id);
 
     let where = [
-        {id: {[Op.in]: groupIds}},
+        { id: { [Op.in]: groupIds } },
         // sequelize.where(sequelize.col('group_members->page_group_roles.group_id'), user_id),
     ];
 
@@ -87,10 +87,10 @@ exports.get = async (req, res) => {
 }
 
 exports.getGroupByCustomName = async (req, res) => {
-    let {custom_name} = req.query;
+    let { custom_name } = req.query;
 
     let groupMembers = await Groups.findOne({
-        where: {custom_name},
+        where: { custom_name },
         attributes: ['id', 'name', 'custom_name', 'avatar', 'cover', 'description', 'creator_id', 'privacy'],
         include: [
             {
@@ -107,7 +107,7 @@ exports.getGroupByCustomName = async (req, res) => {
 
 
 exports.getById = async (req, res) => {
-    const {id} = req.params
+    const { id } = req.params
 
     const groupMembers = await Groups.findOne({
         where: { id },
@@ -121,14 +121,52 @@ exports.getById = async (req, res) => {
         ]
     });
 
-   res.send(groupMembers)
+    res.send(groupMembers)
+}
+
+const GROUP_REMOVING_TYPES = {
+    irrevocably: 1,
+    switchAdmin: 2,
+    removeMembers: 3
+}
+
+exports.deleteGroup = async (req, res) => {
+    const { id, type } = req.params
+
+    switch (type) {
+        case GROUP_REMOVING_TYPES.irrevocably:
+            await this.removePrimary(id)
+            break;
+        case GROUP_REMOVING_TYPES.switchAdmin:
+            await this.switchAdminInGroup(id)
+            break;
+        case GROUP_REMOVING_TYPES.removeMembers:
+            await this.switchAdminInGroup(id)
+            break;
+        default:
+            break;
+    }
+
+    res.send({ message: 'ok' })
+}
+
+exports.removePrimary = async (id) => {
+    await Groups.destroy({ where: { id } })
+}
+
+exports.switchAdminInGroup = async (id) => {
+    return null
+}
+
+exports.removeMembers = async (group_id) => {
+    await GroupsMembers.destroy({ where: { group_id } })
 }
 
 exports.getGroupById = async (req, res) => {
-    let {group_id} = req.query;
+    let { group_id } = req.query;
 
     let groupMembers = await Groups.findOne({
-        where: {id: group_id},
+        where: { id: group_id },
         attributes: ['id', 'name', 'custom_name', 'avatar', 'creator_id', 'privacy'],
         include: [
             {
@@ -193,11 +231,11 @@ exports.createGroup = async (req, res) => {
 };
 
 exports.removeGroup = async (req, res) => {
-    const {group_id} = req.query;
-    let group = await Groups.findOne({where: {id: group_id}, attributes: ['creator_id']});
+    const { group_id } = req.query;
+    let group = await Groups.findOne({ where: { id: group_id }, attributes: ['creator_id'] });
     req.query.user_id = group.creator_id;
-    await GroupsMembers.destroy({where: {group_id}});
-    await Groups.destroy({where: {id: group_id}});
+    await GroupsMembers.destroy({ where: { group_id } });
+    await Groups.destroy({ where: { id: group_id } });
     this.get(req, res);
 };
 
@@ -219,7 +257,7 @@ exports.getGroupMembers = async (req, res) => {
                 // through: {attributes: ['confirmed']}
             }
         ],
-        where: {id: group_id}
+        where: { id: group_id }
     });
 
     if (req.return) {
@@ -230,9 +268,9 @@ exports.getGroupMembers = async (req, res) => {
 };
 
 exports.addGroupMembers = async (req, res) => {
-    const {group_id, member_ids, accepted} = req.body;
+    const { group_id, member_ids, accepted } = req.body;
     let list = member_ids?.map(async (member_id) => {
-        await to(GroupsMembers.create({group_id, member_id, ...{accepted, confirmed: 0}}));
+        await to(GroupsMembers.create({ group_id, member_id, ...{ accepted, confirmed: 0 } }));
     });
 
     await Promise.all(list);
@@ -241,72 +279,72 @@ exports.addGroupMembers = async (req, res) => {
 };
 
 exports.removeGroupMember = async (req, res) => {
-    const {group_id, member_id} = req.query;
+    const { group_id, member_id } = req.query;
     console.log('remove group member', req.query)
-    await GroupsMembers.destroy({where: {group_id, member_id}});
+    await GroupsMembers.destroy({ where: { group_id, member_id } });
 
     req.query.group_id = group_id;
     await this.getGroupById(req, res);
 };
 
 exports.leaveGroup = async (req, res) => {
-    const {group_id, member_id} = req.query;
-    let group = await Groups.findOne({where: {id: group_id}, attributes: ['creator_id']});
+    const { group_id, member_id } = req.query;
+    let group = await Groups.findOne({ where: { id: group_id }, attributes: ['creator_id'] });
     if (+member_id !== group.creator_id) {
-        await GroupsMembers.destroy({where: {group_id, member_id}});
+        await GroupsMembers.destroy({ where: { group_id, member_id } });
         req.query.user_id = member_id;
         this.get(req, res);
     } else {
-        res.status(500).json({msg: 'The group owner cannot leave the group'});
+        res.status(500).json({ msg: 'The group owner cannot leave the group' });
     }
 };
 
 exports.acceptGroupJoin = async (req, res) => {
-    const {group_id, member_id} = req.body;
-    await GroupsMembers.update({accepted: 1}, {where: {group_id, member_id}});
+    const { group_id, member_id } = req.body;
+    await GroupsMembers.update({ accepted: 1 }, { where: { group_id, member_id } });
     req.query.user_id = member_id;
     this.get(req, res);
 };
 
 exports.declineGroupJoin = async (req, res) => {
-    const {group_id, member_id} = req.body;
-    await GroupsMembers.destroy({where: {group_id, member_id}});
+    const { group_id, member_id } = req.body;
+    await GroupsMembers.destroy({ where: { group_id, member_id } });
     req.query.user_id = member_id;
     this.get(req, res);
 };
 
 exports.confirmJoinGroup = async (req, res) => {
-    const {group_id, member_id} = req.body;
-    await GroupsMembers.update({confirmed: 1}, {where: {group_id, member_id}});
+    const { group_id, member_id } = req.body;
+    await GroupsMembers.update({ confirmed: 1 }, { where: { group_id, member_id } });
     req.query.user_id = member_id;
     this.get(req, res);
 }
 
 exports.ignoreJoinGroup = async (req, res) => {
-    const {group_id, member_id} = req.body;
-    await GroupsMembers.destroy({where: {group_id, member_id}});
-    let group = await Groups.findOne({where: {id: group_id}});
+    const { group_id, member_id } = req.body;
+    await GroupsMembers.destroy({ where: { group_id, member_id } });
+    let group = await Groups.findOne({ where: { id: group_id } });
     console.log(group)
     req.query.user_id = group.creator_id;
     this.get(req, res);
 }
 
 exports.makeMemberAdmin = async (req, res) => {
-    const {group_id, member_id, type} = req.body;
+    const { group_id, member_id, type } = req.body;
     let is_admin = +(type === 'admin');
     let is_moderator = +(type === 'moderator');
     console.log('making', is_admin, is_moderator, member_id)
-    await GroupsMembers.update({is_admin, is_moderator}, {where: {group_id, member_id}});
+    await GroupsMembers.update({ is_admin, is_moderator }, { where: { group_id, member_id } });
     res.json('OK');
 }
 
 exports.declineMakeAdmin = async (req, res) => {
-    const {group_id, member_id} = req.body;
+    const { group_id, member_id } = req.body;
 }
 
 exports.removeAdminPrivileges = async (req, res) => {
-    const {group_id, member_id} = req.body;
-    await GroupsMembers.update({is_admin: 0, is_moderator: 0}, {where: {group_id, member_id}});
+    const { group_id, member_id } = req.body;
+    await GroupsMembers.update({ is_admin: 0, is_moderator: 0 }, { where: { group_id, member_id } });
     req.query.group_id = group_id;
     this.getGroupMembers(req, res)
 }
