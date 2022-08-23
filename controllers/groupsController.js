@@ -133,7 +133,7 @@ const GROUP_REMOVING_TYPES = {
 exports.deleteGroup = async (req, res) => {
     const { id, type } = req.params
 
-    switch (type) {
+    switch (+type) {
         case GROUP_REMOVING_TYPES.irrevocably:
             await this.removePrimary(id)
             break;
