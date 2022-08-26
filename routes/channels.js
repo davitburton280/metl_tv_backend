@@ -14,5 +14,8 @@ router.put('/subscriptions/update-priority',isAuth, channelsController.changeSub
 router.put('/save-description',isAuth, validateChannelDescription.rules, channelsController.saveDescription);
 router.put('/save-channel-details', isAuth, channelsController.saveChannelDetails);
 router.get('/get-channel-subscribers', isAuth, channelsController.getChannelSubscribers);
+router.get('/detail/:id', isAuth, channelsController.getChanelDetail)
+router.put('/:id', isAuth, channelsController.update)
+router.get('/videos/:id', isAuth, channelsController.getChanelVideos)
 
 module.exports = router;

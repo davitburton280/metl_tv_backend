@@ -13,6 +13,8 @@ const Op = sequelize.Op;
 const nl2br = require('../helpers/nl2br');
 const showIfErrors = require('../helpers/showIfErrors');
 const getFullName = require('../helpers/getFullNameCol');
+const { FILTER_SORTING_FIELDS,
+    FILTER_SORTINH_VALUES } = require('../helpers/filters')
 
 exports.get = async (req, res) => {
     // console.log('here!!!!!!!!!!!!!')
@@ -54,10 +56,10 @@ exports.searchChannelVideos = async (req, res) => {
                 name: {
                     [Op.like]: '%' + item + '%'
                 }
-            }) 
+            })
         });
         or.push(sequelize.where(sequelize.col('`videos`.`name`'), 'like', '%' + search + '%'))
-    } 
+    }
 
     // let userWhere = user_id ? sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id) : {};
     if (search) {
@@ -240,3 +242,59 @@ exports.getChannelSubscribers = async (req, res) => {
 
     res.json(channelSubscribers);
 };
+
+exports.getChanelDetail = async (req, res) => {
+    try {
+        const { id } = req.params
+        const chanel = await Channels.findOne({ where: { id } })
+        return res.send({ message: 'ok', data: chanel })
+    } catch (error) {
+        return res.status(500).send({ message: 'Something went wrong' })
+    }
+}
+
+exports.update = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { avatar, cover, name } = req.body
+        let updateBody = { avatar, cover, name }
+
+        Object.keys(updateBody).map(item => {
+            if (!updateBody[item]) delete updateBody[item]
+        })
+
+        await Channels.update(updateBody, { where: { id } })
+        return res.send({ message: 'ok', data: id })
+    } catch (error) {
+        return res.status(500).send({ message: 'Something went wrong' })
+    }
+}
+
+exports.getChanelVideos = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { offset, limit } = req.query
+        const sort = [FILTER_SORTING_FIELDS.postsFiltersFields.created_at, FILTER_SORTINH_VALUES.desc];
+
+        const filter = { channel_id: id }
+
+        const [list, totalCount] = await Promise.all([
+            Videos.findAll({
+                where: filter,
+                limit: +limit,
+                offset: (+offset - 1) * +limit,
+                order: [
+                    sort
+                ]
+            }),
+            Videos.count({ where: filter })
+        ])
+        return res.send({
+            message: 'video list', data: {
+                list, totalCount
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({ message: 'Something went wrong' })
+    }
+}
