@@ -270,13 +270,76 @@ exports.update = async (req, res) => {
     }
 }
 
+const UPLOAD_DATE_FILTER_TYPES = {
+    lastHour: 1,
+    today: 2,
+    thisWeek: 3,
+    thisMount: 4,
+    thisYear: 5
+}
+
 exports.getChanelVideos = async (req, res) => {
     try {
-        const { id } = req.params
-        const { offset, limit } = req.query
+        const { id, offset, limit, uploadDate, category, search } = req.body
+        const currentDate = new Date()
+
         const sort = [FILTER_SORTING_FIELDS.postsFiltersFields.created_at, FILTER_SORTINH_VALUES.desc];
 
-        const filter = { channel_id: id }
+        let filter = {};
+
+        if (id && id.length) {
+            filter['channel_id'] = {
+                [Op.in]: id
+            }
+        }
+
+        if (search) {
+            filter['name'] = {
+                [Op.like]: `%${search}%`
+            }
+        }
+
+        if (uploadDate) {
+            switch (uploadDate) {
+                case UPLOAD_DATE_FILTER_TYPES.lastHour:
+                    filter['created_at'] = {
+                        [Op.lt]: new Date(currentDate.setHours(currentDate.getHours() - 1)),
+                        [Op.gt]: currentDate
+                    }
+                    break;
+                case UPLOAD_DATE_FILTER_TYPES.thisMount:
+                    filter['created_at'] = {
+                        [Op.lt]: new Date(currentDate.setDate(1)),
+                        [Op.gt]: currentDate
+                    }
+                    break;
+                case UPLOAD_DATE_FILTER_TYPES.thisWeek:
+                    filter['created_at'] = {
+                        [Op.lt]: new Date(currentDate.setDate(currentDate.getDate() - 7)),
+                        [Op.gt]: currentDate
+                    }
+                    break;
+                case UPLOAD_DATE_FILTER_TYPES.thisYear:
+                    filter['created_at'] = {
+                        [Op.lt]: new Date(currentDate.setFullYear(currentDate.getUTCFullYear() - 1)),
+                        [Op.gt]: currentDate
+                    }
+                    break;
+                case UPLOAD_DATE_FILTER_TYPES.today:
+                    filter['created_at'] = {
+                        [Op.lt]: new Date(new Date(currentDate.setHours(0)).setMinutes(0)),
+                        [Op.gt]: currentDate
+                    }
+                    break;
+            }
+        }
+
+        if (category && category.length) {
+            filter['channel_id'] = {
+                [Op.in]: category
+            }
+        }
+
 
         const [list, totalCount] = await Promise.all([
             Videos.findAll({

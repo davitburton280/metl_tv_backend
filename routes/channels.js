@@ -16,6 +16,6 @@ router.put('/save-channel-details', isAuth, channelsController.saveChannelDetail
 router.get('/get-channel-subscribers', isAuth, channelsController.getChannelSubscribers);
 router.get('/detail/:id', isAuth, channelsController.getChanelDetail)
 router.put('/:id', isAuth, channelsController.update)
-router.get('/videos/:id', isAuth, channelsController.getChanelVideos)
+router.post('/videos', isAuth, channelsController.getChanelVideos)
 
 module.exports = router;
