@@ -280,17 +280,18 @@ const UPLOAD_DATE_FILTER_TYPES = {
 
 exports.getChanelVideos = async (req, res) => {
     try {
-        const { id, offset, limit, uploadDate, category, search } = req.body
+        let { id, page, limit, uploadDate, category, search } = req.body
         const currentDate = new Date()
 
         const sort = [FILTER_SORTING_FIELDS.postsFiltersFields.created_at, FILTER_SORTINH_VALUES.desc];
 
+        if (!limit) limit = 20
+        if (!page) page = 1
+
         let filter = {};
 
-        if (id && id.length) {
-            filter['channel_id'] = {
-                [Op.in]: id
-            }
+        if (id) {
+            filter['channel_id'] = +id
         }
 
         if (search) {
@@ -345,7 +346,7 @@ exports.getChanelVideos = async (req, res) => {
             Videos.findAll({
                 where: filter,
                 limit: +limit,
-                offset: (+offset - 1) * +limit,
+                offset: (+page - 1) * Number(limit),
                 order: [
                     sort
                 ]
