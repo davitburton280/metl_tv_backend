@@ -215,6 +215,7 @@ exports.saveVideoData = async (req, res) => {
         console.log(video)
 
         if (!video) {
+            d.author_id = data.author_id
             d.channel_id = channel.id || channel.dataValues.id
             video = await Videos.create(d)
         }
