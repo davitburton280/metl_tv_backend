@@ -215,9 +215,8 @@ exports.saveVideoData = async (req, res) => {
 
         if (!video) {
             video = await Videos.create(d)
-            
         }
-
+        console.log(video, '--------------------');
         let userVideo = await UsersVideos.create({
             // where: {
             user_id: data.author_id,
