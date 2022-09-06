@@ -208,12 +208,14 @@ exports.saveVideoData = async (req, res) => {
             status: 'recorded',
         };
 
+        const channel = await Channels.findOne({ user_id: data.author_id })
 
         let video = await Videos.findOne({where: {status: 'live', author_id: data.author_id}});
         console.log('video id')
         console.log(video)
 
         if (!video) {
+            d.channel_id = channel.id || channel.dataValues.id
             video = await Videos.create(d)
         }
         console.log(video, '--------------------');
