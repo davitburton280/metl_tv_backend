@@ -220,7 +220,7 @@ exports.saveVideoData = async (req, res) => {
         let userVideo = await UsersVideos.create({
             // where: {
             user_id: data.author_id,
-            video_id: video?.id
+            video_id: video?.dataValues?.id
             // }
         });
         await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
