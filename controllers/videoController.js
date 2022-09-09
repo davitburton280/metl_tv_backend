@@ -646,6 +646,13 @@ exports.updatePrivacy = async (req, res) => {
     res.json(foundPrivacy);
 };
 
+exports.updatePrivacyStatus = async (req, res) => {
+    let data = req.body;
+    let { privacy, video_id } = data;
+    let v = await Videos.update({privacy_id: privacy}, {where: {id: video_id}});
+    res.json({ message: 'ok', data: privacy });
+};
+
 
 exports.addCommentForVideo = async (req, res) => {
     let data = req.body;

@@ -25,6 +25,7 @@ router.get('/get-saved', videoController.getUserSavedVideos);
 router.put('/update-likes', isAuth, videoController.updateLikes);
 router.put('/update-comment-likes', isAuth, videoController.updateCommentLikes);
 router.put('/update-privacy', isAuth, videoController.updatePrivacy);
+router.put('/update-privacy-status', isAuth, videoController.updatePrivacyStatus)
 router.put('/update-views', isAuth, videoController.updateViews);
 router.put('/index-user-tags', isAuth, videoController.updateUserTags);
 router.put('/save-video', isAuth, videoController.saveVideo);
