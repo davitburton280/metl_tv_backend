@@ -32,24 +32,81 @@ const path = require('path');
 const moment = require('moment');
 const m = require('../helpers/multer');
 const { castDurationToMiliseconds } = require('../helpers/index');
+const { SORTING_VALUE, SORTING_KEYS } = require('../constants/index')
+
 
 const VIDEO_TYPES = {
     clipz: 'clipz',
     videos: 'videos'
 }
 
+const VIDEO_FILTER_OPTIONS = {
+    trending: 'trending',
+    latest: 'latest'
+}
+
+exports.castSortingModel = (key, value) => {
+    if (!key) key = SORTING_KEYS.createdAt
+    if (!value) value = SORTING_VALUE.desc
+
+    return [[key, value]]
+}
+
+exports.getVideosList = async (req, res) => {
+    let { limit, page, sort, tag } = req.body
+    if (!limit) limit = 10
+    if (!page) page = 1
+    if (!sort || !sort.key || !sort.value) sort = { key: null, value: null }
+
+    const sorting = this.castSortingModel(sort.key, sort.value)
+    let whereTag = tag ? { name: tag } : {}
+
+    const filter = {
+        include: [
+            {
+                model: Users, as: 'user', include: [
+                    { model: Channels, as: 'channel' }
+                ]
+            },
+            {
+                model: Channels,
+                as: 'channel',
+            },
+            {
+                model: Tags,
+                as: 'tags',
+                where: whereTag,
+                required: !!tag
+            },
+            {
+                model: VideoCategories,
+                as: 'category'
+            }
+        ],
+        order: sorting,
+        limit,
+        offset: (page - 1) * limit
+    }
+
+    const [list, count] = await Promise.all([
+        Videos.findAll(filter),
+        Videos.count(filter)
+    ])
+    return res.send({ message: 'data', data: { list, count } })
+}
+
 exports.VIDEO_TYPES = VIDEO_TYPES;
 
 exports.getVideos = async (req, res) => {
     let data = req.query;
-    let {withPlaylists, trending, limit, tag, user_id} = data;
+    let { withPlaylists, trending, limit, tag, user_id } = data;
     let ret = {};
-    let limitOption = limit ? {limit: +limit} : {};
+    let limitOption = limit ? { limit: +limit } : {};
     let trendingOption = +trending ? [['views', 'DESC']] : [['created_at', 'DESC']];
     let filters = data.filters ? JSON.parse(data.filters) : {};
     let whereFilters = this.getVideoFiltersQuery(filters);
-    let whereTag = tag ? {name: tag} : {};
-    let wherePrivacy = user_id ? {} : {name: 'Public'};
+    let whereTag = tag ? { name: tag } : {};
+    let wherePrivacy = user_id ? {} : { name: 'Public' };
     let whereCategory = filters.category && filters.category.name !== 'All'
         ? sequelize.where(sequelize.col('`category`.`name`'), filters.category.name)
         : {};
@@ -58,7 +115,7 @@ exports.getVideos = async (req, res) => {
         include: [
             {
                 model: Users, as: 'user', include: [
-                    {model: Channels, as: 'channel'}
+                    { model: Channels, as: 'channel' }
                 ]
             },
             {
@@ -151,20 +208,20 @@ exports.getVideoFiltersQuery = (filters, categoryCol = '`category.name`') => {
 
 exports.saveVideoToken = async (req, res) => {
     const data = req.body;
-    const {token, name} = data;
+    const { token, name } = data;
 
-    let v = await Videos.findOne({where: {token: token}});
+    let v = await Videos.findOne({ where: { token: token } });
 
     if (!v) {
         let video = await Videos.create(data);
         data.tags.map(async (t) => {
-            let found = await Tags.findOne({where: {name: t.name}});
+            let found = await Tags.findOne({ where: { name: t.name } });
 
             if (!found) {
-                let tag = await Tags.create({name: t.name});
-                await VideosTags.create({tag_id: tag.id, video_id: video.id}, {fields: ['tag_id', 'video_id']});
+                let tag = await Tags.create({ name: t.name });
+                await VideosTags.create({ tag_id: tag.id, video_id: video.id }, { fields: ['tag_id', 'video_id'] });
             } else {
-                await VideosTags.create({tag_id: found.id, video_id: video.id}, {fields: ['tag_id', 'video_id']});
+                await VideosTags.create({ tag_id: found.id, video_id: video.id }, { fields: ['tag_id', 'video_id'] });
             }
         });
         res.json(video);
@@ -174,8 +231,8 @@ exports.saveVideoToken = async (req, res) => {
 };
 
 exports.updateParticipantsCount = async (req, res) => {
-    let {video_id, participants} = req.body;
-    await Videos.update({participants}, {where: {id: video_id}});
+    let { video_id, participants } = req.body;
+    await Videos.update({ participants }, { where: { id: video_id } });
     res.json('OK');
 }
 
@@ -189,11 +246,11 @@ exports.saveVideoData = async (req, res) => {
     uploadVideoStreamFile(req, res, async (err) => {
 
 
-        let privacy_id = await PrivacyTypes.findOne({where: {name: videoSettings.privacy}, attributes: ['id']});
+        let privacy_id = await PrivacyTypes.findOne({ where: { name: videoSettings.privacy }, attributes: ['id'] });
 
         console.log(privacy_id.dataValues)
         let duration_miliseconds = castDurationToMiliseconds(data.video_duration).decoded;
-        
+
         let d = {
             name: videoSettings.name,
             description: videoSettings.description,
@@ -210,7 +267,7 @@ exports.saveVideoData = async (req, res) => {
 
         const channel = await Channels.findOne({ user_id: data.author_id })
 
-        let video = await Videos.findOne({where: {status: 'live', author_id: data.author_id}});
+        let video = await Videos.findOne({ where: { status: 'live', author_id: data.author_id } });
         console.log('video id')
         console.log(video)
 
@@ -226,7 +283,7 @@ exports.saveVideoData = async (req, res) => {
             video_id: video?.dataValues?.id
             // }
         });
-        await Videos.update(d, {where: {status: 'live', author_id: data.author_id}});
+        await Videos.update(d, { where: { status: 'live', author_id: data.author_id } });
 
         res.json('OK');
     })
@@ -249,9 +306,9 @@ exports.getCategories = async (req, res) => {
     let whereAll = data.all ? {} : {
         where: {
             [Op.not]:
-                {
-                    name: 'All'
-                }
+            {
+                name: 'All'
+            }
         }
     };
 
@@ -262,7 +319,7 @@ exports.getCategories = async (req, res) => {
 exports.getUserVideos = async (req, res) => {
     console.log(req.query)
     let data = req.query;
-    let {user_id, search} = data;
+    let { user_id, search } = data;
     // let v = await Videos.findAll({author_id: req.query.user_id});
     let where = search ? sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%') : {};
     let filters = data.filters ? JSON.parse(data.filters) : {};
@@ -277,10 +334,10 @@ exports.getUserVideos = async (req, res) => {
             model: Videos, as: 'videos',
             where: [where, whereFilters],
             include: [
-                {model: Channels, as: 'channel'},
-                {model: Playlists, as: 'playlists', attributes: ['id']},
-                {model: Users, as: 'user'},
-                {model: Tags, as: 'tags'},
+                { model: Channels, as: 'channel' },
+                { model: Playlists, as: 'playlists', attributes: ['id'] },
+                { model: Users, as: 'user' },
+                { model: Tags, as: 'tags' },
                 {
                     model: VideoCategories,
                     as: 'category',
@@ -288,7 +345,7 @@ exports.getUserVideos = async (req, res) => {
                 }
                 // {model: PrivacyTypes, as: 'privacy'}
             ]
-        }, {model: Channels, as: 'channel'}],
+        }, { model: Channels, as: 'channel' }],
         where: {
             id: user_id
         },
@@ -300,7 +357,7 @@ exports.getUserVideos = async (req, res) => {
 
 exports.getUserSavedVideos = async (req, res) => {
     console.log(req.query)
-    let userWhere = {id: req.query.user_id};
+    let userWhere = { id: req.query.user_id };
     let v = await Users.findOne({
         where: userWhere,
         include: [
@@ -309,9 +366,9 @@ exports.getUserSavedVideos = async (req, res) => {
                 as: 'users_vids',
                 where: [sequelize.where(sequelize.col('`users_vids->users_videos`.`saved`'), 1)],
                 include: [
-                    {model: Channels, as: 'channel'},
-                    {model: Users, as: 'user'},
-                    {model: Tags, as: 'tags'}
+                    { model: Channels, as: 'channel' },
+                    { model: Users, as: 'user' },
+                    { model: Tags, as: 'tags' }
                 ]
             }
         ],
@@ -321,8 +378,8 @@ exports.getUserSavedVideos = async (req, res) => {
 };
 
 exports.getVideoById = async (req, res) => {
-    let {id, playlist_id} = req.query;
-    let idWhere = {id: id};
+    let { id, playlist_id } = req.query;
+    let idWhere = { id: id };
     // let playlistWhere = playlist_id ? sequelize.where(sequelize.col(`playlists->playlists_videos.playlist_id`), playlist_id) : {};
     console.log('get video by id!!!')
     let v = await Videos.findOne({
@@ -344,18 +401,18 @@ exports.getVideoById = async (req, res) => {
                 attributes: ['id', getFullName(), 'username'],
                 // where: {id: user_id},
                 // where: sequelize.where(sequelize.col(`users_vids->users_videos.user_id`), user_id),
-                through: {attributes: ['liked', 'disliked', 'saved', 'viewed']}
+                through: { attributes: ['liked', 'disliked', 'saved', 'viewed'] }
             },
-            {model: Playlists, as: 'playlists', attributes: ['id']} //where: playlistWhere
+            { model: Playlists, as: 'playlists', attributes: ['id'] } //where: playlistWhere
         ],
         attributes: ['id', 'author_id', 'likes', 'thumbnail', 'duration', 'name', 'dislikes', 'views', 'filename', 'status', 'created_at']
     });
 
     let messages = await VideoChatMessages.find({
         video_id: id
-    }).sort({'created_at': 1});
+    }).sort({ 'created_at': 1 });
 
-    let ret = {...v?.toJSON(), ...{messages}};
+    let ret = { ...v?.toJSON(), ...{ messages } };
 
     // v.messages = messages
     console.log('video messages!!!', ret)
@@ -372,8 +429,8 @@ exports.getVideosByAuthor = async (req, res) => {
     let v = await Users.findAll(
         {
             include: [
-                {model: Videos, as: 'videos', where: whereFilters},
-                {model: Channels, as: 'channel', attributes: ['id', 'avatar', 'name']}
+                { model: Videos, as: 'videos', where: whereFilters },
+                { model: Channels, as: 'channel', attributes: ['id', 'avatar', 'name'] }
             ],
             order: [[sequelize.col(`videos.created_at`), 'desc']],
             where: whereSearch
@@ -382,14 +439,14 @@ exports.getVideosByAuthor = async (req, res) => {
 };
 
 exports.searchInAllVideos = async (req, res) => {
-    let {search} = req.query;
+    let { search } = req.query;
     let v = await Videos.findAll({
         where: sequelize.where(sequelize.col('`videos.name`'), 'like', '%' + search + '%'),
         include: [
-            {model: Channels, as: 'channel'},
-            {model: Playlists, as: 'playlists', attributes: ['id']},
-            {model: Users, as: 'user'},
-            {model: Tags, as: 'tags'}
+            { model: Channels, as: 'channel' },
+            { model: Playlists, as: 'playlists', attributes: ['id'] },
+            { model: Users, as: 'user' },
+            { model: Tags, as: 'tags' }
         ]
     });
     res.json(v);
@@ -398,7 +455,7 @@ exports.searchInAllVideos = async (req, res) => {
 
 exports.updateLikes = async (req, res) => {
     let data = req.body;
-    const {user_id, video_id, likes, dislikes, liked, disliked, likeStatus} = data;
+    const { user_id, video_id, likes, dislikes, liked, disliked, likeStatus } = data;
 
 
     let found = await UsersVideos.findOne({
@@ -416,21 +473,21 @@ exports.updateLikes = async (req, res) => {
         });
 
     } else {
-        await UsersVideos.update({disliked: disliked, liked: liked}, {
+        await UsersVideos.update({ disliked: disliked, liked: liked }, {
             where: {
                 user_id: user_id,
                 video_id: video_id
             }
         });
     }
-    await Videos.update({dislikes: dislikes, likes: likes}, {where: {id: video_id}});
+    await Videos.update({ dislikes: dislikes, likes: likes }, { where: { id: video_id } });
     res.json('OK');
 };
 
 
 exports.updateViews = async (req, res) => {
     let data = req.body;
-    const {user_id, video_id} = data;
+    const { user_id, video_id } = data;
 
     let found = await UsersVideos.findOne({
         where: {
@@ -440,9 +497,9 @@ exports.updateViews = async (req, res) => {
     });
 
     if (!found) {
-        await UsersVideos.create({...data, viewed: 1});
+        await UsersVideos.create({ ...data, viewed: 1 });
     } else {
-        await UsersVideos.update({viewed: 1}, {
+        await UsersVideos.update({ viewed: 1 }, {
             where: {
                 user_id: user_id,
                 video_id: video_id
@@ -450,7 +507,7 @@ exports.updateViews = async (req, res) => {
         });
     }
 
-    await Videos.increment({views: 1}, {where: {id: video_id}});
+    await Videos.increment({ views: 1 }, { where: { id: video_id } });
     req.query.id = video_id;
     this.getVideoById(req, res);
 };
@@ -459,7 +516,7 @@ exports.updateViews = async (req, res) => {
 exports.saveVideo = async (req, res) => {
 
     let data = req.body;
-    const {user_id, video_id, saved} = data;
+    const { user_id, video_id, saved } = data;
     console.log(data)
 
     let found = await UsersVideos.findOne({
@@ -491,7 +548,7 @@ exports.saveVideo = async (req, res) => {
 
 exports.removeVideo = async (req, res) => {
     let data = req.query;
-    let {id, token, filename} = data;
+    let { id, token, filename } = data;
     if (!filename && !filename.length) filename = 'file_file';
     console.log('remove video!!!')
     console.log(req.query)
@@ -503,22 +560,22 @@ exports.removeVideo = async (req, res) => {
     }
     if (!removeResult) {
         if (id) {
-            await to(PlaylistsVideos.destroy({where: {video_id: id}}));
-            await to(UsersVideos.destroy({where: {video_id: id}}));
-            await to(Videos.destroy({where: {id: id}}));
+            await to(PlaylistsVideos.destroy({ where: { video_id: id } }));
+            await to(UsersVideos.destroy({ where: { video_id: id } }));
+            await to(Videos.destroy({ where: { id: id } }));
             // await to(ChatMessages.destroy({where: {video_id: id}}));
-            await to(VideosComments.destroy({where: {video_id: id}}))
+            await to(VideosComments.destroy({ where: { video_id: id } }))
             if (data.bigFileDetected) {
-                res.status(423).json({msg: 'File size exceeds maximum size of 3Mb'})
+                res.status(423).json({ msg: 'File size exceeds maximum size of 3Mb' })
             } else {
                 await usersController.getUserInfo(req, res);
             }
             // removing live video by token
         } else if (token) {
-            let v = await to(Videos.findOne({where: {token: token, status: 'live'}}));
+            let v = await to(Videos.findOne({ where: { token: token, status: 'live' } }));
             // await to(ChatMessages.destroy({where: {video_id: v.id}}));
-            await to(UsersVideos.destroy({where: {video_id: v?.id}}));
-            await to(Videos.destroy({where: {token: token, status: 'live'}}));
+            await to(UsersVideos.destroy({ where: { video_id: v?.id } }));
+            await to(Videos.destroy({ where: { token: token, status: 'live' } }));
             res.json('removed live video');
         }
     }
@@ -537,24 +594,24 @@ exports.saveVideoDetails = async (req, res) => {
 
         uploadVideoThumbFile(req, res, async (err) => {
 
-            await Videos.update({name: data.name, thumbnail: data.thumbnail}, {where: {id: data.video_id}});
-            await VideosTags.destroy({where: {video_id: data.video_id}});
+            await Videos.update({ name: data.name, thumbnail: data.thumbnail }, { where: { id: data.video_id } });
+            await VideosTags.destroy({ where: { video_id: data.video_id } });
             let result = JSON.parse(data.tags).map(async (t) => {
 
-                let found = await Tags.findOne({where: {name: t.name}});
+                let found = await Tags.findOne({ where: { name: t.name } });
                 console.log(!found)
 
                 if (!found) {
-                    let tag = await Tags.create({name: t.name});
+                    let tag = await Tags.create({ name: t.name });
                     await VideosTags.create({
                         tag_id: tag.id,
                         video_id: data.video_id
-                    }, {fields: ['tag_id', 'video_id']});
+                    }, { fields: ['tag_id', 'video_id'] });
                 } else {
                     await VideosTags.create({
                         tag_id: found.id,
                         video_id: data.video_id
-                    }, {fields: ['tag_id', 'video_id']});
+                    }, { fields: ['tag_id', 'video_id'] });
                 }
 
             });
@@ -571,16 +628,16 @@ exports.saveVideoDetails = async (req, res) => {
 exports.updateUserTags = async (req, res) => {
     let data = req.body;
     console.log('increment!!!!')
-    let {user_id, video_id, tags} = data;
+    let { user_id, video_id, tags } = data;
     let results = tags.map(async (t) => {
         let foundTag = await UsersTags.findOne({
-            where: {user_id: user_id, tag_id: t.id}
+            where: { user_id: user_id, tag_id: t.id }
         });
         if (!foundTag) {
-            await UsersTags.create({user_id: user_id, tag_id: t.id});
+            await UsersTags.create({ user_id: user_id, tag_id: t.id });
         } else {
             console.log('increment!!!!')
-            await UsersTags.increment('popularity', {where: {user_id: user_id, tag_id: t.id}});
+            await UsersTags.increment('popularity', { where: { user_id: user_id, tag_id: t.id } });
         }
     });
 
@@ -607,7 +664,7 @@ exports.getVideoTags = async (req, res) => {
     });
 
 
-    let ret = [{name: 'Most used', values: []}, {name: 'Trending', values: []}, {name: 'Previously used', values: []}];
+    let ret = [{ name: 'Most used', values: [] }, { name: 'Trending', values: [] }, { name: 'Previously used', values: [] }];
 
     videoTags.map((vt, index) => {
         if (index < 5) {
@@ -625,14 +682,14 @@ exports.getVideoTags = async (req, res) => {
 exports.getUserTags = async (req, res) => {
     console.log('get user tags!!!')
     let data = req.query;
-    let {user_id} = data;
+    let { user_id } = data;
     // console.log(data)
     let userTags = await UsersTags.findAll({
-        where: {user_id: user_id},
+        where: { user_id: user_id },
         order: [['popularity', 'desc']],
         include: [{
             model: Tags, as: 'tag_details',
-            include: [{model: Videos, as: 'tags_videos', attributes: ['id']}]
+            include: [{ model: Videos, as: 'tags_videos', attributes: ['id'] }]
         }]
     }).filter(ut => ut.tag_details.tags_videos.length !== 0);
     res.json(userTags);
@@ -640,16 +697,16 @@ exports.getUserTags = async (req, res) => {
 
 exports.updatePrivacy = async (req, res) => {
     let data = req.body;
-    let {privacy, video_id} = data;
-    let foundPrivacy = await PrivacyTypes.findOne({where: {name: privacy}});
-    let v = await Videos.update({privacy_id: foundPrivacy.id}, {where: {id: data.video_id}});
+    let { privacy, video_id } = data;
+    let foundPrivacy = await PrivacyTypes.findOne({ where: { name: privacy } });
+    let v = await Videos.update({ privacy_id: foundPrivacy.id }, { where: { id: data.video_id } });
     res.json(foundPrivacy);
 };
 
 exports.updatePrivacyStatus = async (req, res) => {
     let data = req.body;
     let { privacy, video_id } = data;
-    let v = await Videos.update({privacy_id: privacy}, {where: {id: video_id}});
+    let v = await Videos.update({ privacy_id: privacy }, { where: { id: video_id } });
     res.json({ message: 'ok', data: privacy });
 };
 
@@ -664,9 +721,9 @@ exports.addCommentForVideo = async (req, res) => {
 };
 
 exports.getVideoComments = async (req, res) => {
-    let {video_id, from_id, comment_id} = req.query;
+    let { video_id, from_id, comment_id } = req.query;
     // console.log(req.query)
-    let where = {video_id: video_id, is_reply: 0};
+    let where = { video_id: video_id, is_reply: 0 };
     if (from_id) {
         where.from_id = from_id;
     }
@@ -684,25 +741,25 @@ exports.getVideoComments = async (req, res) => {
                 as: 'user',
                 attributes: ['id', 'first_name', 'last_name', 'username', 'avatar'],
                 include: [
-                    {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
+                    { model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar'] }
                 ]
             },
 
             {
-                model: VideosComments, as: 'replies', where: {is_reply: 1}, required: false, include: [
+                model: VideosComments, as: 'replies', where: { is_reply: 1 }, required: false, include: [
                     {
                         model: Users,
                         as: 'user',
                         attributes: ['id', 'first_name', 'last_name', 'username', 'avatar'],
                         include: [
-                            {model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar']}
+                            { model: Channels, as: 'channel', attributes: ['id', 'name', 'avatar'] }
                         ]
                     },
                     {
                         model: Users,
                         as: 'reactors',
                         attributes: ['id', 'first_name', 'last_name', 'username'],
-                        through: {attributes: ['liked', 'disliked']},
+                        through: { attributes: ['liked', 'disliked'] },
                         required: false
                     },
                 ]
@@ -711,7 +768,7 @@ exports.getVideoComments = async (req, res) => {
                 model: Users,
                 as: 'reactors',
                 attributes: ['id', 'first_name', 'last_name', 'username'],
-                through: {attributes: ['liked', 'disliked']},
+                through: { attributes: ['liked', 'disliked'] },
                 required: false
             },
 
@@ -725,20 +782,20 @@ exports.updateVideoComment = async (req, res) => {
     let d = req.body;
     d.comment = nl2br(d.comment, false);
     console.log(d.comment)
-    await VideosComments.update(d, {where: {id: d.id, from_id: d.from_id}});
+    await VideosComments.update(d, { where: { id: d.id, from_id: d.from_id } });
     req.query.video_id = req.body.video_id;
     this.getVideoComments(req, res);
 };
 
 exports.removeVideoComment = async (req, res) => {
-    let {id, user_id} = req.query;
-    await to(VideosComments.destroy({where: {id: id, from_id: user_id}}));
+    let { id, user_id } = req.query;
+    await to(VideosComments.destroy({ where: { id: id, from_id: user_id } }));
     this.getVideoComments(req, res);
 };
 
 exports.updateCommentLikes = async (req, res) => {
     let data = req.body;
-    const {user_id, comment_id, likes, dislikes, liked, disliked} = data;
+    const { user_id, comment_id, likes, dislikes, liked, disliked } = data;
     let video_id = data.video_id;
     delete data.video_id;
 
@@ -758,14 +815,14 @@ exports.updateCommentLikes = async (req, res) => {
         });
 
     } else {
-        await UsersComments.update({disliked: disliked, liked: liked}, {
+        await UsersComments.update({ disliked: disliked, liked: liked }, {
             where: {
                 user_id: user_id,
                 comment_id: comment_id
             }
         });
     }
-    await VideosComments.update({dislikes: dislikes, likes: likes}, {where: {id: comment_id}});
+    await VideosComments.update({ dislikes: dislikes, likes: likes }, { where: { id: comment_id } });
     // req.query.comment_id = req.body.comment_id;
     req.query.video_id = video_id;
     this.getVideoComments(req, res);

@@ -23,11 +23,24 @@ const USER_SUBSCRIPTION_PLANS = {
     gold: 'gold'
 }
 
+const SORTING_VALUE = {
+    asc: 'ASC',
+    desc: 'DESC'
+}
+
+const SORTING_KEYS = {
+    views: 'views',
+    createdAt: 'created_at',
+    likes: 'likes',
+}
+
 module.exports = {
     CLIPZ_DURATION,
     UPLOAD_MODULE_TYPES,
     ALLOWED_VIDEO_EXTS,
     ALLOWED_MIME_TYPES,
     FILE_PATHS,
-    USER_SUBSCRIPTION_PLANS
+    USER_SUBSCRIPTION_PLANS,
+    SORTING_VALUE,
+    SORTING_KEYS
 };

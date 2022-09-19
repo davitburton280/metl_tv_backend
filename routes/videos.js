@@ -37,4 +37,6 @@ router.put('/update-comment', isAuth, videoController.updateVideoComment);
 router.get('/get-comments', isAuth, videoController.getVideoComments);
 router.delete('/remove-comment', isAuth, videoController.removeVideoComment);
 
+router.post('/list', videoController.getVideosList)
+
 module.exports = router;
