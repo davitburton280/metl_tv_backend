@@ -256,8 +256,8 @@ exports.getChanelDetail = async (req, res) => {
 exports.update = async (req, res) => {
     try {
         const { id } = req.params
-        const { avatar, cover, name } = req.body
-        let updateBody = { avatar, cover, name }
+        const { avatar, cover, name, description } = req.body
+        let updateBody = { avatar, cover, name, description }
 
         Object.keys(updateBody).map(item => {
             if (!updateBody[item]) delete updateBody[item]

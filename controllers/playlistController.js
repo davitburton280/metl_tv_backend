@@ -22,7 +22,8 @@ exports.add = async (req, res) => {
 
 exports.addVideos = async (req, res) => {
     const data = req.body;
-    const videoIds = JSON.parse(data.video_ids);
+    const videoIds = data.video_ids;
+    console.log(videoIds)
     videoIds.map(async (id) => {
         let lastPosition = await PlaylistsVideos.findOne({
             where: {video_id: id},
