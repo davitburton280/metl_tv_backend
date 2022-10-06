@@ -23,7 +23,10 @@ exports.add = async (req, res) => {
 exports.addVideos = async (req, res) => {
     const data = req.body;
     const videoIds = data.video_ids;
+<<<<<<< Updated upstream
     console.log(videoIds)
+=======
+>>>>>>> Stashed changes
     videoIds.map(async (id) => {
         let lastPosition = await PlaylistsVideos.findOne({
             where: {video_id: id},
@@ -85,7 +88,7 @@ exports.get = async (req, res) => {
             {model: Channels, as: 'channel'}],
         where: [where, wherePlaylistFilters, whereSearch]
     })
-        .filter(p => p.channel.user_id !== +user_id ? p.privacy === 0 : p); // Filtering out private playlists for other users
+        .filter(p => p.channel?.user_id !== +user_id ? p.privacy === 0 : p); // Filtering out private playlists for other users
 
     res.json(playlists);
 };
