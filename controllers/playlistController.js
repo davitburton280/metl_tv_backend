@@ -23,10 +23,7 @@ exports.add = async (req, res) => {
 exports.addVideos = async (req, res) => {
     const data = req.body;
     const videoIds = data.video_ids;
-<<<<<<< Updated upstream
     console.log(videoIds)
-=======
->>>>>>> Stashed changes
     videoIds.map(async (id) => {
         let lastPosition = await PlaylistsVideos.findOne({
             where: {video_id: id},
