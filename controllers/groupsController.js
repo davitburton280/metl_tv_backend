@@ -111,7 +111,7 @@ exports.getById = async (req, res) => {
 
     const groupMembers = await Groups.findOne({
         where: { id },
-        attributes: ['id', 'name', 'custom_name', 'avatar', 'cover', 'creator_id', 'privacy'],
+        attributes: ['id', 'name', 'custom_name', 'avatar', 'description', 'cover', 'creator_id', 'privacy'],
         include: [
             {
                 model: Users,
