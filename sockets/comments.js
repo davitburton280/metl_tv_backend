@@ -16,7 +16,7 @@ exports.store = async (data, socket, io) => {
     await socket.join(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`)
     console.log(user.username, 'connected to room', `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`);
     // io.in(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`).emit('fetchMessages', 'hello')
-    io.sockets.clients(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`)
+    console.log(io.sockets.clients(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`));
 
     return true
 
