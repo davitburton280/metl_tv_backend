@@ -13,7 +13,7 @@ exports.store = async (data, socket, io) => {
     const { post_id, video_id } = JSON.parse(data)
 
     await socket.join(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`)
-
+    console.log(user.username, 'connected to room', `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`);
     // io.in(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`).emit('fetchMessages', 'hello')
     return true
 

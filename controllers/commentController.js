@@ -43,7 +43,7 @@ exports.create = async (body, user) => {
     //     sort
     // ]
 
-
+    console.log(data.dataValues);
     return {
         success: true, message: 'ok', data: {
             room: `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`,
