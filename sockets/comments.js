@@ -20,7 +20,11 @@ exports.store = async (data, socket, io) => {
     await socket.join(room)
     console.log(user.username, 'connected to room', room);
     // io.in(room).emit('fetchMessages', 'hello')
-    console.log(io.sockets.adapter.rooms, '111111111111111111111111');
+    Object.keys(io.sockets.adapter.rooms).map(item => {
+        if (item === room) {
+            console.log(io.sockets.adapter.rooms[item], '111111111111111111111111')
+        }
+    })
 
     return true
 
