@@ -17,6 +17,7 @@ exports.store = async (data, socket, io) => {
 
     io.sockets.adapter.rooms.forEach((element, index) => {
         console.log(element, 'element ', index);
+        console.log(io.sockets.adapter.rooms[index].length);
     })
     console.log(user.username, 'connected to room', room);
     return true
