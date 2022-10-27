@@ -5,9 +5,23 @@ let directChat = require('./direct_chat');
 let groupChat = require('./group_chat');
 let chatGroups = require('./chat_groups');
 let pageGroups = require('./page_groups');
+let comments = require('./comments')
 let posts = require('./posts');
-
+const jwt = require('jsonwebtoken')
 let socket = (io) => {
+    console.log('Socket server is running');
+    io.use(async (socket, next) => {
+        if (socket.handshake.headers && socket.handshake.headers['token']) {
+            jwt.verify(socket.handshake.headers['token'], 'secretkey', function (err, decoded) {
+                if (err) return next(new Error('Authentication error'));
+                socket.decoded = decoded;
+                next();
+            });
+        }
+        else {
+            next(new Error('Authentication error'));
+        }
+    })
     io.on('connection', async (socket) => {
         console.log('new connection made');
 
@@ -169,9 +183,23 @@ let socket = (io) => {
             await users.forceDisconnect(user, usersGroups, socket, io);
         });
 
+        //!
+        socket.on('addComment', async (data) => {
+            await comments.createComment(data, socket, io)
+        })
+
+        socket.on('storeComments', async (data) => {
+            await comments.store(data, socket, io)
+        })
+
         socket.on('disconnect', () => {
             console.log('user disconnected');
         });
+
+
+        // socket
+
+
     })
 }
 

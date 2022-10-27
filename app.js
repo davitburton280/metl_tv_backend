@@ -137,6 +137,7 @@ app.use('/chat/video', require('./routes/chat/video'));
 app.use('/notifications', require('./routes/notifications'));
 app.use('', require('./routes/upload'));
 app.use('', require('./routes/subscription'))
+app.use('/comments', require('./routes/comments'))
 
 
 let dist = path.join(__dirname, 'dist/');

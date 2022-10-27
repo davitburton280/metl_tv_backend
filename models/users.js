@@ -20,7 +20,9 @@ module.exports = (sequelize, DataTypes) => {
     }, {timestamps: false, underscored: true});
     users.associate = function (models) {
         users.hasMany(models.videos, {as: 'videos', foreignKey: 'author_id'});
+        users.hasMany(models.comments, {as: 'comments', foreignKey: 'user_id'});
         users.hasMany(models.users_cards, {foreignKey: 'user_id'});
+        // users.hasMany(models.comments, {as: 'comments', foreignKey: 'user_id'});
         // users.hasMany(models.chat_messages, {as: 'from_messages', foreignKey: 'from_id'});
         // users.hasMany(models.chat_messages, {as: 'to_messages', foreignKey: 'to_id'});
         // users.hasMany(models.users_connection, {as: 'connection', foreignKey: 'connection_id'});
@@ -28,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         users.hasMany(models.users_tags, {as: 'tags_users', foreignKey: 'tag_id'}); // ?
         users.hasOne(models.channels, {foreignKey: 'user_id', as: 'channel'});
         users.belongsTo(models.stocks_ordering_types, {foreignKey: 'stocks_order_type_id', as: 'stocks_order_type'});
+        // users.belongsTo(models.comments, {foreignKey: 'user_id', as: 'user'});
 
 
         users.belongsToMany(models.channels, {
@@ -40,6 +43,12 @@ module.exports = (sequelize, DataTypes) => {
             through: models.users_videos,
             foreignKey: 'user_id'
         });
+
+        // users.belongsToMany(models.comments, {
+        //     as: 'user',
+        //     through: models.comments,
+        //     foreignKey: 'user_id'
+        // });
 
         users.belongsToMany(models.posts, {
             as: 'user_posts',
@@ -110,7 +119,7 @@ module.exports = (sequelize, DataTypes) => {
         // users.hasMany(models.users_connection, {as: 'to_connection_user', foreignKey: 'to_id'});
 
         users.hasMany(models.posts, {as: 'posts', foreignKey: 'author_id'});
-
+        users.hasMany(models.comments, {foreignKey: 'user_id'})
         // associations can be defined here
     };
     return users;
