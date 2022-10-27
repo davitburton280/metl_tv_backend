@@ -17,10 +17,10 @@ exports.store = async (data, socket, io) => {
     console.log(exsitsRoom, 'exsitsRoom');
     console.log(typeof exsitsRoom, 'exsitsRooType');
 
-    await socket.join(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`)
-    console.log(user.username, 'connected to room', `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`);
-    // io.in(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`).emit('fetchMessages', 'hello')
-    console.log(io.sockets.adapter.rooms[`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`], '111111111111111111111111');
+    await socket.join(room)
+    console.log(user.username, 'connected to room', room);
+    // io.in(room).emit('fetchMessages', 'hello')
+    console.log(io.sockets.adapter.rooms[room], '111111111111111111111111');
 
     return true
 
