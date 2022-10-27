@@ -17,14 +17,16 @@ exports.store = async (data, socket, io) => {
     console.log(exsitsRoom, 'exsitsRoom');
     console.log(typeof exsitsRoom, 'exsitsRooType');
 
-    await socket.join(room)
-    console.log(user.username, 'connected to room', room);
-    // io.in(room).emit('fetchMessages', 'hello')
-    Object.keys(exsitsRoom).map(item => {
-        console.log(item, 'item item imte imte');
-        if (item === room) {
-            console.log(exsitsRoom[item], '111111111111111111111111')
-        }
+    const data = new Promise(socket.join(room)).then(data => {
+        console.log(io.sockets.adapter.rooms, 'pppppppp')
+        console.log(user.username, 'connected to room', room);
+        // io.in(room).emit('fetchMessages', 'hello')
+        Object.keys(io.sockets.adapter.rooms).map(item => {
+            console.log(item, 'item item imte imte');
+            if (item === room) {
+                console.log(io.sockets.adapter.rooms[item], '111111111111111111111111')
+            }
+        })
     })
 
     return true
