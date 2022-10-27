@@ -13,25 +13,10 @@ exports.store = async (data, socket, io) => {
     const user = socket.decoded
     const { post_id, video_id } = JSON.parse(data)
     const room = `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`
-    const exsitsRoom = io.sockets.adapter.rooms
-    console.log(exsitsRoom, 'exsitsRoom');
-    console.log(typeof exsitsRoom, 'exsitsRooType');
+    await socket.join(room)
 
-    const aaa = new Promise(socket.join(room))
-    aaa.then((res, rej) => {
-        res(() => {
-            console.log(io.sockets.adapter.rooms, 'pppppppp')
-            console.log(user.username, 'connected to room', room);
-            // io.in(room).emit('fetchMessages', 'hello')
-            Object.keys(io.sockets.adapter.rooms).map(item => {
-                console.log(item, 'item item imte imte');
-                if (item === room) {
-                    console.log(io.sockets.adapter.rooms[item], '111111111111111111111111')
-                }
-            })
-        })
-    })
-
+    console.log(io.sockets.adapter.rooms, 'pppppppp')
+    console.log(user.username, 'connected to room', room);
     return true
 
 }
