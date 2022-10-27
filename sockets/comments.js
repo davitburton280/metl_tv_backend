@@ -13,7 +13,7 @@ exports.store = async (data, socket, io) => {
     const user = socket.decoded
     const { post_id, video_id } = JSON.parse(data)
     const room = `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`
-    const exsitsRoom = io.sockets.adapter.rooms[room]
+    const exsitsRoom = io.sockets.adapter.rooms
     console.log(exsitsRoom, 'exsitsRoom');
 
     await socket.join(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`)
