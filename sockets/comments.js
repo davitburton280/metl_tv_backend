@@ -12,11 +12,14 @@ exports.createComment = async (data, socket, io) => {
 exports.store = async (data, socket, io) => {
     const user = socket.decoded
     const { post_id, video_id } = JSON.parse(data)
+    const room = `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`
+    const exsitsRoom = io.sockets.adapter.rooms[room]
+    console.log(exsitsRoom, 'exsitsRoom');
 
     await socket.join(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`)
     console.log(user.username, 'connected to room', `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`);
     // io.in(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`).emit('fetchMessages', 'hello')
-    console.log(io.sockets.adapter.rooms[`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`], '111111111111111111111111');
+    console.log(exsitsRoom, '111111111111111111111111');
 
     return true
 
