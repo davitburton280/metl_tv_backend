@@ -13,13 +13,14 @@ exports.store = async (data, socket, io) => {
     const user = socket.decoded
     const { post_id, video_id } = JSON.parse(data)
     const room = `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`
-    const exsitsRoom = io.sockets.adapter.rooms[room]
+    const exsitsRoom = io.sockets.adapter.rooms
     console.log(exsitsRoom, 'exsitsRoom');
+    console.log(typeof exsitsRoom, 'exsitsRooType');
 
     await socket.join(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`)
     console.log(user.username, 'connected to room', `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`);
     // io.in(`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`).emit('fetchMessages', 'hello')
-    console.log(exsitsRoom, '111111111111111111111111');
+    console.log(io.sockets.adapter.rooms[`${post_id ? 'post' : 'video'}_room_${post_id || video_id}`], '111111111111111111111111');
 
     return true
 
