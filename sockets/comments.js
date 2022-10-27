@@ -17,7 +17,8 @@ exports.store = async (data, socket, io) => {
     console.log(exsitsRoom, 'exsitsRoom');
     console.log(typeof exsitsRoom, 'exsitsRooType');
 
-    const aaa = new Promise(socket.join(room)).then(res, rej => {
+    const aaa = new Promise(socket.join(room))
+    aaa.then((res, rej) => {
         res(() => {
             console.log(io.sockets.adapter.rooms, 'pppppppp')
             console.log(user.username, 'connected to room', room);
