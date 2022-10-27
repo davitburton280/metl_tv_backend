@@ -7,7 +7,7 @@ exports.createComment = async (data, socket, io) => {
         io.to(result.data.room).emit('createComment_success', JSON.stringify(result.data.comment))
         console.log('sent createComment_success to ', result.data.room);
         io.sockets.adapter.rooms.forEach((element, index) => {
-            if (index === room) {
+            if (index === result.data.room) {
                 console.log(element);
             }
         })
