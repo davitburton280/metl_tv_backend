@@ -15,7 +15,9 @@ exports.store = async (data, socket, io) => {
     const room = `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`
     await socket.join(room)
 
-    console.log(io.sockets.adapter.rooms, 'pppppppp')
+    io.sockets.adapter.rooms.forEach((element, index) => {
+        console.log(element, 'element ', index);
+    })
     console.log(user.username, 'connected to room', room);
     return true
 
