@@ -17,7 +17,7 @@ exports.createComment = async (data, socket, io) => {
 
 exports.store = async (data, socket, io) => {
     const user = socket.decoded
-    const { post_id, video_id } = JSON.parse(data)
+    const { post_id, video_id } = data
     const room = `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`
     await socket.join(room)
 

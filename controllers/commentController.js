@@ -6,7 +6,7 @@ const Users = db.users
 const comments = db.comments
 
 exports.create = async (body, user) => {
-    let { post_id, video_id, is_reply, comment, parent_comment, files } = JSON.parse(body)
+    let { post_id, video_id, is_reply, comment, parent_comment, files } = body
     const model = {
         user_id: user.id,
         post_id: post_id || null,
