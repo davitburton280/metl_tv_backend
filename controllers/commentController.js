@@ -7,6 +7,7 @@ const comments = db.comments
 
 exports.create = async (body, user) => {
     let { post_id, video_id, is_reply, comment, parent_comment, files } = body
+    console.log(body, 'body ---------------------------- create');
     const model = {
         user_id: user.id,
         post_id: post_id || null,
