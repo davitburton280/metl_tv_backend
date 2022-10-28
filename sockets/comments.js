@@ -4,6 +4,7 @@ exports.createComment = async (data, socket, io) => {
     const user = socket.decoded
     const result = await comment_controller.create(data, user)
     if (result.success) {
+        console.log(`success room ------------------------- ${result.data.room}`);
         io.in(result.data.room).emit('createComment_success', JSON.stringify(result.data.comment))
         console.log('sent createComment_success to ', result.data.room);
         io.sockets.adapter.rooms.forEach((element, index) => {
