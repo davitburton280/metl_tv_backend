@@ -68,7 +68,7 @@ exports.getList = async (req, res) => {
         if (!page) page = 1
         if (!limit) limit = 20
 
-        let filter = {}
+        let filter = {} 
         if (type === 'video') {
             filter['video_id'] = id
         } else if (type === 'post') {
