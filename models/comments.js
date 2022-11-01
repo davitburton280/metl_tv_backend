@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             comments.belongsTo(models.users, { as: 'user', foreignKey: 'user_id' })
-            // comments.belongsTo(models.comments, { as: 'reply', foreignKey: 'parent_comment' })
+            comments.hasOne(models.comments, { as: 'reply', foreignKey: 'parent_comment' })
             // define association here
         }
     };
