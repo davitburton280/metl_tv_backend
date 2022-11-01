@@ -192,13 +192,16 @@ let socket = (io) => {
             await comments.store(data, socket, io)
         })
 
+        socket.on('disconnectStoredComment', async (data) => {
+            await comments.disconnectStoredComment(data, socket, io)
+        })
+
         socket.on('disconnect', () => {
             console.log('user disconnected');
         });
 
         
         // socket
-
 
     })
 }

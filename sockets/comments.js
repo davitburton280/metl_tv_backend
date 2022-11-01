@@ -33,3 +33,19 @@ exports.store = async (data, socket, io) => {
     return true
 
 }
+
+exports.disconnectStoredComment = async (data, socket, io) => {
+    const { post_id, video_id } = JSON.parse(data)
+    console.log(data, 'data from disconnecting from stored data')
+    const room = `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`
+    
+    await socket.leave(room)
+
+    io.sockets.adapter.rooms.forEach((element, index) => {
+        if (index === room) {
+            console.log(element, 'socket romm after disconnection from room - ', room);
+        }
+    })
+
+    return true
+}

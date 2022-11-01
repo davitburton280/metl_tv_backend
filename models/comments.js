@@ -10,21 +10,22 @@ module.exports = (sequelize, DataTypes) => {
          * The `models/index` file will call this method automatically.
          */
         static associate(models) {
-            comments.belongsTo(models.users, {as: 'user', foreignKey: 'user_id'})
+            comments.belongsTo(models.users, { as: 'user', foreignKey: 'user_id' })
+            comments.belongsTo(models.comments, { as: 'reply', foreignKey: 'parent_comment' })
             // define association here
         }
     };
     comments.init({
-      user_id: DataTypes.INTEGER,
-      post_id: DataTypes.INTEGER,
-      video_id: DataTypes.INTEGER,
-      is_reply: DataTypes.INTEGER,
-      comment: DataTypes.TEXT,
-      parent_comment: DataTypes.INTEGER,
-      likes: DataTypes.INTEGER,
-      dislikes: DataTypes.INTEGER,
-      files: DataTypes.JSON,
-      reply_count: DataTypes.INTEGER
+        user_id: DataTypes.INTEGER,
+        post_id: DataTypes.INTEGER,
+        video_id: DataTypes.INTEGER,
+        is_reply: DataTypes.INTEGER,
+        comment: DataTypes.TEXT,
+        parent_comment: DataTypes.INTEGER,
+        likes: DataTypes.INTEGER,
+        dislikes: DataTypes.INTEGER,
+        files: DataTypes.JSON,
+        reply_count: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'comments',

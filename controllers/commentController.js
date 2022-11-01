@@ -86,6 +86,9 @@ exports.getList = async (req, res) => {
                     model: Users, as: 'user', attributes: [
                         'first_name', 'last_name', 'username', 'email', 'avatar'
                     ]
+                },
+                {
+                    model: comments, as: 'parent_comment'
                 }
             ],
             order: [
