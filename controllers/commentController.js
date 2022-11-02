@@ -85,7 +85,7 @@ exports.getList = async (req, res) => {
         } else {
             return res.status(400).send({ success: false, message: 'type in params must be video or post' })
         }
-
+        console.log(`----------------------------${filter}`);
         const { count, rows } = await comments.findAndCountAll({
             where: filter,
             limit,
@@ -95,9 +95,6 @@ exports.getList = async (req, res) => {
                     model: Users, as: 'user', attributes: [
                         'first_name', 'last_name', 'username', 'email', 'avatar'
                     ]
-                },
-                {
-                    model: comments, as: 'reply'
                 }
             ],
             order: [
