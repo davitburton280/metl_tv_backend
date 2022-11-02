@@ -4,6 +4,8 @@ const Op = sequelize.Op;
 const db = require('../models');
 const Users = db.users
 const comments = db.comments
+const posts = db.posts
+const videos = db.videos
 
 exports.create = async (body, user) => {
     let { post_id, video_id, is_reply, comment, parent_comment, files } = JSON.parse(body)
@@ -37,6 +39,12 @@ exports.create = async (body, user) => {
     if (!post_id) delete filter.post_id
     if (!video_id) delete filter.video_id
 
+
+    if (parent_comment) {
+        const parentComment = await comment.findOne({ where: { id: parent_comment } })
+        await comments.update({ reply_count: parentComment.reply_count + 1 }, { where: { id: parent_comment } })
+    }
+
     // const list = await comments.findAll({ where: filter, order: [['id','desc']], limit: 5 })
     // limit: +limit,
     // offset: (+offset - 1) * +limit,
@@ -44,7 +52,6 @@ exports.create = async (body, user) => {
     //     sort
     // ]
 
-    console.log(data.dataValues);
     return {
         success: true, message: 'ok', data: {
             room: `${post_id ? 'post' : 'video'}_room_${post_id || video_id}`,
@@ -68,7 +75,9 @@ exports.getList = async (req, res) => {
         if (!page) page = 1
         if (!limit) limit = 20
 
-        let filter = {}
+        let filter = {
+            parent_comment: null
+        }
         if (type === 'video') {
             filter['video_id'] = id
         } else if (type === 'post') {
@@ -101,4 +110,50 @@ exports.getList = async (req, res) => {
         return res.status(500).send({ success: false, message: 'Something went wrong' })
     }
 
+}
+
+exports.getReplys = async (req, res) => {
+    try {
+        let { id } = req.params
+
+        if (!id) return res.send({ success: true, message: "id in params is required" })
+        const list = await comments.findAll({
+            where: { parent_comment: id, is_reply: true }, include: [
+                {
+                    model: Users, as: 'user', attributes: [
+                        'first_name', 'last_name', 'username', 'email', 'avatar'
+                    ]
+                }
+            ]
+        })
+        return res.send({ success: true, message: 'ok', data: list })
+    } catch (error) {
+        return res.status(500).send({ success: false, message: 'Something went wrong in getReplys list' })
+    }
+}
+
+exports.delete = async (req, res) => {
+    try {
+        let { id } = req.params
+        const user = req.user
+
+        if (!id) return res.send({ success: false, message: "Something went wrong in delete comment api, id in params is required" })
+
+        const targetComment = await comments.findOne({ where: { id } })
+        if (!targetComment) return res.send({ success: false, message: "Wrong target id" })
+
+        const target = targetComment.video_id ? await videos.findOne({ id: targetComment.video_id })
+            : await posts.findOne({ id: targetComment.post_id })
+            
+        if (!target) return res.send({ success: false, message: "Wrong id" })
+        if (target.author_id === user.id || targetComment.user_id === user.id) {
+
+            await comments.destroy({ where: { id } })
+
+        } else return res.sendStatus(403)
+
+        return res.send({ success: true, message: 'ok' })
+    } catch (error) {
+        return res.status(500).send({ success: false, message: 'Something went wrong' })
+    }
 }
