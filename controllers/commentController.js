@@ -41,7 +41,7 @@ exports.create = async (body, user) => {
 
 
     if (parent_comment) {
-        const parentComment = await comment.findOne({ where: { id: parent_comment } })
+        const parentComment = await comments.findOne({ where: { id: parent_comment } })
         await comments.update({ reply_count: parentComment.reply_count + 1 }, { where: { id: parent_comment } })
     }
 
