@@ -57,7 +57,7 @@ exports.get = async (req, res) => {
     }
 
     let groupsResult = await GroupsMembers.findAll({
-        where: { member_id: user_id, confirmed: 1 }, attributes: ['group_id']
+        where: { member_id: req.decoded.id, confirmed: 1 }, attributes: ['group_id']
     });
 
     let groupIds = JSON.parse(JSON.stringify(groupsResult)).map(t => t.group_id);

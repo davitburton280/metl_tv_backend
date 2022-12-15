@@ -9,6 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       user_id: Sequelize.INTEGER,
+      reply_user_id: Sequelize.INTEGER,
       video_id: {
         type: Sequelize.INTEGER
       },
@@ -24,10 +25,10 @@ module.exports = {
       parent_comment: {
         type: Sequelize.INTEGER
       },
-      likes: {
+      likes_count: {
         type: Sequelize.INTEGER
       },
-      dislikes: {
+      dislikes_count: {
         type: Sequelize.INTEGER
       },
       files: {
@@ -35,6 +36,14 @@ module.exports = {
       },
       reply_count: {
         type: Sequelize.INTEGER
+      },
+      likes: {
+        type: Sequelize.JSON,
+        defaultValue: []
+      },
+      dislikes: {
+        type: Sequelize.JSON,
+        defaultValue: []
       },
       created_at: {
         type: Sequelize.DATE

@@ -8,6 +8,9 @@ let pageGroups = require('./page_groups');
 let comments = require('./comments')
 let posts = require('./posts');
 const jwt = require('jsonwebtoken')
+// const RedisStore = require('../services/redis')
+const SocketHandlerService = require('../services/socketHandlerService')
+
 let socket = (io) => {
     console.log('Socket server is running');
     io.use(async (socket, next) => {
@@ -24,6 +27,15 @@ let socket = (io) => {
     })
     io.on('connection', async (socket) => {
         console.log('new connection made');
+
+        await SocketHandlerService.attach({ user_id: socket.decoded.id, socket: socket.id })
+
+        // const existsUserConnected = await RedisStore.client.get(`${socket.decoded.id}`)
+        // if (!existsUserConnected) await RedisStore.client.set(`${socket.decoded.id}`, socket.id)
+        // else {
+        //     await RedisStore.client.del(`${socket.decoded.id}`)
+        //     await RedisStore.client.set(`${socket.decoded.id}`, socket.id)
+        // }
 
         socket.on('newUser', (data) => {
             users.newUser(data, usersGroups, socket, io)
@@ -196,11 +208,20 @@ let socket = (io) => {
             await comments.disconnectStoredComment(data, socket, io)
         })
 
-        socket.on('disconnect', () => {
+        socket.on('likeComment', async (data) => {
+            await comments.likeComment(data, socket, io)
+        })
+
+        socket.on('dislikeComment', async (data) => {
+            await comments.dislikeComment(data, socket, io)
+        })
+
+        socket.on('disconnect', async (socket) => {
+            // await RedisStore.client.del(`${socket.decoded.id}`)
             console.log('user disconnected');
         });
 
-        
+
         // socket
 
     })

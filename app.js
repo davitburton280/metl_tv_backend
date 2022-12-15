@@ -13,7 +13,7 @@ const path = require('path');
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const IN_PRODUCTION = process.env.NODE_ENV === 'production';
-
+// const RedisStore = require('./services/redis')
 // Listen
 // const session = require('express-session');
 const https = require('https');
@@ -75,7 +75,7 @@ const bodyParser = require('body-parser');
 server.listen(port, () => {
     console.log('server is listening on port ' + port)
 });
-
+// RedisStore.connect()
 // Dotenv used to read process.env
 require('dotenv').config();
 
@@ -138,6 +138,7 @@ app.use('/notifications', require('./routes/notifications'));
 app.use('', require('./routes/upload'));
 app.use('', require('./routes/subscription'))
 app.use('/comments', require('./routes/comments'))
+app.use('/notification', require('./routes/notification'))
 
 
 let dist = path.join(__dirname, 'dist/');

@@ -34,6 +34,10 @@ const SORTING_KEYS = {
     likes: 'likes',
 }
 
+const NOTIFICATION_TYPES = {
+    commentReaction: 'comment_reaction'
+}
+
 module.exports = {
     CLIPZ_DURATION,
     UPLOAD_MODULE_TYPES,
@@ -42,5 +46,6 @@ module.exports = {
     FILE_PATHS,
     USER_SUBSCRIPTION_PLANS,
     SORTING_VALUE,
-    SORTING_KEYS
+    SORTING_KEYS,
+    NOTIFICATION_TYPES
 };

@@ -169,7 +169,7 @@ exports.getSubscribers = async (req, res) => {
                 model: Users, as: 'subscribers',
                 attributes: ['email', 'id'],
                 where:
-                    sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), user_id),
+                    sequelize.where(sequelize.col('subscribers->channel_subscribers.subscriber_id'), req.decoded.id),
             },
             { model: Users, attributes: ['username'], as: 'user' }
         ],

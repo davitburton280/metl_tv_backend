@@ -9,16 +9,20 @@ const videos = db.videos
 
 exports.create = async (body, user) => {
     let { post_id, video_id, is_reply, comment, parent_comment, files } = JSON.parse(body)
-    console.log(body, 'body ---------------------------- create');
+    const parentComment = await comments.findOne({ where: { id: parent_comment } })
+
     const model = {
         user_id: user.id,
+        reply_user_id: parentComment ? parentComment.user_id : null, //!
         post_id: post_id || null,
         video_id: video_id || null,
         is_reply,
         comment,
         parent_comment: parent_comment || null,
-        likes: 0,
-        dislikes: 0,
+        likes_count: 0,
+        dislikes_count: 0,
+        likes: [],
+        dislikes: [],
         reply_count: 0,
         files: files || []
     }
@@ -26,6 +30,7 @@ exports.create = async (body, user) => {
     const data = await comments.create(model)
     delete data.dataValues.user_id
     data.dataValues.user = {
+        id: user.id,
         first_name: user.first_name,
         last_name: user.last_name,
         username: user.username,
@@ -39,9 +44,7 @@ exports.create = async (body, user) => {
     if (!post_id) delete filter.post_id
     if (!video_id) delete filter.video_id
 
-
     if (parent_comment) {
-        const parentComment = await comments.findOne({ where: { id: parent_comment } })
         await comments.update({ reply_count: parentComment.reply_count + 1 }, { where: { id: parent_comment } })
     }
 
@@ -58,6 +61,91 @@ exports.create = async (body, user) => {
             comment: data.dataValues
         }
     }
+}
+
+exports.likeComment = async (id, user) => {
+    let feedback = {
+        liked: true,
+        comment: null
+    }
+    const comment = await comments.findOne({ where: { id } })
+    const index = comment.likes.indexOf(user.id)
+
+    if (index > -1) {
+        comment.likes.splice(index, 1)
+        comment.likes_count = comment.likes_count -1 >= 0 ? comment.likes_count -1 : 0
+        feedback.liked = false
+
+    } else {
+        comment.likes.push(user.id)
+        comment.likes_count += 1
+    }
+
+    let updateBody = {
+        likes: comment.likes,
+        likes_count: comment.likes_count
+    }
+
+    // find is disliked
+    const dislikedCommentIndex = comment.dislikes.indexOf(user.id)
+
+    if (dislikedCommentIndex > -1) {
+        comment.dislikes.splice(index, 1)
+        comment.dislikes_count = comment.dislikes_count - 1 >= 0 ? comment.dislikes_count - 1 : 0
+        updateBody['dislikes'] = comment.dislikes
+        updateBody['dislikes_count'] = comment.dislikes_count
+    }
+    //
+
+
+    feedback.comment = comment
+
+    
+
+    await comments.update(updateBody, { where: { id } })
+
+    return feedback
+}
+
+exports.dislikeComment = async (id, user) => {
+    let feedback = {
+        disliked: true,
+        comment: null
+    }
+    const comment = await comments.findOne({ where: { id } })
+    const index = comment.likes.indexOf(user.id)
+
+    if (index > -1) {
+        comment.dislikes.splice(index, 1)
+        comment.dislikes_count = comment.dislikes_count - 1 >= 0 ? comment.dislikes_count -1 : 0
+        feedback.disliked = false
+
+    } else {
+        comment.dislikes.push(user.id)
+        comment.dislikes_count = comment.dislikes_count + 1
+    }
+
+    let updateBody = {
+        dislikes: comment.dislikes,
+        dislikes_count: comment.dislikes_count
+    }
+
+    // find is disliked
+    const likedCommentIndex = comment.likes.indexOf(user.id)
+
+    if (likedCommentIndex > -1) {
+        comment.likes.splice(index, 1)
+        comment.likes_count = comment.likes_count - 1 >= 0 ? comment.likes_count - 1 : 0
+        updateBody['likes'] = comment.dislikes
+        updateBody['likes_count'] = comment.likes_count
+    }
+    //
+
+
+    feedback.comment = comment
+    await comments.update(updateBody, { where: { id } })
+
+    return feedback
 }
 
 exports.addComment = async (req, res) => {
@@ -93,7 +181,7 @@ exports.getList = async (req, res) => {
             include: [
                 {
                     model: Users, as: 'user', attributes: [
-                        'first_name', 'last_name', 'username', 'email', 'avatar'
+                        'id', 'first_name', 'last_name', 'username', 'email', 'avatar'
                     ]
                 }
             ],
@@ -118,7 +206,12 @@ exports.getReplys = async (req, res) => {
             where: { parent_comment: id, is_reply: true }, include: [
                 {
                     model: Users, as: 'user', attributes: [
-                        'first_name', 'last_name', 'username', 'email', 'avatar'
+                        'id', 'first_name', 'last_name', 'username', 'email', 'avatar'
+                    ]
+                },
+                {
+                    model: Users, as: 'replyUser', attributes: [
+                        'id', 'first_name', 'last_name', 'username', 'email', 'avatar'
                     ]
                 }
             ]
@@ -141,7 +234,7 @@ exports.delete = async (req, res) => {
 
         const target = targetComment.video_id ? await videos.findOne({ id: targetComment.video_id })
             : await posts.findOne({ id: targetComment.post_id })
-            
+
         if (!target) return res.send({ success: false, message: "Wrong id" })
         if (target.author_id === user.id || targetComment.user_id === user.id) {
 

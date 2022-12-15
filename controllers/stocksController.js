@@ -176,7 +176,8 @@ exports.getCustomStocksChartData = async (req, res) => {
 
 
 exports.getUserStocks = async (req, res) => {
-    let {user_id, type_id, sort_type} = req.query;
+    let {type_id, sort_type} = req.query;
+    let user_id = req.decoded.id
     let whereType = type_id ? {type_id: +type_id} : {};
     console.log('get user stocks!!!!')
 
