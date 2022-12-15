@@ -27,6 +27,8 @@ exports.create = async (body, user) => {
         files: files || []
     }
 
+    console.log(model, 'fffff model');
+
     const data = await comments.create(model)
     delete data.dataValues.user_id
     data.dataValues.user = {
