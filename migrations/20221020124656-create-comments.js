@@ -38,12 +38,10 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       likes: {
-        type: Sequelize.JSON,
-        defaultValue: []
+        type: Sequelize.JSON
       },
       dislikes: {
-        type: Sequelize.JSON,
-        defaultValue: []
+        type: Sequelize.JSON
       },
       created_at: {
         type: Sequelize.DATE
