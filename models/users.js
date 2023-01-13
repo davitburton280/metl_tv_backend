@@ -97,6 +97,12 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'user_id',
         })
 
+        // users.belongsToMany(models.conversations, {
+        //     as: 'conversation_creator',
+        //     through: models.conversations,
+        //     foreignKey: 'creator',
+        // })
+
         users.belongsToMany(models.roles, {
             as: 'chat_group_roles',
             through: models.users_chat_groups,
@@ -120,6 +126,10 @@ module.exports = (sequelize, DataTypes) => {
 
         users.hasMany(models.posts, {as: 'posts', foreignKey: 'author_id'});
         users.hasMany(models.comments, {foreignKey: 'user_id'})
+        users.hasMany(models.conversations, {as: 'creatorData', foreignKey: 'creator_id'});
+        users.hasMany(models.conversations, {as: 'targetData', foreignKey: 'target_id'});
+        users.hasMany(models.messages, {as: 'creator', foreignKey: 'creator_id'});
+        // users.hasMany(models.conversations, {as: 'target', foreignKey: 'target'});
         // associations can be defined here
     };
     return users;
