@@ -17,10 +17,8 @@ exports.castSortingModel = (key, value) => {
     return [[key, value]]
 }
 
-exports.create = async (req, res) => {
-    let { id, parent_message, files, reactions, message } = req.body
-    const user = req.decoded
-
+async function createMessage(body, user) {
+    let { id, parent_message, files, reactions, message } = body;
     const existsConversation = await Conversations.findOne({
         where: {
             id
@@ -28,7 +26,6 @@ exports.create = async (req, res) => {
     })
     if (!existsConversation) return res.status(400).send({ message: 'wrong conversation id' })
     if (existsConversation.creator_id !== user.id && existsConversation.target_id !== user.id) return res.sendStatus(403)
-
     const data = await Messages.create({
         creator_id: user.id,
         conversation: id,
@@ -40,7 +37,20 @@ exports.create = async (req, res) => {
         deleted: 0,
         reactions
     })
-    return res.send({ message: 'ok', data })      
+    return {
+        success: true,
+        message: 'ok',
+        data,
+    };
+}
+
+exports.create = async (req, res) => {
+    const data = await createMessage(req.body, req.decoded);
+    return res.send(data)
+}
+
+exports.createForSocket = async (body, user) => {
+    return await createMessage(body, user);
 }
 
 exports.update = async (req, res) => {
@@ -60,6 +70,22 @@ exports.update = async (req, res) => {
     await Messages.update(updateBody, { where: { id } })
 
     return res.send({ message: 'Message updated' })
+}
+
+exports.deleteForSocket = async (messageId, user) => {
+    const existsMessage = await Messages.findOne({ where: { id: messageId, creator_id: user.id, deleted: { [Op.ne]: 1 } } })
+    if (!existsMessage) {
+        return {
+            success: false,
+            message: 'Message not found',
+        }
+    }
+
+    await Messages.update({ deleted: 1 },{ where: { id: messageId } })
+
+    return {
+        success: true,
+    }
 }
 
 exports.delete = async (req, res) => {

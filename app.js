@@ -23,7 +23,8 @@ const https = require('https');
 const io = require('socket.io')(server, {
     cors: {
         origin: '*'
-    }
+    },
+    maxHttpBufferSize: 1e8,
 });
 // const {socket} = require('./helpers/socket');
 const {socket} = require('./sockets');

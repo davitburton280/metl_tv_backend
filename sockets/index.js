@@ -7,6 +7,7 @@ let chatGroups = require('./chat_groups');
 let pageGroups = require('./page_groups');
 let comments = require('./comments')
 let posts = require('./posts');
+let messages = require('./messages');
 const jwt = require('jsonwebtoken')
 // const RedisStore = require('../services/redis')
 const SocketHandlerService = require('../services/socketHandlerService')
@@ -221,6 +222,29 @@ let socket = (io) => {
             console.log('user disconnected');
         });
 
+        // messages, conversations
+        socket.on('joinConversation', async (conversationId) => {
+            const room = `conversation_room_${conversationId}`;
+            console.log('user joined conversation room --------- ', room)
+            await socket.join(room);
+        })
+
+        socket.on('leaveConversation', async (conversationId) => {
+            const room = `conversation_room_${conversationId}`;
+            console.log('user left conversation room --------- ', room)
+            await socket.leave(room);
+        })
+
+        socket.on('createMessage', async (data={}, ...files) => {
+            await messages.createMessage({
+                ...data,
+                files,
+            }, socket);
+        })
+
+        socket.on('deleteMessage', async (data={}) => {
+            await messages.deleteMessage(data, socket, io);
+        })
 
         // socket
 
