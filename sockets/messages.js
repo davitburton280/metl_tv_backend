@@ -26,6 +26,8 @@ async function saveConversationFiles(conversationId, files) {
 }
 
 exports.createMessage = async (data, socket) => {
+  const failureEvent = 'createMessage_failure';
+  const successEvent = 'createMessage_success';
   const user = socket.decoded
   if (data.files.length > 0) {
     const filenames = await saveConversationFiles(data.id, data.files);
@@ -33,15 +35,16 @@ exports.createMessage = async (data, socket) => {
   }
   const result = await messages_controller.createForSocket(data, user)
   
-  if (result.success) {
-    console.log('success ----------')
-    // console.log(result.data);
-
-    const room = `conversation_room_${result.data.conversation}`;
-    console.log(room);
-
-    socket.to(room).emit('createMessage_success', result.data);
+  if (!result.success) {
+    return socket.emit(failureEvent, result.message);
   }
+
+  console.log('success ----------')
+
+  const room = `conversation_room_${result.data.conversation}`;
+  console.log(room);
+
+  socket.to(room).emit(successEvent, result.data);
 }
 
 exports.deleteMessage = async (data, socket, io) => {
@@ -62,4 +65,21 @@ exports.deleteMessage = async (data, socket, io) => {
 
   console.log('deleteMessage success -----');
   io.to(room).emit(successEvent, data.messageId);
+}
+
+exports.updateMessage = async (data, socket, io) => {
+  const failureEvent = 'updateMessage_failure';
+  const successEvent = 'updateMessage_success';
+  const user = socket.decoded;
+  if (!data.messageId) {
+    return socket.emit(failureEvent, 'messageId required');
+  }
+
+  const result = await messages_controller.updateForSocket(data, user);
+
+  if (!result.success) {
+    return socket.emit(failureEvent, result.message);
+  }
+
+  io.to(`conversation_room_${result.data.conversation}`).emit(successEvent, result.data);
 }

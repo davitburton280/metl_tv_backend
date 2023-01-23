@@ -246,6 +246,10 @@ let socket = (io) => {
             await messages.deleteMessage(data, socket, io);
         })
 
+        socket.on('updateMessage', async (data={}) => {
+            await messages.updateMessage(data, socket, io);
+        })
+
         // socket
 
     })

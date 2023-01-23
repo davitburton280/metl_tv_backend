@@ -1,5 +1,8 @@
+const { body } = require('express-validator')
 const sequelize = require('sequelize')
 const { Sequelize } = require('../models')
+const fsPromises = require('fs/promises')
+const path = require('path')
 const Op = sequelize.Op
 
 const db = require('../models')
@@ -24,8 +27,21 @@ async function createMessage(body, user) {
             id
         }
     })
-    if (!existsConversation) return res.status(400).send({ message: 'wrong conversation id' })
-    if (existsConversation.creator_id !== user.id && existsConversation.target_id !== user.id) return res.sendStatus(403)
+    if (!existsConversation) {
+        return {
+            success: false,
+            statusCode: 400,
+            message: 'wrong conversation id',
+        }
+    }
+    if (existsConversation.creator_id !== user.id && existsConversation.target_id !== user.id) {
+        return {
+            success: false,
+            statusCode: 403,
+            message: 'Forbidden operation',
+        }
+    }
+
     const data = await Messages.create({
         creator_id: user.id,
         conversation: id,
@@ -44,13 +60,79 @@ async function createMessage(body, user) {
     };
 }
 
-exports.create = async (req, res) => {
-    const data = await createMessage(req.body, req.decoded);
-    return res.send(data)
-}
-
 exports.createForSocket = async (body, user) => {
     return await createMessage(body, user);
+}
+
+exports.create = async (req, res) => {
+    const result = await createMessage(req.body, req.decoded);
+
+    if (!result.success) {
+        return res.status(result.statusCode).json({ message: result.message });
+    }
+
+    res.json(result.data);
+}
+
+exports.updateForSocket = async (body, user) => {
+    const { message, files, messageId } = body;
+
+    const mess = await Messages.findOne({ where: { id: messageId, deleted: 0 } })
+    // console.log('mess')
+    // console.log(mess)
+    if (!mess) {
+        return {
+            success: false,
+            message: 'wrong message id',
+        }
+    }
+    if (mess.creator_id !== user.id) {
+        return {
+            success: false,
+            message: 'not allowed',
+        }
+    }
+    if (files && files.length > mess.files.length) {
+        return {
+            success: false,
+            message: 'Invalid operation',
+        }
+    }
+
+    let updateBody = {}
+    if (message) {
+        updateBody.message = message
+        updateBody.edited = 1;
+    } 
+    if (files && Array.isArray(files)) {
+        updateBody.files = files
+    } 
+
+    // if (message) mess.message = message
+    // if (files && Array.isArray(files)) mess.files = files
+
+    // const updatedMessage = await Messages.update(updateBody, { where: { id: messageId } });
+    await mess.update(updateBody);
+
+    if (files) {
+        const oldFiles = mess.files.filter((i) => !files.includes(i));
+        oldFiles.forEach((file) => {
+            const filePath = path.join(__dirname, '..', 'public', 'uploads', 'conversation_files', file);
+            fsPromises.unlink(filePath);
+        })
+    }
+
+    // console.log('mess 2');
+    // console.log(mess);
+    // console.log('updatedMessage');
+    // console.log(updatedMessage);
+
+    return {
+        success: true,
+        message: 'ok',
+        data: mess,
+    }
+
 }
 
 exports.update = async (req, res) => {
