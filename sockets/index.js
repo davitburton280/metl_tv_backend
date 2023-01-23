@@ -235,6 +235,17 @@ let socket = (io) => {
             await socket.leave(room);
         })
 
+        socket.on('conversationTyping', (conversationId) => {
+            const user = socket.decoded;
+            const room = `conversation_room_${conversationId}`;
+            socket.to(room).emit('conversationTyping', user.first_name);
+        })
+
+        socket.on('conversationTypingStopped', (conversationId) => {
+            const room = `conversation_room_${conversationId}`;
+            socket.to(room).emit('conversationTypingStopped');
+        })
+
         socket.on('createMessage', async (data={}, ...files) => {
             await messages.createMessage({
                 ...data,
