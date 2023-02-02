@@ -175,6 +175,130 @@ exports.leaveSession = (req, res) => {
     res.json('Leaved session');
 };
 
+exports.createSession = async (req, res) => {
+    try {
+        const user = req.decoded;
+        const data = req.body;
+    
+        const session = await OV.createSession();
+        session.creatorId = user.id;
+
+        console.log('------ create session -----');
+        console.log(session);
+    
+        const privacy = await PrivacyTypes.findOne({ where: {
+            name: data.privacy,
+        } });
+
+        const channel = await Channels.findOne({
+            where: {
+                user_id: user.id,
+            },
+        });
+    
+        const videoData = {
+            author_id: user.id,
+            channel_id: channel.id,
+            category_id: data.category_id,
+            description: data.description,
+            name: data.name,
+            thumbnail: data.thumbnail,
+            status: 'live',
+            session_id: session.sessionId,
+            privacy_id: privacy.id,
+        }
+    
+        const video = await Videos.create(videoData);
+    
+        console.log(1);
+
+        const token = await session.generateToken({
+            role: 'PUBLISHER',
+        })
+    
+        res.json({
+            message: 'Session created',
+            data: {
+                video,
+                token,
+            }
+        })
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: 'Internal server error',
+        })
+    }
+    
+};
+
+exports.closeSessionById = async (req, res) => {
+    try {
+        const user = req.decoded;
+        const { id } = req.params;
+
+        await OV.fetch();
+        const session = OV.activeSessions.find((i) => i.sessionId === id);
+
+        if (!session) {
+            return res.status(404).json({
+                error: 'Session not found',
+            });
+        }
+        
+        if (user.id !== session.creatorId) {
+            return res.status(403).json({
+                error: 'Forbidden operation'
+            })
+        }
+
+        await session.close();
+
+        res.json({
+            message: 'Session Closed',
+        })
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: 'Internal server error',
+        })
+    }
+    
+}
+
+exports.getTokenBySessionId = async (req, res) => {
+    try {
+        const { id } = req.params;
+    
+        await OV.fetch();
+        const session = OV.activeSessions.find((i) => i.sessionId === id);
+        console.log('------ session token -----');
+        console.log(session);
+
+        if (!session) {
+            return res.status(404).json({
+                error: 'Session not found',
+            });
+        }
+
+        const token = await session.generateToken({
+            role: 'SUBSCRIBER',
+        });
+
+        res.json({
+            message: 'token generated',
+            data: {
+                token,
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            error: 'Internal server error',
+        })
+    }
+}
+
 exports.changeAvatar = async (req, res) => {
     let {id, avatar} = req.body;
     let data = req.body;

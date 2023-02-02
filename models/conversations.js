@@ -23,7 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       target_id: DataTypes.INTEGER,
       last_message: DataTypes.INTEGER,
       deleted_from: DataTypes.ARRAY(DataTypes.INTEGER),
-      muted_from: DataTypes.ARRAY(DataTypes.INTEGER)
+      muted_from: DataTypes.ARRAY(DataTypes.INTEGER),
+      blocked_from: DataTypes.INTEGER,
+      is_blocked: DataTypes.BOOLEAN,
     }, {
         sequelize,
         modelName: 'conversations',

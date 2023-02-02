@@ -16,13 +16,46 @@ exports.castSortingModel = (key, value) => {
 }
 
 exports.create = async (req, res) => {
+    console.log('body');
+    console.log(req.body);
     const user = req.decoded
     const { targetUser } = req.body
+    const targetUserExists = await Users.findByPk(targetUser);
+
+    if (!targetUserExists) {
+        return res.status(404).json({
+            error: 'Target user not found'
+        })
+    }
+
+    const conversationExists = await Conversations.findOne({
+        where: {
+            [Op.or]: [
+                {
+                    creator_id: user.id,
+                    target_id: targetUserExists.id,
+                },
+                {
+                    creator_id: targetUserExists.id,
+                    target_id: user.id,
+                }
+            ]
+        }
+    });
+
+    if (conversationExists) {
+        return res.status(400).json({
+            error: 'Conversation already exists',
+        })
+    }
+
     const data = await ChatService.createConversation(user.id, targetUser)
     return res.send(data)
 }
 
 exports.getList = async (req, res) => {
+    console.log('------- conversation list --------');
+    console.log(req.headers)
     const user = req.decoded
     let { limit, page } = req.body
 
@@ -48,15 +81,15 @@ exports.getList = async (req, res) => {
             {
                 model: Users,
                 as: 'creator',
-                attributes: ['id', 'first_name', 'last_name', 'username', 'avatar']
+                attributes: ['id', 'first_name', 'last_name', 'username', 'avatar'],
             },
             {
                 model: Users,
                 as: 'target',
-                attributes: ['id', 'first_name', 'last_name', 'username', 'avatar']
-            }
+                attributes: ['id', 'first_name', 'last_name', 'username', 'avatar'],
+            },
         ],
-        attributes: ['id', 'last_message', 'deleted_from', 'muted_from', 'created_at', 'updated_at'],
+        attributes: ['id', 'last_message', 'deleted_from', 'muted_from', 'created_at', 'updated_at', 'is_blocked'],
         order: sorting,
         limit,
         offset: (page - 1) * limit
@@ -110,4 +143,64 @@ exports.delete = async (req, res) => {
     await Conversations.updateOne({ deleted_from: conversation.deleted_from }, { where: { id } })
 
     return res.send({ message: 'ok' })
+}
+
+exports.block = async (req, res) => {
+    const { id } = req.params;
+    const user = req.decoded;
+
+    const conversation = await Conversations.findByPk(id);
+
+    if (!conversation) {
+        return res.status(404).json({
+            error: 'Conversation not found',
+        });
+    }
+
+    if (conversation.creator_id !== user.id && conversation.target_id !== user.id) {
+        return res.status(403).json({
+            error: 'Forbidden operation'
+        });
+    }
+
+    await Conversations.update({
+        blocked_from: user.id,
+        is_blocked: true,
+    }, {
+        where: {
+            id: conversation.id,
+        }
+    });
+
+    return res.json({ message: 'ok' });
+}
+
+exports.unblock = async (req, res) => {
+    const { id } = req.params;
+    const user = req.decoded;
+
+    const conversation = await Conversations.findByPk(id);
+
+    if (!conversation) {
+        return res.status(404).json({
+            error: 'Conversation not found',
+        });
+    }
+
+    if (conversation.blocked_from !== user.id) {
+        return res.status(403).json({
+            error: 'Forbidden operation'
+        });
+    }
+
+    await Conversations.update({
+        blocked_from: null,
+        is_blocked: false,
+    }, {
+        where: {
+            id: conversation.id,
+        }
+    });
+
+    return res.json({ message: 'ok' });
 }

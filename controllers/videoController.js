@@ -207,7 +207,9 @@ exports.getVideoFiltersQuery = (filters, categoryCol = '`category.name`') => {
 };
 
 exports.saveVideoToken = async (req, res) => {
+    console.log('------------ video token ---------- ');
     const data = req.body;
+    console.log(data);
     const { token, name } = data;
 
     let v = await Videos.findOne({ where: { token: token } });
@@ -237,9 +239,12 @@ exports.updateParticipantsCount = async (req, res) => {
 }
 
 exports.saveVideoData = async (req, res) => {
+    console.log('------------ video data ---------- ');
     let data = req.body;
+    console.log(data);
     let videoSettings = JSON.parse(data.video_settings);
     // let videoSettings = data.video_settings;
+    console.log('------------ video settings ---------- ');
     console.log(videoSettings)
 
 

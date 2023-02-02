@@ -49,6 +49,7 @@ module.exports = (sequelize, DataTypes) => {
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
         session_name: DataTypes.STRING,
+        session_id: DataTypes.STRING,
         token: DataTypes.STRING,
         filename: DataTypes.STRING,
         thumbnail: DataTypes.STRING,
