@@ -40,11 +40,15 @@ const UsersCards = db.users_cards;
 const Videos = db.videos;
 const Tags = db.tags;
 const Channels = db.channels;
+const ChannelSubscribers = db.channel_subscribers;
 const PrivacyTypes = db.privacy_types;
 const StocksOrderType = db.stocks_ordering_types;
 const UsersConnection = db.users_connection;
 const UsersConnectionMembers = db.users_connection_members;
 const UserConnectionNots = db.users_connection_notifications;
+const notifications = db.notifications;
+
+const SocketHandlerService = require('../services/socketHandlerService');
 
 const url = require('url');
 
@@ -63,6 +67,12 @@ const to = require('../helpers/getPromiseResult');
 const getFullName = require('../helpers/getFullNameCol');
 
 const usersConnectionNotifsController = require('./notifications/directChatNotificationsController');
+
+const path = require('path');
+const fsPromises = require('fs/promises');
+const { NOTIFICATION_TYPES } = require('../constants');
+const { getSubscribers } = require('./channelsController');
+const { Sequelize } = require('../models');
 
 exports.getSession = async (req, res) => {
     const {email, sessionName, role} = req.query;
@@ -194,6 +204,10 @@ exports.createSession = async (req, res) => {
             where: {
                 user_id: user.id,
             },
+            include: {
+                model: Users,
+                as: 'subscribers',
+            },
         });
     
         const videoData = {
@@ -209,13 +223,11 @@ exports.createSession = async (req, res) => {
         }
     
         const video = await Videos.create(videoData);
-    
-        console.log(1);
 
         const token = await session.generateToken({
             role: 'PUBLISHER',
         })
-    
+
         res.json({
             message: 'Session created',
             data: {
@@ -223,6 +235,41 @@ exports.createSession = async (req, res) => {
                 token,
             }
         })
+
+        try {
+            const notificationBodies = {};
+            
+            const subscriberIds = channel.subscribers.map(subscriber => {
+                const notificationDescription = {
+                    user: subscriber,
+                    value: `${user.username} is now on live`,
+                }
+                const notificationBody = {
+                    user_id: subscriber.id,
+                    type: NOTIFICATION_TYPES.liveStreamStarted,
+                    seen: false,
+                    description: JSON.stringify(notificationDescription),
+                }
+                notificationBodies[subscriber.id] = notificationBody;
+                return subscriber.id;
+            });
+            
+            const subscriberSocketDocs = await SocketHandlerService.getByUsers(subscriberIds);
+           
+            subscriberSocketDocs.forEach((socketDoc) => {
+                const socket = io.sockets.sockets.get(socketDoc.socket);
+                if (socket) {
+                    socket.emit('pushNotification', JSON.stringify(notificationBodies[socketDoc.user_id]));
+                }
+            });
+
+            // await notifications.bulkCreate(Object.values(notificationBodies));
+        } catch(err) {
+            console.error('An error occured with live stream notifications')
+            console.error(err);
+        }
+
+        
     } catch (err) {
         console.error(err);
         res.status(500).json({
@@ -442,6 +489,12 @@ exports.getUserInfo = async (req, res) => {
 exports.saveProfileChanges = async (req, res) => {
     const {id, ...data} = req.body;
 
+    if (id !== req.decoded.id) {
+        return res.status(403).json({
+            error: 'Forbidden operation'
+        })
+    }
+
     uploadUserAvatar(req, res, async (err) => {
 
         let newPassword = data.password;
@@ -651,6 +704,25 @@ exports.createUsersConnection = async (data) => {
         connection_id: connection.id
     });
 
+    const notificationDescription = {
+        user: from_user,
+        value: `${from_user.username} wants to connect`,
+    }
+    const notificationBody = {
+        user_id: to_user.id,
+        type: NOTIFICATION_TYPES.usersConnectionRequest,
+        seen: false,
+        description: JSON.stringify(notificationDescription),
+    }
+
+    await notifications.create(notificationBody)
+    const existsClient = await SocketHandlerService.getByUser(to_user.id);
+    if (existsClient) {
+        const client = io.sockets.sockets.get(existsClient.socket)
+        if (client) {
+            client.emit('pushNotification', JSON.stringify(notificationBody))
+        }
+    }
 
     let checkAgain = await this.checkIfUsersConnected(params)
     let returnData = {
@@ -704,18 +776,43 @@ exports.confirmConnection = async (data) => {
         }
     });
 
-    // await UserConnectionNots.destroy({
-    //     where: {
-    //         id: data.notification_id
-    //     }
-    // });
-
     let confirmedConnection = await UsersConnection.findOne({
         where: {
             id: data.connection_id
         }
     });
 
+    const fromUser = await Users.findOne({
+        where: {
+            id: confirmedConnection.from_id,
+        }
+    });
+
+    const toUser = await Users.findOne({
+        where: {
+            id: confirmedConnection.to_id,
+        }
+    });
+
+    const notificationDescription = {
+        user: toUser,
+        value: `${toUser.username} accepted your request`,
+    }
+    const notificationBody = {
+        user_id: fromUser.id,
+        type: NOTIFICATION_TYPES.acceptConnectionRequest,
+        seen: false,
+        description: JSON.stringify(notificationDescription),
+    }
+
+    await notifications.create(notificationBody)
+    const existsClient = await SocketHandlerService.getByUser(fromUser.id);
+    if (existsClient) {
+        const client = io.sockets.sockets.get(existsClient.socket)
+        if (client) {
+            client.emit('pushNotification', JSON.stringify(notificationBody))
+        }
+    }
 
     // return JSON.parse(JSON.stringify(t[0]));
     return confirmedConnection;
@@ -805,3 +902,61 @@ exports.getUserConnections = async (req, res) => {
 
     res.json(connections)
 };
+
+exports.changeChannelCover = async (req, res) => {
+    const channel = await Channels.findOne({
+        where: {
+            user_id: req.decoded.id,
+        }
+    })
+
+    if (!channel) {
+        return res.status(404).json({
+            error: 'Channel not found',
+        })
+    }
+
+    if (channel.cover) {
+        const filePath = path.join(__dirname, '../public/uploads/images/', channel.cover);
+        await fsPromises.unlink(filePath);
+    }
+
+    await Channels.update({
+        cover: req.file.filename,
+    }, {
+        where: {
+            user_id: req.decoded.id,
+        }
+    })
+
+    res.json({ success: true });
+}
+
+exports.changeChannelImage = async (req, res) => {
+    const channel = await Channels.findOne({
+        where: {
+            user_id: req.decoded.id,
+        }
+    })
+
+    if (!channel) {
+        return res.status(404).json({
+            error: 'Channel not found',
+        })
+    }
+
+    if (channel.avatar) {
+        const filePath = path.join(__dirname, '../public/uploads/images/', channel.avatar);
+        await fsPromises.unlink(filePath);
+    }
+
+    await Channels.update({
+        avatar: req.file.filename,
+    }, {
+        where: {
+            user_id: req.decoded.id,
+        }
+    })
+    
+    res.json({ success: true });
+}

@@ -215,7 +215,7 @@ exports.getUserStocks = async (req, res) => {
         });
 
         stocks = stocks.slice(0, -1);
-
+        console.log({ stocks });
         let graphDataUrl = `${config.FMP_API_V3_URL}private/historical-chart/1min/${stocks}?apikey=${process.env.FMP_CLOUD_API_KEY}`;
 
         try {

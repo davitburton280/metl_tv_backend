@@ -242,15 +242,18 @@ exports.saveVideoData = async (req, res) => {
     console.log('------------ video data ---------- ');
     let data = req.body;
     console.log(data);
-    let videoSettings = JSON.parse(data.video_settings);
+    // let videoSettings = JSON.parse(data.video_settings);
     // let videoSettings = data.video_settings;
-    console.log('------------ video settings ---------- ');
-    console.log(videoSettings)
+    // console.log('------------ video settings ---------- ');
+    // console.log(videoSettings)
 
 
     uploadVideoStreamFile(req, res, async (err) => {
 
-
+        console.log('callback')
+        if (err) {
+            console.error(err);
+        }
         let privacy_id = await PrivacyTypes.findOne({ where: { name: videoSettings.privacy }, attributes: ['id'] });
 
         console.log(privacy_id.dataValues)

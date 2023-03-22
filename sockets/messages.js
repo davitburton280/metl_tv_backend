@@ -34,7 +34,7 @@ exports.createMessage = async (data, socket) => {
     data.files = filenames;
   }
   const result = await messages_controller.createForSocket(data, user)
-  
+
   if (!result.success) {
     return socket.emit(failureEvent, result.message);
   }
@@ -44,7 +44,7 @@ exports.createMessage = async (data, socket) => {
   const room = `conversation_room_${result.data.conversation}`;
   console.log(room);
 
-  socket.to(room).emit(successEvent, result.data);
+  io.in(room).emit(successEvent, result.data);
 }
 
 exports.deleteMessage = async (data, socket, io) => {
@@ -64,7 +64,7 @@ exports.deleteMessage = async (data, socket, io) => {
   const room = `conversation_room_${data.conversationId}`;
 
   console.log('deleteMessage success -----');
-  io.to(room).emit(successEvent, data.messageId);
+  io.in(room).emit(successEvent, data.messageId);
 }
 
 exports.updateMessage = async (data, socket, io) => {
@@ -81,5 +81,5 @@ exports.updateMessage = async (data, socket, io) => {
     return socket.emit(failureEvent, result.message);
   }
 
-  io.to(`conversation_room_${result.data.conversation}`).emit(successEvent, result.data);
+  io.in(`conversation_room_${result.data.conversation}`).emit(successEvent, result.data);
 }

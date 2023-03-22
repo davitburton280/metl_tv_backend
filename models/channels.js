@@ -22,7 +22,11 @@ module.exports = (sequelize, DataTypes) => {
 
     };
     channels.init({
-        user_id: DataTypes.INTEGER,
+        user_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            unique: true,
+        },
         name: DataTypes.STRING,
         description: DataTypes.TEXT,
         avatar: DataTypes.STRING,

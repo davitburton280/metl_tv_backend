@@ -24,6 +24,12 @@ class SocketHandlerService {
         return await SocketHandlers.findOne({ user_id })
     }
 
+    getByUsers = async (userIds) => {
+        return await SocketHandlers.distinct('socket', {
+            user_id: { $in: userIds }
+        });
+    }
+
     delete = async (user_id) => {
         await SocketHandlers.deleteOne({ user_id })
     }

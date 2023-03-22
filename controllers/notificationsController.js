@@ -57,15 +57,19 @@ exports.read = async (req, res) => {
     let userNotificationsResult;
 
     if (c.USER_CONNECTION_NOTIFICATION_TYPES.includes(type)) {
+        console.log(1);
         userNotificationsResult = await directChatNotificationsController.read(req, res);
         req.query.user_id = userNotificationsResult;
     } else if (c.GROUP_CHAT_NOTIFICATION_TYPES.includes(type)) {
+        console.log(2);
         userNotificationsResult = await groupChatNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     } else if (c.GROUP_NOTIFICATION_TYPES.includes(type)) {
+        console.log(3);
         userNotificationsResult = await groupNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     } else if (c.POST_NOTIFICATION_TYPES.includes(type)) {
+        console.log(4);
         userNotificationsResult = await postsNotificationsController.read(req, res);
         req.query.user_id = read_by.id;
     }

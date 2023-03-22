@@ -29,6 +29,7 @@ const io = require('socket.io')(server, {
 // const {socket} = require('./helpers/socket');
 const {socket} = require('./sockets');
 socket(io);
+global.io = io;
 
 // const redis = require('redis');
 // global.redisClient = redis.createClient({

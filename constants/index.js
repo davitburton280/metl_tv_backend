@@ -35,7 +35,10 @@ const SORTING_KEYS = {
 }
 
 const NOTIFICATION_TYPES = {
-    commentReaction: 'comment_reaction'
+    commentReaction: 'comment_reaction',
+    usersConnectionRequest: 'users_connection_request',
+    acceptConnectionRequest: 'accept_connection_request',
+    liveStreamStarted: 'live_stream_started',
 }
 
 module.exports = {
