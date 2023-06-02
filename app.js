@@ -143,6 +143,7 @@ app.use('/comments', require('./routes/comments'))
 app.use('/notification', require('./routes/notification'))
 app.use('/conversations', require('./routes/conversations'))
 app.use('/messages', require('./routes/messages'))
+app.use('/blogs', require('./routes/blogs'))
 
 let dist = path.join(__dirname, 'dist/');
 console.log(dist);

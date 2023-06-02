@@ -13,7 +13,8 @@ const OpenViduRole = require('openvidu-node-client').OpenViduRole;
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 // Environment variable: URL where our OpenVidu server is listening
-let OPENVIDU_URL = 'https://localhost:4443';
+let OPENVIDU_URL = 'https://metl.tv/'
+console.log(process.env.NODE_ENV)
 if (process.env.NODE_ENV === 'staging') {
     OPENVIDU_URL = 'https://staging.metl.tv/';
 } else if (process.env.NODE_ENV === 'production') {
@@ -47,6 +48,7 @@ const UsersConnection = db.users_connection;
 const UsersConnectionMembers = db.users_connection_members;
 const UserConnectionNots = db.users_connection_notifications;
 const notifications = db.notifications;
+
 
 const SocketHandlerService = require('../services/socketHandlerService');
 
@@ -109,6 +111,9 @@ exports.getSession = async (req, res) => {
                 mapSessionNamesTokens[sessionName].push(token);
 
                 const urlParts = url.parse(token, true);
+                
+                console.log(token, 'token')
+
                 res.status(200).json(token);
                 // res.status(200).send({...urlParts.query, ...{href: urlParts.href}});
             })
@@ -253,7 +258,6 @@ exports.createSession = async (req, res) => {
                 notificationBodies[subscriber.id] = notificationBody;
                 return subscriber.id;
             });
-            
             const subscriberSocketDocs = await SocketHandlerService.getByUsers(subscriberIds);
            
             subscriberSocketDocs.forEach((socketDoc) => {
