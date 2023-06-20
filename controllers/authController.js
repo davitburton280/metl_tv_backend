@@ -39,6 +39,7 @@ exports.login = async (req, res) => {
             // order: [[{model: UsersCards}, sequelize.col('is_primary'), 'DESC']]
         }, res);
 
+        const channel = await Channels.findOne({ where: { user_id: user.id } });
 
         if (!res.headersSent) {
 
@@ -50,6 +51,7 @@ exports.login = async (req, res) => {
                 // Cloning users object without password and saving user full name
                 let {password, ...details} = user.toJSON();
                 console.log("!!!!!!", details.page_group_roles, "!!!!");
+                details.channel = channel;
                 // req.session.full_name = user.full_name;
                 // console.log(details)
                 res.status(200).json({
